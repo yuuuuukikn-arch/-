@@ -25,11 +25,12 @@ function buildProducts(cat) {
   const map = new Map();
   for (const snap of ALL.filter((s) => s.cat === cat)) {
     for (const [name, it] of Object.entries(snap.items)) {
-      if (it.opened == null) continue;
+      if (it.sealed == null) continue;
+      if (SHOW_ONLY[cat] && !SHOW_ONLY[cat].test(name)) continue;
       if (!map.has(name)) map.set(name, new Map());
       const byDate = map.get(name);
       const cur = byDate.get(snap.date);
-      if (!cur || it.opened > cur.price) byDate.set(snap.date, { price: it.opened, note: it.note, boost: it.boost, date: snap.date, shop: snap.shop, sample: snap.sample });
+      if (!cur || it.sealed > cur.price) byDate.set(snap.date, { price: it.sealed, note: it.note, boost: it.boost, date: snap.date, shop: snap.shop, sample: snap.sample });
     }
   }
   return [...map].map(([name, byDate]) => {
@@ -71,7 +72,7 @@ function render() {
       <td class="star-cell"><button class="star ${stars.has(p.name) ? "on" : ""}" data-star="${esc(p.name)}" aria-label="ウォッチ">${stars.has(p.name) ? "★" : "☆"}</button></td>
       <td class="name"><b>${esc(p.name)}${p.latest.boost ? ' <span class="boost">強化</span>' : ""}</b>${p.latest.note ? `<small>色・状態の減額：${esc(p.latest.note)}</small>` : ""}</td>
       <td class="num" data-label="定価">${p.retail != null ? yen(p.retail) + (p.estimated ? '<sup class="est" title="推定の定価">推定</sup>' : "") : '<span class="na">未登録</span>'}</td>
-      <td class="num sealed" data-label="買取価格">${yen(p.price)}</td>
+      <td class="num sealed" data-label="買取価格（未開封）">${yen(p.price)}</td>
       <td class="num" data-label="前回比">${p.hasPrev ? `<span class="chg ${sign(p.change)}">${p.change > 0 ? "▲" : p.change < 0 ? "▼" : "±"}${yen(Math.abs(p.change))}</span>` : '<span class="na">—</span>'}</td>
       <td class="spark-cell" data-label="推移">${Chart.sparkline(p.history.map((h) => h.price))}</td>
       <td class="num profit ${p.profit != null ? sign(p.profit) : ""}" data-label="利益">${p.profit != null ? signed(p.profit) : "—"}</td>
@@ -123,7 +124,7 @@ function detail(p) {
       <div>
         <h3>${esc(p.name)} の買取価格推移</h3>
         <div class="legend">
-          <span><i class="key s1"></i>買取価格（開封済未使用）</span>
+          <span><i class="key s1"></i>買取価格（未開封）</span>
           ${p.retail != null ? `<span><i class="key ref-key"></i>定価${p.estimated ? "（推定）" : ""}</span>` : ""}
         </div>
       </div>

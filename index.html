@@ -24,7 +24,7 @@
     <section class="container summary">
       <div>
         <h1>仕入れ前に、利益をチェック。</h1>
-        <p class="lead"><strong>iPhone</strong>と<strong>ポケカBOX</strong>の買取価格から、<strong>定価で買って買取店に売ったときの利益</strong>をランキング表示します。</p>
+        <p class="lead"><strong>iPhone 18シリーズ</strong>と<strong>ポケカBOX</strong>の買取価格から、<strong>定価で買って買取店に売ったときの利益</strong>をランキング表示します。</p>
         <p class="updated" id="updated"></p>
       </div>
       <div class="stats" id="stats"></div>
@@ -59,7 +59,7 @@
               <th></th>
               <th>商品</th>
               <th class="num">定価</th>
-              <th class="num">買取価格</th>
+              <th class="num">買取（未開封）</th>
               <th class="num">前回比</th>
               <th>推移</th>
               <th class="num">利益</th>
@@ -69,7 +69,7 @@
           <tbody id="rows"></tbody>
         </table>
       </div>
-      <p class="note">行をクリックすると価格推移のグラフが開きます。利益は「買取価格（開封済未使用・減額なしの色）− 定価」です。色によっては減額があります。</p>
+      <p class="note">行をクリックすると価格推移のグラフが開きます。利益は「買取価格（未開封・減額なしの色）− 定価」です。色によっては減額があります。</p>
     </section>
 
     <section id="calc" class="container panel">
@@ -77,7 +77,7 @@
       <div class="calc">
         <div class="calc-inputs">
           <label>仕入れ値（円）<input type="number" id="cBuy" value="239800" min="0"></label>
-          <label>買取価格（円）<input type="number" id="cSell" value="221000" min="0"></label>
+          <label>買取価格（円）<input type="number" id="cSell" value="245000" min="0"></label>
           <label>ポイント還元（%）<input type="number" id="cPoint" value="1" min="0" step="0.1"></label>
           <label>交通費・送料など（円）<input type="number" id="cCost" value="0" min="0"></label>
         </div>

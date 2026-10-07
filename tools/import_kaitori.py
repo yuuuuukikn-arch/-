@@ -91,7 +91,7 @@ def main():
 
     print(f"{args.date} {args.shop}（{args.cat}）: {len(items)}件を取り込みました")
     for name, it in items.items():
-        print(f"  {name}: 開封済未使用 {it.get('opened', '-')}  {it['note']}")
+        print(f"  {name}: 未開封 {it.get('sealed', '-')}  {it['note']}")
 
 
 if __name__ == "__main__":
