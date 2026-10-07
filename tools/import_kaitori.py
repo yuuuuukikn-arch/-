@@ -169,30 +169,42 @@ MD_LINK_RE = re.compile(r"\[([^\]]*)\]\([^)]*\)")
 
 
 def parse_shouten(text):
-    """買取商店形式（色ごとに「機種 容量 色 型番 SIMフリー → JAN → 新品¥000,000 → 中古¥…」）。
-    ページをコピーすると商品名が [名前](URL) になるので、リンクの書式は外して読む。"""
+    """買取商店形式（「[商品名](URL) → JAN → ※条件 → 新品¥000,000 → 中古¥…」）。
+    iPhone は「機種 容量 色 型番 SIMフリー」を機種ごとにまとめて色別価格に、
+    それ以外（トレカなど）は商品名ごとに JAN と条件（※…）も保存する。"""
     lines = [norm(MD_LINK_RE.sub(r"\1", l)) for l in text.splitlines()]
     items = {}
     for i, line in enumerate(lines):
-        m = MODEL_RE.match(line)
-        if not m:
+        nxt = next((l for l in lines[i + 1 : i + 3] if l), "")
+        if not line or not nxt.startswith("JAN"):
             continue
-        price = None
-        for l in lines[i + 1 : i + 6]:
+        jan = re.sub(r"\D", "", nxt) or None
+        price, notes = None, []
+        for l in lines[i + 2 : i + 8]:
             pm = NEW_PRICE_RE.match(l)
             if pm:
                 price = int(pm.group(1).replace(",", ""))
                 break
-            if MODEL_RE.match(l):
+            if l.startswith("※"):
+                notes.append(l)
+            if l.startswith("JAN"):
                 break
         if price is None:
             continue
         prev = next((l for l in reversed(lines[max(0, i - 3) : i]) if l), "")
-        name, color = m.group(1), COLORS.get(m.group(2), m.group(2))
-        item = items.setdefault(name, {"note": "", "boost": False})
-        item["boost"] = item["boost"] or prev.startswith("強化")
-        item.setdefault("colors", {})[color] = price
-        item["sealed"] = max(item.get("sealed", 0), price)
+        boost = prev.startswith("強化")
+        m = MODEL_RE.match(line)
+        if m:
+            name, color = m.group(1), COLORS.get(m.group(2), m.group(2))
+            item = items.setdefault(name, {"note": "", "boost": False})
+            item["boost"] = item["boost"] or boost
+            item.setdefault("colors", {})[color] = price
+            item["sealed"] = max(item.get("sealed", 0), price)
+        else:
+            item = {"note": " / ".join(notes), "boost": boost, "sealed": price}
+            if jan:
+                item["jan"] = jan
+            items[line] = item
     return items
 
 
@@ -208,7 +220,8 @@ def parse_morimori(text):
         name_line = re.sub(r"^Apple\s+", "", line)
         name_line = re.sub(r"^iPhone\s*(\d)", r"iPhone \1", name_line)
         m = re.match(r"^(iPhone .+? \d+(?:GB|TB)) (\S+) SIMフリー", name_line)
-        if not m:
+        nxt = next((l for l in lines[i + 1 : i + 3] if l), "")
+        if not m and not nxt.startswith("JAN"):
             continue
         price = None
         for l in lines[i + 1 : i + 4]:
@@ -217,6 +230,14 @@ def parse_morimori(text):
                 price = int(pm.group(1).replace(",", ""))
                 break
         if price is None:
+            continue
+        if not m:
+            # トレカなど：商品名ごと（JAN で登録済み商品にそろえる）
+            item = {"note": "", "boost": False, "sealed": price}
+            jan = re.sub(r"\D", "", nxt)
+            if jan:
+                item["jan"] = jan
+            items[line] = item
             continue
         name, color = m.group(1), COLORS.get(m.group(2), m.group(2))
         item = items.setdefault(name, {"note": "", "boost": False})
@@ -265,6 +286,28 @@ def main():
     items = detect_and_parse(text)
     if not items:
         sys.exit("商品が1件も読み取れませんでした。テキストの形式を確認してください。")
+
+    # トレカなど店ごとに商品名の書き方が違うものは、JAN が同じ登録済み商品の名前にそろえる。
+    # 登録済みの商品と JAN が合わないものは取り込まない（ほかのジャンルの商品が混ざるため）。
+    if args.cat != "iPhone" and any("jan" in it for it in items.values()):
+        known = {it["jan"]: name for s in load() if s["cat"] == args.cat
+                 for name, it in s["items"].items() if it.get("jan")}
+        if known:
+            renamed, skipped = {}, []
+            for name, it in items.items():
+                if it.get("jan") in known:
+                    renamed[known[it["jan"]]] = it
+                elif name in known.values():
+                    renamed[name] = it
+                else:
+                    skipped.append(name)
+            items = renamed
+            if skipped:
+                print(f"登録済みの商品と JAN が合わないため取り込まなかったもの: {len(skipped)}件")
+                for n in skipped:
+                    print(f"  - {n}")
+            if not items:
+                sys.exit("取り込める商品がありませんでした。")
 
     same = lambda s: s["date"] == args.date and s["shop"] == args.shop and s["cat"] == args.cat
     if args.append:
