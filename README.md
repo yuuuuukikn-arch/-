@@ -1,4 +1,4 @@
-# My Site
+# マイサイト
 
 HTML / CSS / JavaScript だけで作ったシンプルなウェブサイトです（ビルド不要）。
 
