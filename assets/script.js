@@ -30,7 +30,7 @@ function buildProducts(cat) {
       if (!map.has(name)) map.set(name, new Map());
       const byDate = map.get(name);
       const cur = byDate.get(snap.date);
-      if (!cur || it.sealed > cur.price) byDate.set(snap.date, { price: it.sealed, note: it.note, boost: it.boost, date: snap.date, shop: snap.shop, sample: snap.sample });
+      if (!cur || it.sealed > cur.price) byDate.set(snap.date, { price: it.sealed, noShrink: it.noShrink, note: it.note, boost: it.boost, date: snap.date, shop: snap.shop, sample: snap.sample });
     }
   }
   return [...map].map(([name, byDate]) => {
@@ -70,9 +70,9 @@ function render() {
     const row = `<tr class="row ${openName === p.name ? "open" : ""}" data-name="${esc(p.name)}">
       <td class="num rank-cell"><span class="rank r${i + 1}">${i + 1}</span></td>
       <td class="star-cell"><button class="star ${stars.has(p.name) ? "on" : ""}" data-star="${esc(p.name)}" aria-label="ウォッチ">${stars.has(p.name) ? "★" : "☆"}</button></td>
-      <td class="name"><b>${esc(p.name)}${p.latest.boost ? ' <span class="boost">強化</span>' : ""}</b>${p.latest.note ? `<small>色・状態の減額：${esc(p.latest.note)}</small>` : ""}</td>
+      <td class="name"><b>${esc(p.name)}${p.latest.boost ? ' <span class="boost">強化</span>' : ""}</b>${p.latest.noShrink != null ? `<small>シュリンクなし ${yen(p.latest.noShrink)}</small>` : ""}${p.latest.note ? `<small>${currentCat === "iPhone" ? "色の減額" : "備考"}：${esc(p.latest.note)}</small>` : ""}</td>
       <td class="num" data-label="定価">${p.retail != null ? yen(p.retail) + (p.estimated ? '<sup class="est" title="推定の定価">推定</sup>' : "") : '<span class="na">未登録</span>'}</td>
-      <td class="num sealed" data-label="買取価格（未開封）">${yen(p.price)}</td>
+      <td class="num sealed" data-label="買取価格">${yen(p.price)}</td>
       <td class="num" data-label="前回比">${p.hasPrev ? `<span class="chg ${sign(p.change)}">${p.change > 0 ? "▲" : p.change < 0 ? "▼" : "±"}${yen(Math.abs(p.change))}</span>` : '<span class="na">—</span>'}</td>
       <td class="spark-cell" data-label="推移">${Chart.sparkline(p.history.map((h) => h.price))}</td>
       <td class="num profit ${p.profit != null ? sign(p.profit) : ""}" data-label="利益">${p.profit != null ? signed(p.profit) : "—"}</td>
@@ -140,7 +140,7 @@ function detail(p) {
       <div><span>記録開始からの変化</span><b class="${sign(last.price - first.price)}">${signed(last.price - first.price)}</b><small>${first.date.replaceAll("-", "/")} から</small></div>
       <div><span>定価との差</span><b class="${p.profit != null ? sign(p.profit) : ""}">${p.profit != null ? signed(p.profit) : "—"}</b><small>${p.retail != null ? "定価 " + yen(p.retail) : "定価未登録"}</small></div>
     </div>
-    ${p.latest.note ? `<p class="note">色・状態による減額（${esc(p.latest.shop)}の表記そのまま）：<b>${esc(p.latest.note)}</b></p>` : ""}
+    ${p.latest.note ? `<p class="note">${currentCat === "iPhone" ? "色による減額" : "備考"}（${esc(p.latest.shop)}の表記そのまま）：<b>${esc(p.latest.note)}</b></p>` : ""}
   </div>`;
 }
 

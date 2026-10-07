@@ -21,7 +21,26 @@ PRICE_RE = re.compile(r"^[¥￥]\s*([\d,]+)")
 
 
 def norm(s):
-    return re.sub(r"\s+", " ", s.replace("　", " ")).strip()
+    s = re.sub("[‎‏﻿]", "", s.replace("　", " "))
+    s = re.sub(r"】\s*", "】 ", s)  # 「【MEGA】メガ…」と「【MEGA】 メガ…」をそろえる
+    return re.sub(r"\s+", " ", s).strip()
+
+
+# 価格の見出し → 保存するキー（備考の「未開封のみ」などと区別するため完全一致で判定）
+PRICE_KEYS = {
+    "未開封": "sealed",
+    "新品未開封": "sealed",
+    "シュリンク有": "sealed",
+    "シュリンク有り": "sealed",
+    "シュリンクなし未開封": "noShrink",
+    "シュリンクなし": "noShrink",
+    "開封済未使用": "opened",
+    "開封済未使用品": "opened",
+}
+
+
+def price_key(line):
+    return PRICE_KEYS.get(line)
 
 
 def parse(text):
@@ -38,28 +57,29 @@ def parse(text):
             j -= 1
         name = lines[j] if j >= 0 else None
         boost = any(lines[k] == "強化" for k in range(max(0, j - 3), j))
-        # 「新品」から「未開封」までが色による減額のメモ
-        notes, i = [], i + 1
-        while i < len(lines) and lines[i] != "未開封":
-            if lines[i]:
+        # 「新品」から最初の価格見出しまでが備考（色による減額・JANなど）
+        notes, jan, i = [], None, i + 1
+        while i < len(lines) and lines[i] != "新品" and not price_key(lines[i]):
+            if lines[i].startswith("JAN"):
+                jan = re.sub(r"\D", "", lines[i]) or None
+            elif lines[i]:
                 notes.append(lines[i])
             i += 1
         item = {"note": " / ".join(notes), "boost": boost}
-        # 未開封・開封済未使用の価格
+        if jan:
+            item["jan"] = jan
+        # 価格（未開封・シュリンク有・シュリンクなし未開封・開封済未使用）
         key = None
         while i < len(lines) and lines[i] != "新品":
             line = lines[i]
-            if line == "未開封":
-                key = "sealed"
-            elif line.startswith("開封済"):
-                key = "opened"
-            else:
-                m = PRICE_RE.match(line)
-                if m and key:
-                    item[key] = int(m.group(1).replace(",", ""))
-                    key = None
+            m = PRICE_RE.match(line)
+            if m and key:
+                item.setdefault(key, int(m.group(1).replace(",", "")))
+                key = None
+            elif price_key(line):
+                key = price_key(line)
             i += 1
-        if name and ("opened" in item or "sealed" in item):
+        if name and "sealed" in item:
             items[name] = item
     return items
 
@@ -91,7 +111,8 @@ def main():
 
     print(f"{args.date} {args.shop}（{args.cat}）: {len(items)}件を取り込みました")
     for name, it in items.items():
-        print(f"  {name}: 未開封 {it.get('sealed', '-')}  {it['note']}")
+        extra = f" / シュリンクなし {it['noShrink']:,}" if "noShrink" in it else ""
+        print(f"  {name}: 未開封 {it['sealed']:,}{extra}  {it['note']}")
 
 
 if __name__ == "__main__":
