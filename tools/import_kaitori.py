@@ -14,6 +14,7 @@
   - 森森買取形式: [Apple iPhone18 Pro 256GB 色 SIMフリー](URL) → JAN → 通常/預かり/即フリの3価格（通常を使う）
 
 同じ日付・同じ店のデータがあれば上書きする（1日に何度送っても最新の1件になる）。
+2ページ目以降は --append をつけると、前のページに追加される。
 """
 import argparse
 import json
@@ -226,7 +227,8 @@ def parse_morimori(text):
 
 def detect_and_parse(text):
     # 「通常買取価格・預かり買取価格・即フリ買取価格」の見出しがあれば森森買取形式
-    if "即フリ買取価格" in text or "預かり買取価格" in text:
+    # （見出しを含めずにコピーした場合も「Apple iPhone18 …」の商品名で見分ける）
+    if "即フリ買取価格" in text or "預かり買取価格" in text or re.search(r"^\s*\[?Apple\s+iPhone\s*\d", text, re.M):
         return parse_morimori(text)
     # 「新品¥000,000」の行がある書き方なら買取商店形式
     if re.search(r"^\s*新品\s*[¥￥]\s*[\d,]+", text, re.M):
@@ -255,6 +257,8 @@ def main():
     ap.add_argument("--date", required=True, help="価格の日付 YYYY-MM-DD")
     ap.add_argument("--shop", required=True, help="買取店の名前")
     ap.add_argument("--cat", default="iPhone", help="カテゴリ（iPhone / ポケカBOX）")
+    ap.add_argument("--append", action="store_true",
+                    help="同じ日付・同じ店のデータに追加する（2ページ目以降を取り込むとき）")
     args = ap.parse_args()
 
     text = sys.stdin.read() if args.file == "-" else Path(args.file).read_text(encoding="utf-8")
@@ -262,7 +266,21 @@ def main():
     if not items:
         sys.exit("商品が1件も読み取れませんでした。テキストの形式を確認してください。")
 
-    snaps = [s for s in load() if not (s["date"] == args.date and s["shop"] == args.shop and s["cat"] == args.cat)]
+    same = lambda s: s["date"] == args.date and s["shop"] == args.shop and s["cat"] == args.cat
+    if args.append:
+        # 前に取り込んだページの商品と合わせる（色別価格はまとめ、最高値を取り直す）
+        old = next((s["items"] for s in load() if same(s)), {})
+        for name, it in items.items():
+            if name in old:
+                merged = {**old[name], **it}
+                if "colors" in old[name] or "colors" in it:
+                    merged["colors"] = {**old[name].get("colors", {}), **it.get("colors", {})}
+                    merged["sealed"] = max(merged["colors"].values())
+                old[name] = merged
+            else:
+                old[name] = it
+        items = old
+    snaps = [s for s in load() if not same(s)]
     snaps.append({"date": args.date, "shop": args.shop, "cat": args.cat, "items": items})
     snaps.sort(key=lambda s: (s["date"], s["cat"], s["shop"]))
     HISTORY.write_text(HEADER + json.dumps(snaps, ensure_ascii=False, indent=1) + ";\n", encoding="utf-8")
