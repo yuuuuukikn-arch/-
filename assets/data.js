@@ -6,15 +6,15 @@ const SHOW_ONLY = {
 // 定価（仕入れ値）の一覧。利益 = 買取価格（未開封） − 定価 で計算します。
 // estimated: true は推定の定価です。正しい金額がわかったら書き換えて false にしてください。
 const CATALOG = {
-  // iPhone 18 Pro / Pro Max（2026年9月発売）
+  // iPhone 18 Pro / Pro Max（Apple Store SIMフリー税込定価・2026年10月確認）
   "iPhone 18 Pro 256GB":     { cat: "iPhone", retail: 219800 },
-  "iPhone 18 Pro 512GB":     { cat: "iPhone", retail: 254800, estimated: true },
-  "iPhone 18 Pro 1TB":       { cat: "iPhone", retail: 289800, estimated: true },
-  "iPhone 18 Pro 2TB":       { cat: "iPhone", retail: 359800, estimated: true },
+  "iPhone 18 Pro 512GB":     { cat: "iPhone", retail: 254800 },
+  "iPhone 18 Pro 1TB":       { cat: "iPhone", retail: 324800 },
+  "iPhone 18 Pro 2TB":       { cat: "iPhone", retail: 429800 },
   "iPhone 18 Pro Max 256GB": { cat: "iPhone", retail: 239800 },
-  "iPhone 18 Pro Max 512GB": { cat: "iPhone", retail: 274800, estimated: true },
-  "iPhone 18 Pro Max 1TB":   { cat: "iPhone", retail: 309800, estimated: true },
-  "iPhone 18 Pro Max 2TB":   { cat: "iPhone", retail: 379800, estimated: true },
+  "iPhone 18 Pro Max 512GB": { cat: "iPhone", retail: 274800 },
+  "iPhone 18 Pro Max 1TB":   { cat: "iPhone", retail: 344800 },
+  "iPhone 18 Pro Max 2TB":   { cat: "iPhone", retail: 449800 },
 
   // ポケカBOX（定価）
   "インフェルノX":         { cat: "ポケカBOX", retail: 6000 },
