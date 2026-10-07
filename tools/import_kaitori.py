@@ -59,7 +59,7 @@ def parse(text):
                     item[key] = int(m.group(1).replace(",", ""))
                     key = None
             i += 1
-        if name and "sealed" in item:
+        if name and ("opened" in item or "sealed" in item):
             items[name] = item
     return items
 
@@ -91,7 +91,7 @@ def main():
 
     print(f"{args.date} {args.shop}（{args.cat}）: {len(items)}件を取り込みました")
     for name, it in items.items():
-        print(f"  {name}: 未開封 {it['sealed']:,} / 開封済 {it.get('opened', '-')}  {it['note']}")
+        print(f"  {name}: 開封済未使用 {it.get('opened', '-')}  {it['note']}")
 
 
 if __name__ == "__main__":

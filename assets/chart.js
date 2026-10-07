@@ -1,7 +1,7 @@
 // 軽量なSVGチャート（外部ライブラリなし）
 const Chart = (() => {
   const NS = "http://www.w3.org/2000/svg";
-  const man = (n) => (n >= 10000 ? (n / 10000).toFixed(n % 10000 ? 1 : 0) + "万" : n.toLocaleString("ja-JP"));
+  const man = (n) => (Math.abs(n) >= 10000 ? +(n / 10000).toFixed(2) + "万" : n.toLocaleString("ja-JP"));
   const yenFull = (n) => "¥" + Math.round(n).toLocaleString("ja-JP");
   const md = (d) => d.slice(5).replace("-", "/");
 
@@ -38,7 +38,7 @@ const Chart = (() => {
     const { dates, series, ref } = opts;
     const all = series.flatMap((s) => s.values).filter((v) => v != null);
     if (ref) all.push(ref.value);
-    const pad = (Math.max(...all) - Math.min(...all)) * 0.08 || Math.max(...all) * 0.05;
+    const pad = Math.max((Math.max(...all) - Math.min(...all)) * 0.08, Math.max(...all) * 0.02);
     const ticks = niceTicks(Math.min(...all) - pad, Math.max(...all) + pad);
     const y0 = ticks[0], y1 = ticks[ticks.length - 1];
     const t = dates.map((d) => Date.parse(d));
