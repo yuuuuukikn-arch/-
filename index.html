@@ -25,15 +25,23 @@
     <section class="container summary">
       <div>
         <h1>仕入れ前に、利益をチェック。</h1>
-        <p class="lead">仕入れ値と各販路の相場から、手数料・送料を引いた<strong>手取り利益</strong>を比較します。</p>
+        <p class="lead"><strong>iPhone</strong>と<strong>ポケカBOX</strong>の利益ランキング。手数料・送料を引いた<strong>手取り利益</strong>で比較します。</p>
+        <p class="updated">相場更新日：<span id="updated"></span></p>
       </div>
       <div class="stats" id="stats"></div>
     </section>
 
     <section id="list" class="container">
+      <div class="tabs" id="tabs" role="tablist">
+        <button class="tab active" data-cat="iPhone">📱 iPhone</button>
+        <button class="tab" data-cat="ポケカBOX">🃏 ポケカBOX</button>
+        <button class="tab" data-cat="">すべて</button>
+      </div>
+
+      <div class="podium" id="podium"></div>
+
       <div class="toolbar">
-        <input type="search" id="q" placeholder="商品名・仕入れ先で検索">
-        <select id="cat"><option value="">すべてのカテゴリ</option></select>
+        <input type="search" id="q" placeholder="商品名で検索">
         <select id="sort">
           <option value="profit">利益が高い順</option>
           <option value="roi">利益率が高い順</option>
@@ -48,13 +56,14 @@
         <table class="table">
           <thead>
             <tr>
+              <th class="num">順位</th>
               <th></th>
               <th>商品</th>
               <th class="num">仕入れ値</th>
+              <th class="num">買取店</th>
               <th class="num">メルカリ</th>
               <th class="num">ヤフオク</th>
               <th class="num">ラクマ</th>
-              <th class="num">Amazon</th>
               <th>おすすめ販路</th>
               <th class="num">利益</th>
               <th class="num">利益率</th>

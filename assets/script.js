@@ -3,6 +3,8 @@ const pct = (n) => (n * 100).toFixed(1) + "%";
 const sign = (n) => (n >= 0 ? "plus" : "minus");
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const $ = (id) => document.getElementById(id);
+let currentCat = "iPhone";
+const MEDALS = ["🥇", "🥈", "🥉"];
 
 const store = {
   get(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } },
@@ -25,7 +27,7 @@ function calc(buy, price, ship, rate) {
 function analyze(p) {
   const channels = Object.keys(CHANNELS)
     .filter((k) => p.prices[k] != null)
-    .map((k) => ({ key: k, ...calc(p.buy, p.prices[k], p.ship, rates[k]) }));
+    .map((k) => ({ key: k, ...calc(p.buy, p.prices[k], CHANNELS[k].noShip ? 0 : p.ship, rates[k]) }));
   const best = channels.reduce((a, b) => (b.profit > a.profit ? b : a), channels[0]);
   return { ...p, channels, best, profit: best ? best.profit : 0, roi: best ? best.roi : 0 };
 }
@@ -33,7 +35,7 @@ function analyze(p) {
 // 一覧の描画
 function render() {
   const q = $("q").value.trim().toLowerCase();
-  const cat = $("cat").value;
+  const cat = currentCat;
   const sortKey = $("sort").value;
   let items = PRODUCTS.map(analyze).filter((p) =>
     (!q || (p.name + p.store).toLowerCase().includes(q)) &&
@@ -43,8 +45,9 @@ function render() {
   );
   items.sort((a, b) => sortKey === "buy" ? a.buy - b.buy : b[sortKey] - a[sortKey]);
 
-  const maxSold = Math.max(...PRODUCTS.map((p) => p.sold));
-  $("rows").innerHTML = items.length ? items.map((p) => {
+  const maxSold = Math.max(...PRODUCTS.filter((p) => !cat || p.cat === cat).map((p) => p.sold));
+  renderPodium(items);
+  $("rows").innerHTML = items.length ? items.map((p, i) => {
     const cells = Object.keys(CHANNELS).map((k) => {
       const v = p.prices[k];
       const label = `data-label="${CHANNELS[k].name}"`;
@@ -53,8 +56,9 @@ function render() {
     }).join("");
     const hot = p.sold >= maxSold * 0.5 ? ' <span class="hot" title="よく売れています">🔥</span>' : "";
     const row = `<tr class="row" data-id="${p.id}">
+      <td class="num rank-cell"><span class="rank r${i + 1}">${i + 1}</span></td>
       <td class="star-cell"><button class="star ${stars.has(p.id) ? "on" : ""}" data-star="${p.id}" aria-label="ウォッチ">${stars.has(p.id) ? "★" : "☆"}</button></td>
-      <td class="name"><b>${esc(p.name)}</b><small>${esc(p.cat)} ・ ${esc(p.store)}</small></td>
+      <td class="name"><b>${esc(p.name)}</b><small>${esc(p.note)} ・ 仕入れ：${esc(p.store)}</small></td>
       <td class="num" data-label="仕入れ値">${yen(p.buy)}</td>
       ${cells}
       <td class="best-ch" data-label="おすすめ"><span class="pill">${CHANNELS[p.best.key].name}</span></td>
@@ -63,9 +67,25 @@ function render() {
       <td class="num" data-label="月間販売">${p.sold}個${hot}</td>
     </tr>`;
     return row + (openId === p.id ? detailRow(p) : "");
-  }).join("") : `<tr><td colspan="11" class="empty">条件に合う商品がありません</td></tr>`;
+  }).join("") : `<tr><td colspan="12" class="empty">条件に合う商品がありません</td></tr>`;
 
   renderStats(items);
+}
+
+// 上位3つを表彰台カードで表示
+function renderPodium(items) {
+  const label = { profit: "利益", roi: "利益率", sold: "月間販売", buy: "仕入れ値" }[$("sort").value];
+  $("podium").innerHTML = items.slice(0, 3).map((p, i) => `
+    <article class="pod pod${i + 1}" data-open="${p.id}">
+      <div class="pod-head"><span class="medal">${MEDALS[i]}</span><span class="muted">${i + 1}位 ・ ${label}順</span></div>
+      <h3>${esc(p.name)}</h3>
+      <div class="pod-profit ${sign(p.profit)}">${p.profit > 0 ? "+" : ""}${yen(p.profit)}</div>
+      <div class="pod-meta">
+        <span>利益率 <b class="${sign(p.roi)}">${pct(p.roi)}</b></span>
+        <span>${CHANNELS[p.best.key].name}で売却</span>
+        <span>仕入れ ${yen(p.buy)}</span>
+      </div>
+    </article>`).join("");
 }
 
 function detailRow(p) {
@@ -76,13 +96,13 @@ function detailRow(p) {
       <dl>
         <dt>販売価格</dt><dd>${yen(c.price)}</dd>
         <dt>手数料（${rates[c.key]}%）</dt><dd>-${yen(c.fee)}</dd>
-        <dt>送料</dt><dd>-${yen(c.ship)}</dd>
+        <dt>送料</dt><dd>${c.ship ? "-" + yen(c.ship) : "なし"}</dd>
         <dt>仕入れ値</dt><dd>-${yen(p.buy)}</dd>
         <dt class="total">利益</dt><dd class="total ${sign(c.profit)}">${yen(c.profit)}（${pct(c.roi)}）</dd>
       </dl>
       <div class="bar"><i class="${c.profit < 0 ? "neg" : ""}" style="width:${Math.abs(c.profit) / maxAbs * 100}%"></i></div>
     </div>`).join("");
-  return `<tr class="detail"><td colspan="11"><div class="breakdown">${cards}</div></td></tr>`;
+  return `<tr class="detail"><td colspan="12"><div class="breakdown">${cards}</div></td></tr>`;
 }
 
 function renderStats(items) {
@@ -120,10 +140,25 @@ function renderFees() {
 
 // 初期化
 $("year").textContent = new Date().getFullYear();
-[...new Set(PRODUCTS.map((p) => p.cat))].forEach((c) => $("cat").insertAdjacentHTML("beforeend", `<option>${esc(c)}</option>`));
+$("updated").textContent = UPDATED.replaceAll("-", ".");
+$("tabs").addEventListener("click", (e) => {
+  const tab = e.target.closest(".tab");
+  if (!tab) return;
+  currentCat = tab.dataset.cat;
+  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t === tab));
+  openId = null;
+  render();
+});
+$("podium").addEventListener("click", (e) => {
+  const pod = e.target.closest("[data-open]");
+  if (!pod) return;
+  openId = +pod.dataset.open;
+  render();
+  document.querySelector(`tr.row[data-id="${openId}"]`).scrollIntoView({ behavior: "smooth", block: "center" });
+});
 Object.entries(CHANNELS).forEach(([k, c]) => $("cCh").insertAdjacentHTML("beforeend", `<option value="${k}">${c.name}</option>`));
 
-["q", "cat", "sort", "onlyProfit", "onlyStar"].forEach((id) => $(id).addEventListener("input", render));
+["q", "sort", "onlyProfit", "onlyStar"].forEach((id) => $(id).addEventListener("input", render));
 ["cBuy", "cSell", "cShip", "cCh"].forEach((id) => $(id).addEventListener("input", renderCalc));
 
 $("rows").addEventListener("click", (e) => {

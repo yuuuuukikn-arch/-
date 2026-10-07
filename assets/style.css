@@ -152,3 +152,37 @@ h2 { margin: 0 0 16px; font-size: 1.25rem; }
   .table tr.detail td { display: block; border-radius: 0 0 12px 12px; border: 1px solid var(--border); border-top: none; padding: 12px; }
   .table tr td.empty { display: block; }
 }
+
+/* カテゴリタブ */
+.tabs { display: flex; gap: 6px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+.tab { font: inherit; font-weight: 700; background: none; border: none; color: var(--muted); padding: 10px 16px; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.tab.active { color: var(--text); border-bottom-color: var(--accent); }
+.updated { margin: 6px 0 0; font-size: .8rem; color: var(--muted); }
+
+/* 表彰台 */
+.podium { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.pod { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; cursor: pointer; transition: transform .15s; }
+.pod:hover { transform: translateY(-2px); }
+.pod1 { border: 2px solid #e7b416; background: linear-gradient(180deg, color-mix(in srgb, #e7b416 10%, var(--surface)), var(--surface)); }
+.pod2 { border-color: #a8b0bd; }
+.pod3 { border-color: #c98a55; }
+.pod-head { display: flex; align-items: center; gap: 8px; font-size: .8rem; }
+.medal { font-size: 1.6rem; line-height: 1; }
+.pod h3 { margin: 8px 0 2px; font-size: 1rem; }
+.pod-profit { font-size: 1.7rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.pod-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .8rem; color: var(--muted); margin-top: 4px; }
+
+/* 順位 */
+.rank { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; font-weight: 800; font-size: .85rem; background: var(--row-hover); }
+.rank.r1 { background: #e7b416; color: #fff; }
+.rank.r2 { background: #a8b0bd; color: #fff; }
+.rank.r3 { background: #c98a55; color: #fff; }
+
+@media (max-width: 720px) {
+  .podium { grid-template-columns: 1fr; }
+  .pod { padding: 12px 14px; }
+  .pod-profit { font-size: 1.4rem; }
+  .table tr.row { position: relative; }
+  .table tr.row td.rank-cell { position: absolute; top: 12px; left: 12px; }
+  .table tr.row td.name { padding-left: 36px; }
+}

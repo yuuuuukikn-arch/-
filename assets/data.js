@@ -1,28 +1,36 @@
 // 販路ごとの販売手数料（設定画面で変更可。目安の値です）
+// noShip: true の販路は送料を差し引かない（店頭・送料無料の買取など）
 const CHANNELS = {
+  kaitori: { name: "買取店",   rate: 0, noShip: true },
   mercari: { name: "メルカリ", rate: 10 },
   yahoo:   { name: "ヤフオク", rate: 10 },
   rakuma:  { name: "ラクマ",   rate: 10 },
-  amazon:  { name: "Amazon",   rate: 10 },
 };
 
-// 商品データ（サンプル）。実際の相場に書き換えて使ってください。
-// buy: 仕入れ値 / ship: 送料 / sold: 月間の売れた数（回転の目安）
-// prices: 各販路の相場（null は出品なし）
+// 最終更新日（相場を書き換えたら更新してください）
+const UPDATED = "2026-10-07";
+
+// 商品データ（サンプル）。相場は日々変わるので、実際の価格に書き換えて使ってください。
+// buy: 仕入れ値（定価など） / ship: 送料 / sold: 月間の売れた数（回転の目安）
+// prices: 各販路の相場（null は取り扱いなし）
 const PRODUCTS = [
-  { id: 1,  name: "携帯ゲーム機 限定カラー",         cat: "ゲーム",     store: "家電量販店",   buy: 37980, ship: 1050, sold: 142, prices: { mercari: 46800, yahoo: 45500, rakuma: 45000, amazon: 49800 } },
-  { id: 2,  name: "ゲームソフト 初回限定版",           cat: "ゲーム",     store: "ネット通販",   buy: 9680,  ship: 230,  sold: 88,  prices: { mercari: 12800, yahoo: 12000, rakuma: 12300, amazon: 13900 } },
-  { id: 3,  name: "トレーディングカード 拡張パック BOX", cat: "トレカ",     store: "ホビーショップ", buy: 5400,  ship: 520,  sold: 310, prices: { mercari: 8900,  yahoo: 8500,  rakuma: 8600,  amazon: 9800 } },
-  { id: 4,  name: "トレーディングカード スターターデッキ", cat: "トレカ",     store: "コンビニ",     buy: 1650,  ship: 230,  sold: 205, prices: { mercari: 2200,  yahoo: 1900,  rakuma: 2100,  amazon: null } },
-  { id: 5,  name: "フィギュア 1/7スケール 限定品",     cat: "ホビー",     store: "ホビー通販",   buy: 22000, ship: 1050, sold: 34,  prices: { mercari: 31000, yahoo: 33500, rakuma: 30000, amazon: 34800 } },
-  { id: 6,  name: "プラモデル 再販品",                 cat: "ホビー",     store: "家電量販店",   buy: 4950,  ship: 750,  sold: 120, prices: { mercari: 6800,  yahoo: 6500,  rakuma: 6500,  amazon: 7480 } },
-  { id: 7,  name: "スニーカー コラボモデル 27cm",      cat: "スニーカー", store: "公式抽選",     buy: 19800, ship: 1050, sold: 56,  prices: { mercari: 32000, yahoo: 30500, rakuma: 31000, amazon: null } },
-  { id: 8,  name: "スニーカー 定番モデル 復刻",         cat: "スニーカー", store: "アウトレット", buy: 12100, ship: 1050, sold: 40,  prices: { mercari: 13500, yahoo: 13000, rakuma: 13200, amazon: 14800 } },
-  { id: 9,  name: "ワイヤレスイヤホン 型落ち",          cat: "家電",       store: "家電量販店",   buy: 14800, ship: 520,  sold: 95,  prices: { mercari: 17500, yahoo: 17000, rakuma: 16800, amazon: 18900 } },
-  { id: 10, name: "美容家電 ヘアドライヤー",            cat: "家電",       store: "ドラッグストア", buy: 24800, ship: 1050, sold: 61,  prices: { mercari: 26500, yahoo: 27000, rakuma: 26000, amazon: 29800 } },
-  { id: 11, name: "限定コスメ ホリデーコフレ",          cat: "コスメ",     store: "百貨店",       buy: 8800,  ship: 520,  sold: 74,  prices: { mercari: 13500, yahoo: 12000, rakuma: 13000, amazon: null } },
-  { id: 12, name: "アニメ 一番くじ A賞",                cat: "ホビー",     store: "コンビニ",     buy: 3500,  ship: 750,  sold: 160, prices: { mercari: 6500,  yahoo: 6000,  rakuma: 6200,  amazon: null } },
-  { id: 13, name: "キャラクター ぬいぐるみ 限定",       cat: "ホビー",     store: "テーマパーク", buy: 4200,  ship: 750,  sold: 48,  prices: { mercari: 5200,  yahoo: 4800,  rakuma: 5000,  amazon: null } },
-  { id: 14, name: "腕時計 限定モデル",                  cat: "ファッション", store: "正規店",     buy: 44000, ship: 1050, sold: 18,  prices: { mercari: 52000, yahoo: 55000, rakuma: 51000, amazon: 58000 } },
-  { id: 15, name: "家庭用ゲーム機 本体",                cat: "ゲーム",     store: "家電量販店",   buy: 49980, ship: 1600, sold: 210, prices: { mercari: 52000, yahoo: 51500, rakuma: 51000, amazon: 54800 } },
+  // ── iPhone（SIMフリー・未開封）──
+  { id: 1,  cat: "iPhone", name: "iPhone 18 Pro Max 256GB",  note: "未開封・SIMフリー", store: "Apple Store", buy: 239800, ship: 1050, sold: 420, prices: { kaitori: 252000, mercari: 268000, yahoo: 262000, rakuma: 265000 } },
+  { id: 2,  cat: "iPhone", name: "iPhone 18 Pro Max 512GB",  note: "未開封・SIMフリー", store: "Apple Store", buy: 274800, ship: 1050, sold: 260, prices: { kaitori: 286000, mercari: 302000, yahoo: 298000, rakuma: 299000 } },
+  { id: 3,  cat: "iPhone", name: "iPhone 18 Pro Max 1TB",    note: "未開封・SIMフリー", store: "Apple Store", buy: 309800, ship: 1050, sold: 90,  prices: { kaitori: 318000, mercari: 335000, yahoo: 330000, rakuma: null } },
+  { id: 4,  cat: "iPhone", name: "iPhone 18 Pro 256GB",      note: "未開封・SIMフリー", store: "Apple Store", buy: 219800, ship: 1050, sold: 380, prices: { kaitori: 226000, mercari: 241000, yahoo: 236000, rakuma: 238000 } },
+  { id: 5,  cat: "iPhone", name: "iPhone 18 Pro 512GB",      note: "未開封・SIMフリー", store: "Apple Store", buy: 254800, ship: 1050, sold: 170, prices: { kaitori: 259000, mercari: 274000, yahoo: 270000, rakuma: 271000 } },
+  { id: 6,  cat: "iPhone", name: "iPhone 18 Pro 1TB",        note: "未開封・SIMフリー", store: "Apple Store", buy: 289800, ship: 1050, sold: 60,  prices: { kaitori: 291000, mercari: 305000, yahoo: 300000, rakuma: null } },
+  { id: 7,  cat: "iPhone", name: "iPhone 17 256GB",          note: "未開封・SIMフリー", store: "家電量販店",  buy: 129800, ship: 1050, sold: 300, prices: { kaitori: 122000, mercari: 133000, yahoo: 130000, rakuma: 131000 } },
+  { id: 8,  cat: "iPhone", name: "iPhone Air 256GB",         note: "未開封・SIMフリー", store: "家電量販店",  buy: 159800, ship: 1050, sold: 80,  prices: { kaitori: 138000, mercari: 150000, yahoo: 146000, rakuma: 147000 } },
+
+  // ── ポケカBOX（シュリンク付き未開封）──
+  { id: 21, cat: "ポケカBOX", name: "インフェルノX",           note: "シュリンク付き", store: "抽選・定価", buy: 6000, ship: 750, sold: 950, prices: { kaitori: 17500, mercari: 21400, yahoo: 20500, rakuma: 20800 } },
+  { id: 22, cat: "ポケカBOX", name: "ストームエメラルダ",       note: "シュリンク付き", store: "抽選・定価", buy: 6000, ship: 750, sold: 720, prices: { kaitori: 14000, mercari: 17300, yahoo: 16800, rakuma: 16900 } },
+  { id: 23, cat: "ポケカBOX", name: "MEGAドリームex",          note: "シュリンク付き", store: "抽選・定価", buy: 5500, ship: 750, sold: 880, prices: { kaitori: 14300, mercari: 13800, yahoo: 13500, rakuma: 13600 } },
+  { id: 24, cat: "ポケカBOX", name: "メガブレイブ",             note: "シュリンク付き", store: "抽選・定価", buy: 5400, ship: 750, sold: 540, prices: { kaitori: 8600,  mercari: 10700, yahoo: 10200, rakuma: 10400 } },
+  { id: 25, cat: "ポケカBOX", name: "ニンジャスピナー",         note: "シュリンク付き", store: "抽選・定価", buy: 5400, ship: 750, sold: 610, prices: { kaitori: 10900, mercari: 10200, yahoo: 9800,  rakuma: 9900 } },
+  { id: 26, cat: "ポケカBOX", name: "アビスアイ",               note: "シュリンク付き", store: "抽選・定価", buy: 5400, ship: 750, sold: 430, prices: { kaitori: 10300, mercari: 8800,  yahoo: 8500,  rakuma: 8600 } },
+  { id: 27, cat: "ポケカBOX", name: "ムニキスゼロ",             note: "シュリンク付き", store: "抽選・定価", buy: 5400, ship: 750, sold: 390, prices: { kaitori: 7200,  mercari: 8400,  yahoo: 8100,  rakuma: 8200 } },
+  { id: 28, cat: "ポケカBOX", name: "クレイバースト（再販）",   note: "シュリンク付き", store: "抽選・定価", buy: 5400, ship: 750, sold: 260, prices: { kaitori: 10000, mercari: 11500, yahoo: 11000, rakuma: 11200 } },
 ];
