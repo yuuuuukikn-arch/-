@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>せどり比較</title>
-  <meta name="description" content="iPhoneとポケカBOXの買取価格・利益ランキングと価格推移グラフ">
+  <meta name="description" content="iPhone 18シリーズとポケカBOXの買取価格ランキング（店舗比較・価格推移グラフ付き）">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>¥</text></svg>">
   <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0f1115" media="(prefers-color-scheme: dark)">
@@ -19,12 +19,12 @@
 <body>
   <header class="site-header">
     <div class="container nav">
-      <a href="#top" class="logo"><span class="logo-mark">¥</span> せどり比較</a>
-      <nav class="nav-links">
-        <a href="#list">利益ランキング</a>
-        <a href="#calc">利益計算</a>
-        <button class="theme-toggle" aria-label="ライト／ダーク切り替え"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg></button>
-      </nav>
+      <a href="#top" class="logo"><span class="logo-mark">¥</span><span class="logo-text">せどり比較</span></a>
+      <div class="seg" id="tabs" role="tablist" aria-label="カテゴリ">
+        <button class="active" role="tab" data-cat="iPhone">iPhone</button>
+        <button role="tab" data-cat="ポケカBOX">ポケカ</button>
+      </div>
+      <button class="theme-toggle" aria-label="ライト／ダーク切り替え"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg></button>
     </div>
   </header>
 
@@ -35,14 +35,9 @@
         <p class="lead"><strong>iPhone 18シリーズ</strong>と<strong>ポケカBOX</strong>の買取価格から、<strong>定価で買って買取店に売ったときの利益</strong>をランキング表示します。</p>
         <p class="updated" id="updated"></p>
       </div>
-      <div class="stats" id="stats"></div>
     </section>
 
     <section id="list" class="container">
-      <div class="tabs" id="tabs" role="tablist">
-        <button class="tab active" data-cat="iPhone">📱 iPhone</button>
-        <button class="tab" data-cat="ポケカBOX">🃏 ポケカBOX</button>
-      </div>
       <p class="sample-note" id="sampleNote" hidden>⚠ このカテゴリの買取価格はサンプルです。</p>
 
       <div class="podium" id="podium"></div>
@@ -51,7 +46,6 @@
         <input type="search" id="q" placeholder="商品名で検索">
         <select id="sort"></select>
         <label class="check"><input type="checkbox" id="onlyProfit"> 黒字のみ</label>
-        <label class="check"><input type="checkbox" id="onlyStar"> ★ウォッチのみ</label>
       </div>
 
       <div class="table-wrap">
@@ -59,7 +53,6 @@
           <thead>
             <tr>
               <th class="num">順位</th>
-              <th></th>
               <th>商品</th>
               <th class="num">定価</th>
               <th class="num">買取（未開封）</th>
@@ -76,18 +69,6 @@
       <p class="note">行をクリックすると価格推移のグラフが開きます。iPhone は「買取率 = 買取価格 ÷ 定価」、ポケカは「利益 = 買取価格 − 定価」で比べています（買取価格は各店の中で一番高い未開封の価格）。iPhone は一番高い色、ポケカはシュリンク付きの価格で計算しています。店舗名を押すと各店のサイトが開きます。</p>
     </section>
 
-    <section id="calc" class="container panel">
-      <h2>利益計算</h2>
-      <div class="calc">
-        <div class="calc-inputs">
-          <label>仕入れ値（円）<input type="number" id="cBuy" value="239800" min="0"></label>
-          <label>買取価格（円）<input type="number" id="cSell" value="245000" min="0"></label>
-          <label>ポイント還元（%）<input type="number" id="cPoint" value="1" min="0" step="0.1"></label>
-          <label>交通費・送料など（円）<input type="number" id="cCost" value="0" min="0"></label>
-        </div>
-        <div class="calc-result" id="cResult"></div>
-      </div>
-    </section>
   </main>
 
   <footer class="site-footer">
@@ -96,13 +77,6 @@
       <p class="muted">買取価格は各店の掲載価格をもとにしています。実際の買取額は店舗で確認してください。</p>
     </div>
   </footer>
-
-  <nav class="bottom-nav" id="bottomNav" aria-label="メニュー">
-    <button data-cat="iPhone" class="active"><span class="ico">📱</span>iPhone</button>
-    <button data-cat="ポケカBOX"><span class="ico">🃏</span>ポケカ</button>
-    <button data-star-filter><span class="ico">⭐</span>ウォッチ</button>
-    <a href="#calc"><span class="ico">🧮</span>利益計算</a>
-  </nav>
 
   <div class="tooltip" id="tooltip" hidden></div>
 

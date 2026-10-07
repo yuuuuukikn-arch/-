@@ -13,7 +13,6 @@ const store = {
 };
 
 let currentCat = "iPhone";
-let stars = new Set(store.get("stars", []));
 let openName = null;
 let range = 30;
 
@@ -111,15 +110,14 @@ function render() {
   const products = buildProducts(currentCat);
   let items = products.filter((p) =>
     (!q || p.name.toLowerCase().includes(q)) &&
-    (!$("onlyProfit").checked || p.profit > 0) &&
-    (!$("onlyStar").checked || stars.has(p.name))
+    (!$("onlyProfit").checked || p.profit > 0)
   );
   // 定価が未登録の商品は最後に
   items.sort((a, b) => (a[key] == null) - (b[key] == null) || b[key] - a[key]);
 
   $("sampleNote").hidden = !products.some((p) => p.latest.sample);
   renderPodium(items.filter((p) => p[key] != null));
-  renderStats(products);
+  renderUpdated();
 
   $("rows").innerHTML = items.length ? items.map((p, i) => {
     const sub = currentCat === "iPhone"
@@ -127,7 +125,6 @@ function render() {
       : (p.bestItem.noShrink != null ? `<small>シュリンクなし ${yen(p.bestItem.noShrink)}</small>` : "") + (p.bestItem.note ? `<small class="memo">備考：${esc(p.bestItem.note)}</small>` : "");
     const row = `<tr class="row ${openName === p.name ? "open" : ""}" data-name="${esc(p.name)}">
       <td class="num rank-cell"><span class="rank r${i + 1}">${i + 1}</span></td>
-      <td class="star-cell"><button class="star ${stars.has(p.name) ? "on" : ""}" data-star="${esc(p.name)}" aria-label="ウォッチ">${stars.has(p.name) ? "★" : "☆"}</button></td>
       <td class="name"><b>${disp(p.name)}${p.boost ? ' <span class="boost">強化</span>' : ""}</b>${sub}</td>
       <td class="num" data-label="定価">${p.retail != null ? yen(p.retail) + (p.estimated ? '<sup class="est" title="推定の定価">推定</sup>' : "") : '<span class="na">未登録</span>'}</td>
       <td class="num sealed" data-label="買取価格">${yen(p.price)}</td>
@@ -137,11 +134,10 @@ function render() {
       <td class="num profit ${p.profit != null ? sign(p.profit) : ""}" data-label="利益">${p.profit != null ? signed(p.profit) : "—"}</td>
       <td class="num metric-cell" data-label="${useRate() ? "最高買取率" : "利益率"}">${rateCell(p)}</td>
     </tr>`;
-    return row + (openName === p.name ? `<tr class="detail"><td colspan="10">${detail(p)}</td></tr>` : "");
-  }).join("") : `<tr><td colspan="10" class="empty">条件に合う商品がありません</td></tr>`;
+    return row + (openName === p.name ? `<tr class="detail"><td colspan="9">${detail(p)}</td></tr>` : "");
+  }).join("") : `<tr><td colspan="9" class="empty">条件に合う商品がありません</td></tr>`;
 
   if (openName) drawChart(items.find((p) => p.name === openName));
-  document.querySelector("[data-star-filter]").classList.toggle("active", $("onlyStar").checked);
 }
 
 function renderPodium(items) {
@@ -165,19 +161,11 @@ function renderPodium(items) {
     </article>`).join("");
 }
 
-function renderStats(products) {
-  const withProfit = products.filter((p) => p.profit != null);
-  const black = withProfit.filter((p) => p.profit > 0);
-  const metric = useRate() ? "rate" : "profit";
-  const top = withProfit.reduce((a, b) => (!a || b[metric] > a[metric] ? b : a), null);
+function renderUpdated() {
   const dates = ALL.filter((s) => s.cat === currentCat).map((s) => s.date).sort();
   const last = dates[dates.length - 1];
   const shops = [...new Set(ALL.filter((s) => s.cat === currentCat && s.date === last).map((s) => s.shop))].sort((a, b) => shopIdx(a) - shopIdx(b));
   $("updated").innerHTML = last ? `価格更新日：${last.replaceAll("-", ".")} ・ 記録 ${new Set(dates).size}日分 ・ 掲載店：${shops.map((sh) => shopLink(sh)).join("")}` : "";
-  $("stats").innerHTML = `
-    <div class="stat"><span>黒字の商品</span><b>${black.length}<small> / ${withProfit.length}</small></b></div>
-    <div class="stat"><span>${useRate() ? "最高買取率" : "最高利益"}</span><b class="${top ? sign(top.profit) : ""}">${top ? (useRate() ? pct(top.rate) : signed(top.profit)) : "—"}</b><small class="muted">${top ? disp(top.name) : ""}</small></div>
-    <div class="stat"><span>強化中</span><b>${products.filter((p) => p.boost).length}<small> 件</small></b></div>`;
 }
 
 // 店舗ごとの価格表（iPhone は色別）
@@ -259,60 +247,24 @@ function drawChart(p) {
   }, $("tooltip"));
 }
 
-// 利益計算
-function renderCalc() {
-  const buy = +$("cBuy").value || 0, sell = +$("cSell").value || 0;
-  const point = Math.floor(buy * (+$("cPoint").value || 0) / 100), cost = +$("cCost").value || 0;
-  const profit = sell - buy + point - cost;
-  $("cResult").innerHTML = `
-    <span class="muted">利益</span>
-    <div class="big ${sign(profit)}">${signed(profit)}</div>
-    <dl>
-      <dt>買取率（買取価格 ÷ 仕入れ値）</dt><dd class="${sign(sell - buy)}">${buy ? pct(sell / buy) : "—"}</dd>
-      <dt>利益率</dt><dd class="${sign(profit)}">${buy ? pct(profit / buy) : "—"}</dd>
-      <dt>買取価格 − 仕入れ値</dt><dd>${signed(sell - buy)}</dd>
-      <dt>ポイント還元</dt><dd>+${yen(point)}</dd>
-      <dt>交通費・送料など</dt><dd>-${yen(cost)}</dd>
-    </dl>`;
-}
-
 // イベント
 $("year").textContent = new Date().getFullYear();
-["q", "sort", "onlyProfit", "onlyStar"].forEach((id) => $(id).addEventListener("input", render));
-["cBuy", "cSell", "cPoint", "cCost"].forEach((id) => $(id).addEventListener("input", renderCalc));
+["q", "sort", "onlyProfit"].forEach((id) => $(id).addEventListener("input", render));
 
 function setCat(cat) {
   currentCat = cat;
   setSortOptions();
-  document.querySelectorAll("[data-cat]").forEach((t) => t.classList.toggle("active", t.dataset.cat === cat));
+  document.querySelectorAll("[data-cat]").forEach((t) => { t.classList.toggle("active", t.dataset.cat === cat); t.setAttribute("aria-selected", t.dataset.cat === cat); });
   openName = null;
   render();
 }
 $("tabs").addEventListener("click", (e) => {
-  const tab = e.target.closest(".tab");
-  if (tab) setCat(tab.dataset.cat);
-});
-
-// 下部ナビ（スマホ）
-$("bottomNav").addEventListener("click", (e) => {
-  const cat = e.target.closest("[data-cat]");
-  if (cat) { setCat(cat.dataset.cat); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
-  if (e.target.closest("[data-star-filter]")) {
-    $("onlyStar").checked = !$("onlyStar").checked;
-    render();
-    document.querySelector("#list").scrollIntoView({ behavior: "smooth" });
-  }
+  const tab = e.target.closest("[data-cat]");
+  if (tab && tab.dataset.cat !== currentCat) { setCat(tab.dataset.cat); window.scrollTo({ top: 0 }); }
 });
 
 $("rows").addEventListener("click", (e) => {
   if (e.target.closest("a")) return; // 店舗リンクはそのまま開く
-  const starBtn = e.target.closest("[data-star]");
-  if (starBtn) {
-    const n = starBtn.dataset.star;
-    stars.has(n) ? stars.delete(n) : stars.add(n);
-    store.set("stars", [...stars]);
-    return render();
-  }
   const rangeBtn = e.target.closest("[data-range]");
   if (rangeBtn) { range = +rangeBtn.dataset.range; return render(); }
   const row = e.target.closest("tr.row");
@@ -344,4 +296,3 @@ document.querySelector(".theme-toggle").addEventListener("click", () => {
 
 setSortOptions();
 render();
-renderCalc();
