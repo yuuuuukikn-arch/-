@@ -280,6 +280,34 @@ $("podium").addEventListener("click", (e) => {
   document.querySelector("tr.row.open").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
+// 速報（見出しの位置に1件ずつ。複数あれば5秒ごとに切り替え）
+function startFlash() {
+  const el = $("flash");
+  // 表示期間内のものだけ（date 〜 until。until が無ければ date から NEWS_DAYS 日間）
+  const today = new Date().toLocaleDateString("sv-SE"); // YYYY-MM-DD（端末の日付）
+  const endOf = (n) => n.until || new Date(Date.parse(n.date) + ((typeof NEWS_DAYS === "number" ? NEWS_DAYS : 7) - 1) * 864e5).toISOString().slice(0, 10);
+  const news = (typeof NEWS === "undefined" ? [] : NEWS)
+    .filter((n) => n.date <= today && today <= endOf(n))
+    .sort((a, b) => b.date.localeCompare(a.date));
+  if (!news.length) { el.hidden = true; return; }
+  let i = 0;
+  const show = () => {
+    const n = news[i];
+    const body = `<span class="flash-label">速報</span>
+      <span class="flash-text"><small>${n.date.slice(5).replace("-", "/")}${n.tag ? " ・ " + esc(n.tag) : ""}</small>${esc(n.title)}</span>
+      ${news.length > 1 ? `<span class="flash-count">${i + 1}/${news.length}</span>` : ""}
+      ${n.url ? '<span class="flash-go" aria-hidden="true">›</span>' : ""}`;
+    el.innerHTML = n.url
+      ? `<a class="flash-inner" href="${esc(n.url)}" target="_blank" rel="noopener" title="${esc(n.source || "")}">${body}</a>`
+      : `<div class="flash-inner">${body}</div>`;
+  };
+  show();
+  if (news.length > 1 && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    setInterval(() => { i = (i + 1) % news.length; show(); }, 5000);
+  }
+}
+startFlash();
+
 let resizeTimer;
 window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => openName && render(), 150); });
 

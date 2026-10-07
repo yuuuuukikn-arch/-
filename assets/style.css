@@ -405,3 +405,26 @@ a.sr-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; 
 @media (max-width: 380px) {
   .logo-text { display: none; }
 }
+
+/* ── 速報 ── */
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.flash { margin: 0 0 6px; }
+.flash-inner {
+  display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 8px 12px;
+  border-radius: 12px; text-decoration: none; color: var(--text);
+  background: color-mix(in srgb, var(--minus) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--minus) 35%, var(--border));
+}
+a.flash-inner:hover { border-color: var(--minus); }
+a.flash-inner:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.flash-label {
+  flex: none; display: inline-flex; align-items: center; gap: 5px;
+  font-size: .78rem; font-weight: 800; color: #fff; background: var(--minus); padding: 3px 9px; border-radius: 6px;
+}
+.flash-label::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: flash-blink 1.2s ease-in-out infinite; }
+@keyframes flash-blink { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .flash-label::before { animation: none; } }
+.flash-text { flex: 1; min-width: 0; font-weight: 700; font-size: .95rem; line-height: 1.4; }
+.flash-text small { display: block; font-size: .7rem; font-weight: 600; color: var(--muted); }
+.flash-count { flex: none; font-size: .7rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.flash-go { flex: none; font-size: 1.4rem; color: var(--muted); line-height: 1; }

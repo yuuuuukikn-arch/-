@@ -54,3 +54,15 @@ const CATALOG = {
 
 // 実データがまだないカテゴリに表示するサンプル（今は不要なので空）
 const SAMPLE_SNAPSHOTS = [];
+
+// 速報（ページ上部に1件ずつ表示され、複数あると5秒ごとに切り替わります）
+// date: 速報の日付 / until: この日まで表示（省略すると date から NEWS_DAYS 日間）
+// url: 押したときに開くページ（出典の記事など）
+const NEWS_DAYS = 7;
+const NEWS = [
+  {
+    date: "2026-10-01", until: "2026-10-14", tag: "ガンプラ",
+    title: "ガンプラ再販12件が値上げ（平均24.3%・最大30%）",
+    url: "https://hayamimi-gunpla.com/blog-entry-29187.html", source: "早耳ガンプラ情報局",
+  },
+];
