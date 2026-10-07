@@ -2,7 +2,8 @@
 const SHOPS = {
   "買取一丁目": { url: "https://www.1-chome.com/" },
   "買取ルデヤ": { url: "https://kaitori-rudeya.com/", hours: "10時〜19時（月〜土・祝）／日曜定休" },
-  "買取商店":   { url: "https://www.kaitorishouten-co.jp/" },
+  // publish: false … 一般公開用（WordPress）には出さない店（規約で転載を禁止しているなど）
+  "買取商店":   { url: "https://www.kaitorishouten-co.jp/", publish: false },
   "森森買取":   { url: "https://www.morimori-kaitori.jp/" },
 };
 

@@ -179,7 +179,8 @@ function renderPodium(items) {
 function renderUpdated() {
   const dates = ALL.filter((s) => s.cat === currentCat).map((s) => s.date).sort();
   const last = dates[dates.length - 1];
-  const shops = [...new Set(ALL.filter((s) => s.cat === currentCat && s.date === last).map((s) => s.shop))].sort((a, b) => shopIdx(a) - shopIdx(b));
+  // 掲載店：各商品の比較に使っている店（各店の最新価格が有効期間内のもの）
+  const shops = [...new Set(buildProducts(currentCat).flatMap((p) => Object.keys(p.latest.shops)))].sort((a, b) => shopIdx(a) - shopIdx(b));
   $("updated").innerHTML = last ? `価格更新日：${last.replaceAll("-", ".")} ・ 記録 ${new Set(dates).size}日分 ・ 掲載店：${shops.map((sh) => shopLink(sh)).join("")}` : "";
 }
 

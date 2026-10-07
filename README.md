@@ -76,6 +76,10 @@ iPhone は 18 シリーズだけ表示します（`assets/data.js` の `SHOW_ONL
 - `tools/import_kaitori.py` — 取り込みスクリプト
 - `data/raw/` — 取り込んだ元テキストの保管
 
+## WordPress で公開する
+
+`wp-plugin/` に WordPress プラグインがあります。導入と毎日の更新の手順は [wp-plugin/README.md](wp-plugin/README.md) を見てください。
+
 ## 公開（GitHub Pages）
 
 Settings → Pages → 「Deploy from a branch」でブランチと `/ (root)` を選んで保存。
