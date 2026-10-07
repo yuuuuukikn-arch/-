@@ -50,6 +50,23 @@ function shopLink(shop, cls = "") {
   return `<a class="shop ${cls}" href="${esc(info.url)}" target="_blank" rel="noopener">${esc(shop)}<span aria-hidden="true">↗</span></a>`;
 }
 
+// 店舗を買取価格の高い順に並べた一覧（1行まるごと店のサイトへのリンク）
+function shopRanking(p, limit = 3) {
+  const list = Object.entries(p.latest.shops)
+    .map(([shop, it]) => ({ shop, price: it.sealed }))
+    .sort((a, b) => b.price - a.price || shopIdx(a.shop) - shopIdx(b.shop));
+  let rank = 0;
+  return `<ol class="shop-rank">${list.slice(0, limit).map((x, i) => {
+    if (i === 0 || x.price < list[i - 1].price) rank = i + 1; // 同じ価格は同じ順位
+    const info = SHOPS[x.shop] || {};
+    const metric = p.retail == null ? "" : useRate()
+      ? `<span class="sr-metric ${sign(x.price - p.retail)}">${pct(x.price / p.retail)}</span>`
+      : `<span class="sr-metric ${sign(x.price - p.retail)}">${signed(x.price - p.retail)}</span>`;
+    const inner = `<span class="sr-pos r${rank}">${rank}位</span><span class="sr-name">${esc(x.shop)}</span><span class="sr-price">${yen(x.price)}</span>${metric}<span class="sr-go" aria-hidden="true">${info.url ? "›" : ""}</span>`;
+    return `<li>${info.url ? `<a class="sr-row ${rank === 1 ? "top" : ""}" href="${esc(info.url)}" target="_blank" rel="noopener" aria-label="${esc(x.shop)}のサイトを開く（${yen(x.price)}）">${inner}</a>` : `<div class="sr-row ${rank === 1 ? "top" : ""}">${inner}</div>`}</li>`;
+  }).join("")}</ol>`;
+}
+
 // 商品ごとに、日付 → 店舗ごとの価格 をまとめる
 function buildProducts(cat) {
   const map = new Map();
@@ -114,11 +131,11 @@ function render() {
       <td class="name"><b>${disp(p.name)}${p.boost ? ' <span class="boost">強化</span>' : ""}</b>${sub}</td>
       <td class="num" data-label="定価">${p.retail != null ? yen(p.retail) + (p.estimated ? '<sup class="est" title="推定の定価">推定</sup>' : "") : '<span class="na">未登録</span>'}</td>
       <td class="num sealed" data-label="買取価格">${yen(p.price)}</td>
-      <td class="shop-cell" data-label="最高値の店">${p.latest.best.map((sh) => shopLink(sh)).join("")}${p.shopCount > 1 ? `<small class="muted">${p.shopCount}店を比較</small>` : ""}</td>
+      <td class="shop-cell" data-label="店舗別（高い順）">${shopRanking(p)}</td>
       <td class="num" data-label="前回比">${p.hasPrev ? `<span class="chg ${sign(p.change)}">${p.change > 0 ? "▲" : p.change < 0 ? "▼" : "±"}${yen(Math.abs(p.change))}</span>` : '<span class="na">—</span>'}</td>
       <td class="spark-cell" data-label="推移">${Chart.sparkline(p.history.map((h) => h.price))}</td>
       <td class="num profit ${p.profit != null ? sign(p.profit) : ""}" data-label="利益">${p.profit != null ? signed(p.profit) : "—"}</td>
-      <td class="num" data-label="${useRate() ? "買取率" : "利益率"}">${rateCell(p)}</td>
+      <td class="num metric-cell" data-label="${useRate() ? "最高買取率" : "利益率"}">${rateCell(p)}</td>
     </tr>`;
     return row + (openName === p.name ? `<tr class="detail"><td colspan="10">${detail(p)}</td></tr>` : "");
   }).join("") : `<tr><td colspan="10" class="empty">条件に合う商品がありません</td></tr>`;
@@ -143,7 +160,7 @@ function renderPodium(items) {
         <span>買取 ${yen(p.price)}</span>
         <span>定価 ${p.retail != null ? yen(p.retail) : "—"}</span>
       </div>
-      <div class="pod-shop">売るなら ${p.latest.best.map((sh) => shopLink(sh)).join(" ")}</div>
+      <div class="pod-shop">最高値の店：<b>${p.latest.best.map(esc).join("・")}</b></div>
       <div class="pod-spark">${Chart.sparkline(p.history.map((h) => h.price), 120, 30)}</div>
     </article>`).join("");
 }
