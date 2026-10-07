@@ -1,3 +1,12 @@
+// 買取店（並び順がグラフの線の色の順になります）
+const SHOPS = {
+  "買取一丁目": { url: "https://www.1-chome.com/" },
+  "買取ルデヤ": { url: "https://kaitori-rudeya.com/", hours: "10時〜19時（月〜土・祝）／日曜定休" },
+};
+
+// iPhone 18 の色（色別価格の表の並び順）
+const IPHONE_COLORS = ["バーガンディ", "ブラック", "グレイシャー", "シルバー"];
+
 // サイトに表示する商品の絞り込み（取り込んだデータ自体はすべて記録されます）
 const SHOW_ONLY = {
   iPhone: /^iPhone 18/,   // iPhone は 18 シリーズだけ表示

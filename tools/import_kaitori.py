@@ -3,6 +3,12 @@
 
 使い方:
   python3 tools/import_kaitori.py data/raw/2026-10-07_買取一丁目.txt --date 2026-10-07 --shop 買取一丁目
+  python3 tools/import_kaitori.py data/raw/2026-10-07_買取ルデヤ.txt --date 2026-10-07 --shop 買取ルデヤ
+
+対応している書き方:
+  - 買取一丁目形式: 商品名 → 新品 → 備考 → 未開封/シュリンク有 → ¥価格
+  - 買取ルデヤ形式: 新品 → 「機種 容量 色 型番 未開封 SIMフリー」 → JAN → 買取価格 → 000,000円
+    （色ごとの行は機種ごとにまとめ、色別価格 colors と最高値 sealed を保存）
 
 同じ日付・同じ店のデータがあれば上書きする（1日に何度送っても最新の1件になる）。
 """
@@ -84,6 +90,88 @@ def parse(text):
     return items
 
 
+# iPhone の色名（表記ゆれ → 正式名）
+COLORS = {
+    "バーガンディ": "バーガンディ",
+    "ブラック": "ブラック",
+    "グレイシャー": "グレイシャー",
+    "グレイシャ": "グレイシャー",
+    "シルバー": "シルバー",
+}
+IPHONE18_COLORS = ["バーガンディ", "ブラック", "グレイシャー", "シルバー"]
+DASH = "-‐−－–"
+
+
+def color_prices(name, base, note):
+    """一丁目の減額メモ（例: 「ブラック,グレイシャー -20000,シルバー -25000」）から色別価格を出す。
+    数字の前に並んだ色はその金額を減額、書かれていない色は満額。読み取れなければ None。"""
+    if not name.startswith("iPhone 18") or not note:
+        return None
+    deduct, pending = {}, []
+    for tok in re.split(r"[,，、]", note):
+        tok = tok.strip()
+        m = re.match(rf"^(.*?)\s*[{DASH}]\s*(\d+)$", tok)
+        label = (m.group(1) if m else tok).strip()
+        if label:
+            if label not in COLORS:
+                return None
+            pending.append(COLORS[label])
+        if m:
+            for c in pending:
+                deduct[c] = int(m.group(2))
+            pending = []
+    if pending:  # 金額がついていない色が残ったら読み方が不明
+        return None
+    return {c: base - deduct.get(c, 0) for c in IPHONE18_COLORS}
+
+
+YEN_RE = re.compile(r"^([\d,]+)\s*円$")
+MODEL_RE = re.compile(r"^(iPhone .+? \d+(?:GB|TB)) (\S+) \S+/A\b")
+
+
+def parse_rudeya(text):
+    """買取ルデヤ形式（色ごとに1行）。同じ商品が2回出てきても1回として扱う。"""
+    lines = [norm(l) for l in text.splitlines()]
+    items = {}
+    for i, line in enumerate(lines):
+        if line != "新品":
+            continue
+        full = next((l for l in lines[i + 1 : i + 4] if l), None)
+        if not full:
+            continue
+        price, notes = None, []
+        for k in range(i + 2, min(i + 20, len(lines))):
+            if lines[k] == "新品":
+                break
+            if lines[k] == "買取価格":
+                m = next((YEN_RE.match(l) for l in lines[k + 1 : k + 3] if YEN_RE.match(l)), None)
+                price = int(m.group(1).replace(",", "")) if m else None
+                break
+            if lines[k].startswith("郵送買取"):
+                notes.append(lines[k])
+        if price is None:
+            continue
+        m = MODEL_RE.match(full)
+        name, color = (m.group(1), COLORS.get(m.group(2), m.group(2))) if m else (full, None)
+        item = items.setdefault(name, {"note": " / ".join(notes), "boost": False})
+        if color:
+            item.setdefault("colors", {})[color] = price
+        item["sealed"] = max(item.get("sealed", 0), price)
+    return items
+
+
+def detect_and_parse(text):
+    # 「買取価格」の次に「000,000円」が来る書き方ならルデヤ形式
+    if re.search(r"買取価格\s*\n\s*[\d,]+\s*円", text):
+        return parse_rudeya(text)
+    items = parse(text)
+    for name, it in items.items():
+        colors = color_prices(name, it["sealed"], it.get("note", ""))
+        if colors:
+            it["colors"] = colors
+    return items
+
+
 def load():
     if not HISTORY.exists():
         return []
@@ -100,7 +188,7 @@ def main():
     args = ap.parse_args()
 
     text = sys.stdin.read() if args.file == "-" else Path(args.file).read_text(encoding="utf-8")
-    items = parse(text)
+    items = detect_and_parse(text)
     if not items:
         sys.exit("商品が1件も読み取れませんでした。テキストの形式を確認してください。")
 
@@ -112,6 +200,8 @@ def main():
     print(f"{args.date} {args.shop}（{args.cat}）: {len(items)}件を取り込みました")
     for name, it in items.items():
         extra = f" / シュリンクなし {it['noShrink']:,}" if "noShrink" in it else ""
+        if "colors" in it:
+            extra += "  [" + ", ".join(f"{c} {p:,}" for c, p in it["colors"].items()) + "]"
         print(f"  {name}: 未開封 {it['sealed']:,}{extra}  {it['note']}")
 
 
