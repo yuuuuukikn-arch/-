@@ -52,6 +52,11 @@ a { color: inherit; }
 
 /* Summary */
 .summary { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; padding: 32px 0 24px; }
+.summary > div { min-width: 0; }
+@media (max-width: 1100px) {
+  .summary { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .stats { max-width: 640px; }
+}
 h1 { font-size: clamp(1.5rem, 4vw, 2.2rem); margin: 0 0 6px; line-height: 1.3; }
 .lead { margin: 0; color: var(--muted); }
 .lead strong { color: var(--text); }
@@ -249,7 +254,7 @@ h2 { margin: 0 0 16px; font-size: 1.25rem; }
 .bottom-nav { display: none; }
 
 /* ════════════ スマホ ════════════ */
-@media (max-width: 720px) {
+@media (max-width: 900px) {
   body { font-size: 15px; padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
   .container { width: calc(100% - 24px); }
   input, select { font-size: 16px; } /* iOS で入力時に拡大されないように */
@@ -381,4 +386,8 @@ h2 { margin: 0 0 16px; font-size: 1.25rem; }
   .bottom-nav .active { color: var(--accent); }
   .bottom-nav .active .ico { filter: none; opacity: 1; }
   .tooltip { min-width: 150px; font-size: .75rem; }
+}
+@media (min-width: 600px) and (max-width: 900px) {
+  .pod { flex-basis: 46%; }
+  .container { width: calc(100% - 32px); }
 }
