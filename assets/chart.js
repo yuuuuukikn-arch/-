@@ -33,7 +33,7 @@ const Chart = (() => {
   // opts: { dates: [...], series: [{ name, cls, values }], ref: { label, value } }
   function line(el, opts, tooltip) {
     const W = Math.max(280, el.clientWidth), H = 240;
-    const m = { l: 52, r: 88, t: 14, b: 28 };
+    const m = { l: 46, r: W < 500 ? 52 : 88, t: 14, b: 28 };
     const iw = W - m.l - m.r, ih = H - m.t - m.b;
     const { dates, series, ref } = opts;
     const all = series.flatMap((s) => s.values).filter((v) => v != null);
@@ -106,6 +106,7 @@ const Chart = (() => {
     const leave = () => { cross.setAttribute("visibility", "hidden"); tooltip.hidden = true; };
     const hit = root.querySelector(".hit");
     hit.addEventListener("mousemove", move);
+    hit.addEventListener("touchstart", move, { passive: true });
     hit.addEventListener("touchmove", move, { passive: true });
     hit.addEventListener("mouseleave", leave);
     hit.addEventListener("touchend", leave);

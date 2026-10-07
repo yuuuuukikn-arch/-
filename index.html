@@ -2,10 +2,18 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>せどり比較</title>
   <meta name="description" content="iPhoneとポケカBOXの買取価格・利益ランキングと価格推移グラフ">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>¥</text></svg>">
+  <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f1115" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="せどり比較">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="apple-touch-icon" href="assets/icon-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -15,7 +23,7 @@
       <nav class="nav-links">
         <a href="#list">利益ランキング</a>
         <a href="#calc">利益計算</a>
-        <button class="theme-toggle" aria-label="テーマ切り替え">◐</button>
+        <button class="theme-toggle" aria-label="ライト／ダーク切り替え"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg></button>
       </nav>
     </div>
   </header>
@@ -88,6 +96,13 @@
       <p class="muted">買取価格は各店の掲載価格をもとにしています。実際の買取額は店舗で確認してください。</p>
     </div>
   </footer>
+
+  <nav class="bottom-nav" id="bottomNav" aria-label="メニュー">
+    <button data-cat="iPhone" class="active"><span class="ico">📱</span>iPhone</button>
+    <button data-cat="ポケカBOX"><span class="ico">🃏</span>ポケカ</button>
+    <button data-star-filter><span class="ico">⭐</span>ウォッチ</button>
+    <a href="#calc"><span class="ico">🧮</span>利益計算</a>
+  </nav>
 
   <div class="tooltip" id="tooltip" hidden></div>
 

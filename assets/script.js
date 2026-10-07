@@ -4,6 +4,7 @@ const sign = (n) => (n > 0 ? "plus" : n < 0 ? "minus" : "zero");
 const signed = (n) => (n > 0 ? "+" : "") + yen(n);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const $ = (id) => document.getElementById(id);
+const disp = (name) => esc(name.replace(/】\s+/g, "】")); // 表示用（【MEGA】 30th → 【MEGA】30th）
 const MEDALS = ["🥇", "🥈", "🥉"];
 
 const store = {
@@ -106,11 +107,11 @@ function render() {
   $("rows").innerHTML = items.length ? items.map((p, i) => {
     const sub = currentCat === "iPhone"
       ? (p.bestItem.colors ? `<small>最高値の色：${esc(Object.keys(p.bestItem.colors).filter((c) => p.bestItem.colors[c] === p.price).join("・"))}</small>` : "")
-      : (p.bestItem.noShrink != null ? `<small>シュリンクなし ${yen(p.bestItem.noShrink)}</small>` : "") + (p.bestItem.note ? `<small>備考：${esc(p.bestItem.note)}</small>` : "");
+      : (p.bestItem.noShrink != null ? `<small>シュリンクなし ${yen(p.bestItem.noShrink)}</small>` : "") + (p.bestItem.note ? `<small class="memo">備考：${esc(p.bestItem.note)}</small>` : "");
     const row = `<tr class="row ${openName === p.name ? "open" : ""}" data-name="${esc(p.name)}">
       <td class="num rank-cell"><span class="rank r${i + 1}">${i + 1}</span></td>
       <td class="star-cell"><button class="star ${stars.has(p.name) ? "on" : ""}" data-star="${esc(p.name)}" aria-label="ウォッチ">${stars.has(p.name) ? "★" : "☆"}</button></td>
-      <td class="name"><b>${esc(p.name)}${p.boost ? ' <span class="boost">強化</span>' : ""}</b>${sub}</td>
+      <td class="name"><b>${disp(p.name)}${p.boost ? ' <span class="boost">強化</span>' : ""}</b>${sub}</td>
       <td class="num" data-label="定価">${p.retail != null ? yen(p.retail) + (p.estimated ? '<sup class="est" title="推定の定価">推定</sup>' : "") : '<span class="na">未登録</span>'}</td>
       <td class="num sealed" data-label="買取価格">${yen(p.price)}</td>
       <td class="shop-cell" data-label="最高値の店">${p.latest.best.map((sh) => shopLink(sh)).join("")}${p.shopCount > 1 ? `<small class="muted">${p.shopCount}店を比較</small>` : ""}</td>
@@ -123,6 +124,7 @@ function render() {
   }).join("") : `<tr><td colspan="10" class="empty">条件に合う商品がありません</td></tr>`;
 
   if (openName) drawChart(items.find((p) => p.name === openName));
+  document.querySelector("[data-star-filter]").classList.toggle("active", $("onlyStar").checked);
 }
 
 function renderPodium(items) {
@@ -130,7 +132,7 @@ function renderPodium(items) {
   $("podium").innerHTML = items.slice(0, 3).map((p, i) => `
     <article class="pod pod${i + 1}" data-open="${esc(p.name)}">
       <div class="pod-head"><span class="medal">${MEDALS[i]}</span><span class="muted">${i + 1}位 ・ ${label}</span>${p.boost ? '<span class="boost">強化</span>' : ""}</div>
-      <h3>${esc(p.name)}</h3>
+      <h3>${disp(p.name)}</h3>
       ${useRate()
         ? `<div class="pod-profit ${p.rate != null ? sign(p.rate - 1) : ""}"><small>買取率</small>${p.rate != null ? pct(p.rate) : "—"}</div>`
         : `<div class="pod-profit ${p.profit != null ? sign(p.profit) : ""}">${p.profit != null ? signed(p.profit) : "—"}</div>`}
@@ -157,7 +159,7 @@ function renderStats(products) {
   $("updated").innerHTML = last ? `価格更新日：${last.replaceAll("-", ".")} ・ 記録 ${new Set(dates).size}日分 ・ 掲載店：${shops.map((sh) => shopLink(sh)).join("")}` : "";
   $("stats").innerHTML = `
     <div class="stat"><span>黒字の商品</span><b>${black.length}<small> / ${withProfit.length}</small></b></div>
-    <div class="stat"><span>${useRate() ? "最高買取率" : "最高利益"}</span><b class="${top ? sign(top.profit) : ""}">${top ? (useRate() ? pct(top.rate) : signed(top.profit)) : "—"}</b><small class="muted">${top ? esc(top.name) : ""}</small></div>
+    <div class="stat"><span>${useRate() ? "最高買取率" : "最高利益"}</span><b class="${top ? sign(top.profit) : ""}">${top ? (useRate() ? pct(top.rate) : signed(top.profit)) : "—"}</b><small class="muted">${top ? disp(top.name) : ""}</small></div>
     <div class="stat"><span>強化中</span><b>${products.filter((p) => p.boost).length}<small> 件</small></b></div>`;
 }
 
@@ -202,7 +204,7 @@ function detail(p) {
   return `<div class="detail-wrap">
     <div class="chart-head">
       <div>
-        <h3>${esc(p.name)} の買取価格推移</h3>
+        <h3>${disp(p.name)} の買取価格推移</h3>
         <div class="legend">
           <span><i class="key s1"></i>最高値（各店で一番高い買取価格）</span>
           ${p.retail != null ? `<span><i class="key ref-key"></i>定価${p.estimated ? "（推定）" : ""}</span>` : ""}
@@ -262,14 +264,27 @@ $("year").textContent = new Date().getFullYear();
 ["q", "sort", "onlyProfit", "onlyStar"].forEach((id) => $(id).addEventListener("input", render));
 ["cBuy", "cSell", "cPoint", "cCost"].forEach((id) => $(id).addEventListener("input", renderCalc));
 
-$("tabs").addEventListener("click", (e) => {
-  const tab = e.target.closest(".tab");
-  if (!tab) return;
-  currentCat = tab.dataset.cat;
+function setCat(cat) {
+  currentCat = cat;
   setSortOptions();
-  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t === tab));
+  document.querySelectorAll("[data-cat]").forEach((t) => t.classList.toggle("active", t.dataset.cat === cat));
   openName = null;
   render();
+}
+$("tabs").addEventListener("click", (e) => {
+  const tab = e.target.closest(".tab");
+  if (tab) setCat(tab.dataset.cat);
+});
+
+// 下部ナビ（スマホ）
+$("bottomNav").addEventListener("click", (e) => {
+  const cat = e.target.closest("[data-cat]");
+  if (cat) { setCat(cat.dataset.cat); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+  if (e.target.closest("[data-star-filter]")) {
+    $("onlyStar").checked = !$("onlyStar").checked;
+    render();
+    document.querySelector("#list").scrollIntoView({ behavior: "smooth" });
+  }
 });
 
 $("rows").addEventListener("click", (e) => {
