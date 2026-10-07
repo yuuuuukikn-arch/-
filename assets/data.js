@@ -2,6 +2,7 @@
 const SHOPS = {
   "買取一丁目": { url: "https://www.1-chome.com/" },
   "買取ルデヤ": { url: "https://kaitori-rudeya.com/", hours: "10時〜19時（月〜土・祝）／日曜定休" },
+  "買取商店":   { url: "https://www.kaitorishouten-co.jp/" },
 };
 
 // iPhone 18 の色（色別価格の表の並び順）

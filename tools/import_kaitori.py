@@ -4,11 +4,13 @@
 使い方:
   python3 tools/import_kaitori.py data/raw/2026-10-07_買取一丁目.txt --date 2026-10-07 --shop 買取一丁目
   python3 tools/import_kaitori.py data/raw/2026-10-07_買取ルデヤ.txt --date 2026-10-07 --shop 買取ルデヤ
+  python3 tools/import_kaitori.py data/raw/2026-10-07_買取商店.txt --date 2026-10-07 --shop 買取商店
 
 対応している書き方:
   - 買取一丁目形式: 商品名 → 新品 → 備考 → 未開封/シュリンク有 → ¥価格
   - 買取ルデヤ形式: 新品 → 「機種 容量 色 型番 未開封 SIMフリー」 → JAN → 買取価格 → 000,000円
     （色ごとの行は機種ごとにまとめ、色別価格 colors と最高値 sealed を保存）
+  - 買取商店形式: [機種 容量 色 型番 SIMフリー](URL) → JAN → 新品¥000,000 → 中古¥…
 
 同じ日付・同じ店のデータがあれば上書きする（1日に何度送っても最新の1件になる）。
 """
@@ -160,7 +162,42 @@ def parse_rudeya(text):
     return items
 
 
+NEW_PRICE_RE = re.compile(r"^新品\s*[¥￥]\s*([\d,]+)")
+MD_LINK_RE = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+
+
+def parse_shouten(text):
+    """買取商店形式（色ごとに「機種 容量 色 型番 SIMフリー → JAN → 新品¥000,000 → 中古¥…」）。
+    ページをコピーすると商品名が [名前](URL) になるので、リンクの書式は外して読む。"""
+    lines = [norm(MD_LINK_RE.sub(r"\1", l)) for l in text.splitlines()]
+    items = {}
+    for i, line in enumerate(lines):
+        m = MODEL_RE.match(line)
+        if not m:
+            continue
+        price = None
+        for l in lines[i + 1 : i + 6]:
+            pm = NEW_PRICE_RE.match(l)
+            if pm:
+                price = int(pm.group(1).replace(",", ""))
+                break
+            if MODEL_RE.match(l):
+                break
+        if price is None:
+            continue
+        prev = next((l for l in reversed(lines[max(0, i - 3) : i]) if l), "")
+        name, color = m.group(1), COLORS.get(m.group(2), m.group(2))
+        item = items.setdefault(name, {"note": "", "boost": False})
+        item["boost"] = item["boost"] or prev.startswith("強化")
+        item.setdefault("colors", {})[color] = price
+        item["sealed"] = max(item.get("sealed", 0), price)
+    return items
+
+
 def detect_and_parse(text):
+    # 「新品¥000,000」の行がある書き方なら買取商店形式
+    if re.search(r"^\s*新品\s*[¥￥]\s*[\d,]+", text, re.M):
+        return parse_shouten(text)
     # 「買取価格」の次に「000,000円」が来る書き方ならルデヤ形式
     if re.search(r"買取価格\s*\n\s*[\d,]+\s*円", text):
         return parse_rudeya(text)
