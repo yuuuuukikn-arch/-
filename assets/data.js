@@ -55,14 +55,17 @@ const CATALOG = {
 // 実データがまだないカテゴリに表示するサンプル（今は不要なので空）
 const SAMPLE_SNAPSHOTS = [];
 
-// 速報（ページ上部に1件ずつ表示され、複数あると5秒ごとに切り替わります）
-// date: 速報の日付 / until: この日まで表示（省略すると date から NEWS_DAYS 日間）
-// url: 押したときに開くページ（出典の記事など）
+// 速報（新しい順に並べなくてOK。ページ上部に表示期間中のものが1件ずつ出て、
+// 押すと速報ページ news.html の該当記事に移動します）
+//   id:     記事ごとの英数字の名前（ページ内リンクに使う）
+//   date:   速報の日付 / until: この日まで上部に表示（省略すると date から NEWS_DAYS 日間）
+//   tag:    ジャンル（ガンプラ・ポケカ・iPhone など）
+//   title:  見出し / body: 本文（省略可）
+//   retail: 定価 / market: 相場（どちらも省略可。あると差額と倍率を表示）
+//   url, source: 出典のリンクと名前（省略可）
+// 例:
+// { id: "pgu-nu", date: "2026-10-08", until: "2026-10-15", tag: "ガンプラ",
+//   title: "PG UNLEASHED νガンダムにプレ値", body: "…", retail: 66000, market: 90000,
+//   url: "https://…", source: "…" },
 const NEWS_DAYS = 7;
-const NEWS = [
-  {
-    date: "2026-10-01", until: "2026-10-14", tag: "ガンプラ",
-    title: "ガンプラ再販12件が値上げ（平均24.3%・最大30%）",
-    url: "https://hayamimi-gunpla.com/blog-entry-29187.html", source: "早耳ガンプラ情報局",
-  },
-];
+const NEWS = [];

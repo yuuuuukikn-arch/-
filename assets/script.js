@@ -296,10 +296,8 @@ function startFlash() {
     const body = `<span class="flash-label">速報</span>
       <span class="flash-text"><small>${n.date.slice(5).replace("-", "/")}${n.tag ? " ・ " + esc(n.tag) : ""}</small>${esc(n.title)}</span>
       ${news.length > 1 ? `<span class="flash-count">${i + 1}/${news.length}</span>` : ""}
-      ${n.url ? '<span class="flash-go" aria-hidden="true">›</span>' : ""}`;
-    el.innerHTML = n.url
-      ? `<a class="flash-inner" href="${esc(n.url)}" target="_blank" rel="noopener" title="${esc(n.source || "")}">${body}</a>`
-      : `<div class="flash-inner">${body}</div>`;
+      <span class="flash-go" aria-hidden="true">›</span>`;
+    el.innerHTML = `<a class="flash-inner" href="news.html#${encodeURIComponent(n.id || "")}">${body}</a>`;
   };
   show();
   if (news.length > 1 && !matchMedia("(prefers-reduced-motion: reduce)").matches) {

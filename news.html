@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>せどり比較 速報</title>
+  <meta name="description" content="ガンプラ・ポケカ・iPhone のプレ値や買取価格の速報一覧">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>¥</text></svg>">
+  <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f1115" media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="assets/icon-180.png">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a href="./" class="logo"><span class="logo-mark">¥</span><span class="logo-text">せどり比較</span></a>
+      <a href="./" class="back-link">‹ ランキングへ</a>
+      <button class="theme-toggle" aria-label="ライト／ダーク切り替え"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg></button>
+    </div>
+  </header>
+
+  <main class="container news-page">
+    <h1 class="news-h1"><span class="flash-label">速報</span> 速報一覧</h1>
+    <div class="news-filter" id="newsFilter" role="tablist" aria-label="ジャンル"></div>
+    <div id="newsList" class="news-list"></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; <span id="year"></span> せどり比較 ・ <a href="./">ランキングへ戻る</a></p>
+      <p class="muted">相場は掲載時点のものです。最新の価格は各店・各サイトで確認してください。</p>
+    </div>
+  </footer>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/news.js"></script>
+</body>
+</html>

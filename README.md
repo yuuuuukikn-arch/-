@@ -5,7 +5,7 @@
 
 ## できること
 
-- **速報**：ページ上部に1件ずつ表示（複数あれば5秒ごとに切り替え）。表示期間を過ぎると自動で消える
+- **速報**：ページ上部に1件ずつ表示（複数あれば5秒ごとに切り替え）。表示期間を過ぎると自動で消える。押すと速報ページ（`news.html`）の記事へ
 - **カテゴリ切り替え**：画面上部の「iPhone｜ポケカ」
 - **表彰台**：上位3つを 🥇🥈🥉 で表示
 - **比べ方**：iPhone は「買取率 = 買取価格 ÷ 定価」、ポケカは「利益 = 買取価格 − 定価」で並べ替え
@@ -42,10 +42,13 @@ iPhone は 18 シリーズだけ表示します（`assets/data.js` の `SHOW_ONL
 
 ## 速報の追加
 
-`assets/data.js` の `NEWS` に追加します。`date` から `until` の日まで表示されます（`until` を省略すると `date` から `NEWS_DAYS` 日間）。
+`assets/data.js` の `NEWS` に追加します。ランキングページの上部には `date` から `until` の日まで表示されます（`until` を省略すると `date` から `NEWS_DAYS` 日間）。
+速報ページ（`news.html`）には期間が過ぎたものも「終了」として残ります。
 
 ```js
-{ date: "2026-10-08", until: "2026-10-15", tag: "ガンプラ", title: "○○がプレ値に", url: "https://...", source: "出典名" },
+{ id: "pgu-nu", date: "2026-10-08", until: "2026-10-15", tag: "ガンプラ",
+  title: "○○がプレ値に", body: "本文", retail: 66000, market: 92000,
+  url: "https://...", source: "出典名" },
 ```
 
 ## 店舗の追加
@@ -62,6 +65,7 @@ iPhone は 18 シリーズだけ表示します（`assets/data.js` の `SHOW_ONL
 
 - `index.html` / `assets/style.css` / `assets/script.js` — サイト本体
 - `assets/chart.js` — 価格推移グラフ（外部ライブラリなし）
+- `news.html` / `assets/news.js` — 速報ページ
 - `assets/data.js` — 定価の一覧、ポケカのサンプルデータ
 - `assets/history.js` — 買取価格の履歴（自動生成）
 - `tools/import_kaitori.py` — 取り込みスクリプト
