@@ -265,7 +265,6 @@ h2 { margin: 0 0 16px; font-size: 1.25rem; }
 .key.s3 { background: var(--series-3); }
 .chart .series.s3 { stroke: var(--series-3); }
 .chart .dot.s3 { fill: var(--series-3); }
-.shop.s1 { color: var(--series-1); } .shop.s2 { color: var(--series-2); } .shop.s3 { color: var(--series-3); }
 
 .shop-compare { margin-top: 14px; }
 .shop-compare h4 { margin: 0 0 8px; font-size: .9rem; }
@@ -282,3 +281,5 @@ h2 { margin: 0 0 16px; font-size: 1.25rem; }
   .table tr.row td.shop-cell { grid-column: span 2; }
   .table tr.row td.shop-cell .shop { margin: 0 10px 0 0; }
 }
+.pod-profit small { font-size: .8rem; font-weight: 600; color: var(--muted); margin-right: 6px; }
+.cmp td small { margin-left: 4px; font-weight: 400; }

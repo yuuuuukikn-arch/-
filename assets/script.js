@@ -20,9 +20,27 @@ let range = 30;
 const realCats = new Set(SNAPSHOTS.map((s) => s.cat));
 const ALL = [...SNAPSHOTS, ...SAMPLE_SNAPSHOTS.filter((s) => !realCats.has(s.cat))];
 
+// スマホ（iPhone）は買取率、ポケカは利益で比べる
+const useRate = () => currentCat === "iPhone";
+const SORTS = {
+  rate:   ["rate", "買取率が高い順"],
+  profit: ["profit", "利益が高い順"],
+  roi:    ["roi", "利益率が高い順"],
+  price:  ["price", "買取価格が高い順"],
+  change: ["change", "前回から上がった順"],
+};
+function setSortOptions() {
+  const keys = useRate() ? ["rate", "profit", "price", "change"] : ["profit", "roi", "price", "change"];
+  $("sort").innerHTML = keys.map((k) => `<option value="${SORTS[k][0]}">${SORTS[k][1]}</option>`).join("");
+  $("colRate").textContent = useRate() ? "買取率" : "利益率";
+}
+function rateCell(p) {
+  if (useRate()) return p.rate != null ? `<span class="roi ${sign(p.rate - 1)}">${pct(p.rate)}</span>` : "—";
+  return p.roi != null ? `<span class="roi ${sign(p.roi)}">${pct(p.roi)}</span>` : "—";
+}
+
 const SHOP_ORDER = Object.keys(SHOPS);
 const shopIdx = (shop) => { const i = SHOP_ORDER.indexOf(shop); return i < 0 ? SHOP_ORDER.length : i; };
-const shopCls = (shop) => "s" + (Math.min(shopIdx(shop), 7) + 1);
 
 // 店舗名（公式サイトへのリンク付き）
 function shopLink(shop, cls = "") {
@@ -61,6 +79,7 @@ function buildProducts(cat) {
       bestItem, boost: Object.values(latest.shops).some((x) => x.boost),
       shopCount: Object.keys(latest.shops).length,
       profit, roi: profit != null ? profit / retail : null,
+      rate: retail != null ? latest.price / retail : null, // 買取率 = 買取価格 ÷ 定価
       price: latest.price,
       change: prev ? latest.price - prev.price : 0,
       hasPrev: !!prev,
@@ -98,7 +117,7 @@ function render() {
       <td class="num" data-label="前回比">${p.hasPrev ? `<span class="chg ${sign(p.change)}">${p.change > 0 ? "▲" : p.change < 0 ? "▼" : "±"}${yen(Math.abs(p.change))}</span>` : '<span class="na">—</span>'}</td>
       <td class="spark-cell" data-label="推移">${Chart.sparkline(p.history.map((h) => h.price))}</td>
       <td class="num profit ${p.profit != null ? sign(p.profit) : ""}" data-label="利益">${p.profit != null ? signed(p.profit) : "—"}</td>
-      <td class="num" data-label="利益率">${p.roi != null ? `<span class="roi ${sign(p.roi)}">${pct(p.roi)}</span>` : "—"}</td>
+      <td class="num" data-label="${useRate() ? "買取率" : "利益率"}">${rateCell(p)}</td>
     </tr>`;
     return row + (openName === p.name ? `<tr class="detail"><td colspan="10">${detail(p)}</td></tr>` : "");
   }).join("") : `<tr><td colspan="10" class="empty">条件に合う商品がありません</td></tr>`;
@@ -112,9 +131,13 @@ function renderPodium(items) {
     <article class="pod pod${i + 1}" data-open="${esc(p.name)}">
       <div class="pod-head"><span class="medal">${MEDALS[i]}</span><span class="muted">${i + 1}位 ・ ${label}</span>${p.boost ? '<span class="boost">強化</span>' : ""}</div>
       <h3>${esc(p.name)}</h3>
-      <div class="pod-profit ${p.profit != null ? sign(p.profit) : ""}">${p.profit != null ? signed(p.profit) : "—"}</div>
+      ${useRate()
+        ? `<div class="pod-profit ${p.rate != null ? sign(p.rate - 1) : ""}"><small>買取率</small>${p.rate != null ? pct(p.rate) : "—"}</div>`
+        : `<div class="pod-profit ${p.profit != null ? sign(p.profit) : ""}">${p.profit != null ? signed(p.profit) : "—"}</div>`}
       <div class="pod-meta">
-        <span>利益率 <b class="${sign(p.roi)}">${p.roi != null ? pct(p.roi) : "—"}</b></span>
+        ${useRate()
+          ? `<span>利益 <b class="${p.profit != null ? sign(p.profit) : ""}">${p.profit != null ? signed(p.profit) : "—"}</b></span>`
+          : `<span>利益率 <b class="${sign(p.roi)}">${p.roi != null ? pct(p.roi) : "—"}</b></span>`}
         <span>買取 ${yen(p.price)}</span>
         <span>定価 ${p.retail != null ? yen(p.retail) : "—"}</span>
       </div>
@@ -126,14 +149,15 @@ function renderPodium(items) {
 function renderStats(products) {
   const withProfit = products.filter((p) => p.profit != null);
   const black = withProfit.filter((p) => p.profit > 0);
-  const top = withProfit.reduce((a, b) => (!a || b.profit > a.profit ? b : a), null);
+  const metric = useRate() ? "rate" : "profit";
+  const top = withProfit.reduce((a, b) => (!a || b[metric] > a[metric] ? b : a), null);
   const dates = ALL.filter((s) => s.cat === currentCat).map((s) => s.date).sort();
   const last = dates[dates.length - 1];
   const shops = [...new Set(ALL.filter((s) => s.cat === currentCat && s.date === last).map((s) => s.shop))].sort((a, b) => shopIdx(a) - shopIdx(b));
   $("updated").innerHTML = last ? `価格更新日：${last.replaceAll("-", ".")} ・ 記録 ${new Set(dates).size}日分 ・ 掲載店：${shops.map((sh) => shopLink(sh)).join("")}` : "";
   $("stats").innerHTML = `
     <div class="stat"><span>黒字の商品</span><b>${black.length}<small> / ${withProfit.length}</small></b></div>
-    <div class="stat"><span>最高利益</span><b class="${top ? sign(top.profit) : ""}">${top ? signed(top.profit) : "—"}</b><small class="muted">${top ? esc(top.name) : ""}</small></div>
+    <div class="stat"><span>${useRate() ? "最高買取率" : "最高利益"}</span><b class="${top ? sign(top.profit) : ""}">${top ? (useRate() ? pct(top.rate) : signed(top.profit)) : "—"}</b><small class="muted">${top ? esc(top.name) : ""}</small></div>
     <div class="stat"><span>強化中</span><b>${products.filter((p) => p.boost).length}<small> 件</small></b></div>`;
 }
 
@@ -147,9 +171,10 @@ function shopTable(p) {
     const vals = its.map((it) => valueOf(it, label));
     const best = Math.max(...vals.filter((v) => v != null));
     const prof = p.retail != null && isFinite(best) ? best - p.retail : null;
-    return `<tr><th scope="row">${esc(label)}</th>${vals.map((v) => cell(v, best)).join("")}<td class="num ${prof != null ? sign(prof) : ""}">${prof != null ? signed(prof) : "—"}</td></tr>`;
+    const last = prof == null ? "—" : useRate() ? `${pct(best / p.retail)}<small class="muted">（${signed(prof)}）</small>` : signed(prof);
+    return `<tr><th scope="row">${esc(label)}</th>${vals.map((v) => cell(v, best)).join("")}<td class="num ${prof != null ? sign(prof) : ""}">${last}</td></tr>`;
   }).join("");
-  const shopHead = shops.map((sh) => `<th class="num">${shopLink(sh, shopCls(sh))}</th>`).join("");
+  const shopHead = shops.map((sh) => `<th class="num">${shopLink(sh)}</th>`).join("");
   const hasColors = its.some((it) => it.colors);
   const body = hasColors
     ? rowsHtml(IPHONE_COLORS, (it, c) => (it.colors ? it.colors[c] ?? null : null))
@@ -162,7 +187,7 @@ function shopTable(p) {
   return `<div class="shop-compare">
     <h4>店舗別の買取価格（${p.latest.date.replaceAll("-", "/")}）</h4>
     <div class="cmp-wrap"><table class="cmp">
-      <thead><tr><th>${hasColors ? "色" : ""}</th>${shopHead}<th class="num">利益（最高値）</th></tr></thead>
+      <thead><tr><th>${hasColors ? "色" : ""}</th>${shopHead}<th class="num">${useRate() ? "買取率（最高値）" : "利益（最高値）"}</th></tr></thead>
       <tbody>${body}</tbody>
     </table></div>
     ${notes ? `<ul class="shop-notes">${notes}</ul>` : ""}
@@ -174,13 +199,12 @@ function detail(p) {
   const first = h[0], last = h[h.length - 1];
   const hi = h.reduce((a, b) => (b.price > a.price ? b : a));
   const lo = h.reduce((a, b) => (b.price < a.price ? b : a));
-  const shops = [...new Set(h.flatMap((x) => Object.keys(x.shops)))].sort((a, b) => shopIdx(a) - shopIdx(b));
   return `<div class="detail-wrap">
     <div class="chart-head">
       <div>
         <h3>${esc(p.name)} の買取価格推移</h3>
         <div class="legend">
-          ${shops.map((sh) => `<span><i class="key ${shopCls(sh)}"></i>${esc(sh)}</span>`).join("")}
+          <span><i class="key s1"></i>最高値（各店で一番高い買取価格）</span>
           ${p.retail != null ? `<span><i class="key ref-key"></i>定価${p.estimated ? "（推定）" : ""}</span>` : ""}
         </div>
       </div>
@@ -194,7 +218,7 @@ function detail(p) {
       <div><span>期間内の最高値</span><b>${yen(hi.price)}</b><small>${hi.date.replaceAll("-", "/")}</small></div>
       <div><span>期間内の最安値</span><b>${yen(lo.price)}</b><small>${lo.date.replaceAll("-", "/")}</small></div>
       <div><span>記録開始からの変化</span><b class="${sign(last.price - first.price)}">${signed(last.price - first.price)}</b><small>${first.date.replaceAll("-", "/")} から</small></div>
-      <div><span>定価との差</span><b class="${p.profit != null ? sign(p.profit) : ""}">${p.profit != null ? signed(p.profit) : "—"}</b><small>${p.retail != null ? "定価 " + yen(p.retail) : "定価未登録"}</small></div>
+      <div><span>${useRate() ? "買取率" : "定価との差"}</span><b class="${p.profit != null ? sign(p.profit) : ""}">${useRate() ? (p.rate != null ? pct(p.rate) : "—") : (p.profit != null ? signed(p.profit) : "—")}</b><small>${p.retail != null ? (useRate() ? `利益 ${signed(p.profit)} ・ ` : "") + "定価 " + yen(p.retail) : "定価未登録"}</small></div>
     </div>
     ${shopTable(p)}
   </div>`;
@@ -210,8 +234,8 @@ function drawChart(p) {
   }
   Chart.line(el, {
     dates: h.map((x) => x.date),
-    series: [...new Set(h.flatMap((x) => Object.keys(x.shops)))].sort((a, b) => shopIdx(a) - shopIdx(b))
-      .map((sh) => ({ name: sh, cls: shopCls(sh), values: h.map((x) => x.shops[sh]?.sealed ?? null) })),
+    series: [{ name: "最高値", cls: "s1", values: h.map((x) => x.price) }],
+    extra: (i) => `<div class="muted">${esc(h[i].best.join("・"))}${p.retail != null ? ` ・ 買取率 ${pct(h[i].price / p.retail)}` : ""}</div>`,
     ref: p.retail != null ? { label: "定価", value: p.retail } : null,
   }, $("tooltip"));
 }
@@ -225,6 +249,7 @@ function renderCalc() {
     <span class="muted">利益</span>
     <div class="big ${sign(profit)}">${signed(profit)}</div>
     <dl>
+      <dt>買取率（買取価格 ÷ 仕入れ値）</dt><dd class="${sign(sell - buy)}">${buy ? pct(sell / buy) : "—"}</dd>
       <dt>利益率</dt><dd class="${sign(profit)}">${buy ? pct(profit / buy) : "—"}</dd>
       <dt>買取価格 − 仕入れ値</dt><dd>${signed(sell - buy)}</dd>
       <dt>ポイント還元</dt><dd>+${yen(point)}</dd>
@@ -241,6 +266,7 @@ $("tabs").addEventListener("click", (e) => {
   const tab = e.target.closest(".tab");
   if (!tab) return;
   currentCat = tab.dataset.cat;
+  setSortOptions();
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t === tab));
   openName = null;
   render();
@@ -284,5 +310,6 @@ document.querySelector(".theme-toggle").addEventListener("click", () => {
   if (openName) render();
 });
 
+setSortOptions();
 render();
 renderCalc();

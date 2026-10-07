@@ -95,7 +95,8 @@ const Chart = (() => {
       cross.setAttribute("x1", X(best)); cross.setAttribute("x2", X(best)); cross.setAttribute("visibility", "visible");
       tooltip.innerHTML = `<b>${dates[best].replaceAll("-", "/")}</b>` +
         series.map((s) => `<div><i class="key ${s.cls}"></i>${s.name}<span>${s.values[best] == null ? "—" : yenFull(s.values[best])}</span></div>`).join("") +
-        (ref ? `<div class="muted"><i class="key ref-key"></i>定価<span>${yenFull(ref.value)}</span></div>` : "");
+        (ref ? `<div class="muted"><i class="key ref-key"></i>定価<span>${yenFull(ref.value)}</span></div>` : "") +
+        (opts.extra ? opts.extra(best) : "");
       tooltip.hidden = false;
       const tx = box.left + (X(best) / W) * box.width, ty = box.top + window.scrollY + 12;
       const tw = tooltip.offsetWidth;

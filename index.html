@@ -41,12 +41,7 @@
 
       <div class="toolbar">
         <input type="search" id="q" placeholder="商品名で検索">
-        <select id="sort">
-          <option value="profit">利益が高い順</option>
-          <option value="roi">利益率が高い順</option>
-          <option value="price">買取価格が高い順</option>
-          <option value="change">前回から上がった順</option>
-        </select>
+        <select id="sort"></select>
         <label class="check"><input type="checkbox" id="onlyProfit"> 黒字のみ</label>
         <label class="check"><input type="checkbox" id="onlyStar"> ★ウォッチのみ</label>
       </div>
@@ -64,13 +59,13 @@
               <th class="num">前回比</th>
               <th>推移</th>
               <th class="num">利益</th>
-              <th class="num">利益率</th>
+              <th class="num" id="colRate">利益率</th>
             </tr>
           </thead>
           <tbody id="rows"></tbody>
         </table>
       </div>
-      <p class="note">行をクリックすると価格推移のグラフが開きます。利益は「各店の中で一番高い買取価格（未開封）− 定価」です。iPhone は一番高い色、ポケカはシュリンク付きの価格で計算しています。店舗名を押すと各店のサイトが開きます。</p>
+      <p class="note">行をクリックすると価格推移のグラフが開きます。iPhone は「買取率 = 買取価格 ÷ 定価」、ポケカは「利益 = 買取価格 − 定価」で比べています（買取価格は各店の中で一番高い未開封の価格）。iPhone は一番高い色、ポケカはシュリンク付きの価格で計算しています。店舗名を押すと各店のサイトが開きます。</p>
     </section>
 
     <section id="calc" class="container panel">
