@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>せどり比較</title>
-  <meta name="description" content="仕入れ値と各販路の相場から、手数料・送料込みの利益を比較するサイト">
+  <meta name="description" content="iPhoneとポケカBOXの買取価格・利益ランキングと価格推移グラフ">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>¥</text></svg>">
   <link rel="stylesheet" href="assets/style.css">
 </head>
@@ -15,7 +15,6 @@
       <nav class="nav-links">
         <a href="#list">利益ランキング</a>
         <a href="#calc">利益計算</a>
-        <a href="#settings">手数料設定</a>
         <button class="theme-toggle" aria-label="テーマ切り替え">◐</button>
       </nav>
     </div>
@@ -25,8 +24,8 @@
     <section class="container summary">
       <div>
         <h1>仕入れ前に、利益をチェック。</h1>
-        <p class="lead"><strong>iPhone</strong>と<strong>ポケカBOX</strong>の利益ランキング。手数料・送料を引いた<strong>手取り利益</strong>で比較します。</p>
-        <p class="updated">相場更新日：<span id="updated"></span></p>
+        <p class="lead"><strong>iPhone</strong>と<strong>ポケカBOX</strong>の買取価格から、<strong>定価で買って買取店に売ったときの利益</strong>をランキング表示します。</p>
+        <p class="updated" id="updated"></p>
       </div>
       <div class="stats" id="stats"></div>
     </section>
@@ -35,8 +34,8 @@
       <div class="tabs" id="tabs" role="tablist">
         <button class="tab active" data-cat="iPhone">📱 iPhone</button>
         <button class="tab" data-cat="ポケカBOX">🃏 ポケカBOX</button>
-        <button class="tab" data-cat="">すべて</button>
       </div>
+      <p class="sample-note" id="sampleNote" hidden>⚠ ポケカBOXの買取価格はまだサンプルです。買取店の価格リストを送ってもらえれば実データに置き換わります。</p>
 
       <div class="podium" id="podium"></div>
 
@@ -45,8 +44,8 @@
         <select id="sort">
           <option value="profit">利益が高い順</option>
           <option value="roi">利益率が高い順</option>
-          <option value="sold">よく売れる順</option>
-          <option value="buy">仕入れ値が安い順</option>
+          <option value="sealed">買取価格が高い順</option>
+          <option value="change">前回から上がった順</option>
         </select>
         <label class="check"><input type="checkbox" id="onlyProfit"> 黒字のみ</label>
         <label class="check"><input type="checkbox" id="onlyStar"> ★ウォッチのみ</label>
@@ -59,52 +58,47 @@
               <th class="num">順位</th>
               <th></th>
               <th>商品</th>
-              <th class="num">仕入れ値</th>
-              <th class="num">買取店</th>
-              <th class="num">メルカリ</th>
-              <th class="num">ヤフオク</th>
-              <th class="num">ラクマ</th>
-              <th>おすすめ販路</th>
+              <th class="num">定価</th>
+              <th class="num">買取（未開封）</th>
+              <th class="num">開封済未使用</th>
+              <th class="num">前回比</th>
+              <th>推移</th>
               <th class="num">利益</th>
               <th class="num">利益率</th>
-              <th class="num">月間販売</th>
             </tr>
           </thead>
           <tbody id="rows"></tbody>
         </table>
       </div>
-      <p class="note">※ 表示している相場はサンプルです。<code>assets/data.js</code> を実際の相場に書き換えて使ってください。行をクリックすると内訳が開きます。</p>
+      <p class="note">行をクリックすると価格推移のグラフが開きます。利益は「買取価格（未開封・減額なしの色）− 定価」です。色によっては減額があります。</p>
     </section>
 
     <section id="calc" class="container panel">
       <h2>利益計算</h2>
       <div class="calc">
         <div class="calc-inputs">
-          <label>仕入れ値（円）<input type="number" id="cBuy" value="10000" min="0"></label>
-          <label>販売価格（円）<input type="number" id="cSell" value="15000" min="0"></label>
-          <label>送料（円）<input type="number" id="cShip" value="750" min="0"></label>
-          <label>販路<select id="cCh"></select></label>
+          <label>仕入れ値（円）<input type="number" id="cBuy" value="239800" min="0"></label>
+          <label>買取価格（円）<input type="number" id="cSell" value="245000" min="0"></label>
+          <label>ポイント還元（%）<input type="number" id="cPoint" value="1" min="0" step="0.1"></label>
+          <label>交通費・送料など（円）<input type="number" id="cCost" value="0" min="0"></label>
         </div>
         <div class="calc-result" id="cResult"></div>
       </div>
-    </section>
-
-    <section id="settings" class="container panel">
-      <h2>手数料設定</h2>
-      <p class="muted">販路ごとの販売手数料（%）を変更できます。変更はこのブラウザに保存され、一覧と計算に反映されます。</p>
-      <div class="fees" id="fees"></div>
-      <button class="btn-ghost" id="resetFees">初期値に戻す</button>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="container">
       <p>&copy; <span id="year"></span> せどり比較</p>
-      <p class="muted">チケットなど法律で転売が禁止されている商品は扱わないでください。</p>
+      <p class="muted">買取価格は各店の掲載価格をもとにしています。実際の買取額は店舗で確認してください。</p>
     </div>
   </footer>
 
+  <div class="tooltip" id="tooltip" hidden></div>
+
   <script src="assets/data.js"></script>
+  <script src="assets/history.js"></script>
+  <script src="assets/chart.js"></script>
   <script src="assets/script.js"></script>
 </body>
 </html>
