@@ -298,7 +298,6 @@ h2 { margin: 0 0 16px; font-size: 1.25rem; }
   .table tr.row td:last-child .roi { font-size: 1.1rem; padding: 4px 10px; border-radius: 8px; }
   .table tr.row td.shop-cell { grid-area: shop; font-size: .85rem; }
   .table tr.row td.shop-cell .shop { margin: 0 10px 0 0; }
-  .table tr.row td.shop-cell small { display: none; }
   .table tr.row td.profit { grid-area: profit; justify-self: end; font-size: .9rem; }
   /* 定価・前回比・推移は1行に小さく */
   .table tr.row td[data-label="定価"],
@@ -460,3 +459,10 @@ a.flash-inner:focus-visible { outline: 2px solid var(--accent); outline-offset: 
 .news-empty { background: var(--surface); border: 1px dashed var(--border); border-radius: 14px; padding: 24px 18px; text-align: center; color: var(--muted); }
 .news-empty p { margin: 0 0 6px; }
 .news-empty b { color: var(--text); }
+.sr-name small, .cmp .stale { display: block; font-size: .65rem; font-weight: 600; color: var(--muted); line-height: 1.2; }
+@media (max-width: 900px) {
+  .cmp { font-size: .75rem; }
+  .cmp th, .cmp td { padding: 7px 4px; }
+  .cmp tbody th { font-size: .72rem; }
+  .cmp td small { font-size: .62rem; }
+}

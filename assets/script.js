@@ -52,7 +52,7 @@ function shopLink(shop, cls = "") {
 // 店舗を買取価格の高い順に並べた一覧（1行まるごと店のサイトへのリンク）
 function shopRanking(p, limit = 3) {
   const list = Object.entries(p.latest.shops)
-    .map(([shop, it]) => ({ shop, price: it.sealed }))
+    .map(([shop, it]) => ({ shop, price: it.sealed, date: it.date }))
     .sort((a, b) => b.price - a.price || shopIdx(a.shop) - shopIdx(b.shop));
   let rank = 0;
   return `<ol class="shop-rank">${list.slice(0, limit).map((x, i) => {
@@ -61,30 +61,45 @@ function shopRanking(p, limit = 3) {
     const metric = p.retail == null ? "" : useRate()
       ? `<span class="sr-metric ${sign(x.price - p.retail)}">${pct(x.price / p.retail)}</span>`
       : `<span class="sr-metric ${sign(x.price - p.retail)}">${signed(x.price - p.retail)}</span>`;
-    const inner = `<span class="sr-pos r${rank}">${rank}位</span><span class="sr-name">${esc(x.shop)}</span><span class="sr-price">${yen(x.price)}</span>${metric}<span class="sr-go" aria-hidden="true">${info.url ? "›" : ""}</span>`;
+    const inner = `<span class="sr-pos r${rank}">${rank}位</span><span class="sr-name">${esc(x.shop)}${x.date < p.latest.date ? `<small>${x.date.slice(5).replace("-", "/")}時点</small>` : ""}</span><span class="sr-price">${yen(x.price)}</span>${metric}<span class="sr-go" aria-hidden="true">${info.url ? "›" : ""}</span>`;
     return `<li>${info.url ? `<a class="sr-row ${rank === 1 ? "top" : ""}" href="${esc(info.url)}" target="_blank" rel="noopener" aria-label="${esc(x.shop)}のサイトを開く（${yen(x.price)}）">${inner}</a>` : `<div class="sr-row ${rank === 1 ? "top" : ""}">${inner}</div>`}</li>`;
   }).join("")}</ol>`;
 }
 
 // 商品ごとに、日付 → 店舗ごとの価格 をまとめる
+// 店ごとの価格は、その店の最新の取り込みを「STALE_DAYS 日」まで有効として扱う
+// （店によって取り込む日がずれても、比較から消えないように）
+const STALE_DAYS = 3;
+const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5);
+
 function buildProducts(cat) {
+  // 商品 → 店 → 日付順の価格
   const map = new Map();
   for (const snap of ALL.filter((s) => s.cat === cat)) {
     for (const [name, it] of Object.entries(snap.items)) {
       if (it.sealed == null) continue;
       if (SHOW_ONLY[cat] && !SHOW_ONLY[cat].test(name)) continue;
-      if (!map.has(name)) map.set(name, new Map());
-      const byDate = map.get(name);
-      if (!byDate.has(snap.date)) byDate.set(snap.date, { date: snap.date, shops: {}, sample: snap.sample });
-      byDate.get(snap.date).shops[snap.shop] = it;
+      if (!map.has(name)) map.set(name, { shops: new Map(), dates: new Set(), sample: false });
+      const p = map.get(name);
+      if (!p.shops.has(snap.shop)) p.shops.set(snap.shop, []);
+      p.shops.get(snap.shop).push({ ...it, date: snap.date });
+      p.dates.add(snap.date);
+      p.sample = p.sample || !!snap.sample;
     }
   }
-  return [...map].map(([name, byDate]) => {
-    const history = [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date)).map((h) => {
-      const price = Math.max(...Object.values(h.shops).map((x) => x.sealed));
-      const best = Object.keys(h.shops).filter((sh) => h.shops[sh].sealed === price).sort((a, b) => shopIdx(a) - shopIdx(b));
-      return { ...h, price, best };
-    });
+  return [...map].map(([name, p]) => {
+    // ある日時点での各店の有効な価格（STALE_DAYS 日以内の最新）
+    const asOf = (d) => {
+      const shops = {};
+      for (const [shop, list] of p.shops) {
+        const e = list.filter((x) => x.date <= d).sort((a, b) => b.date.localeCompare(a.date))[0];
+        if (e && daysBetween(e.date, d) < STALE_DAYS) shops[shop] = e;
+      }
+      const price = Math.max(...Object.values(shops).map((x) => x.sealed));
+      const best = Object.keys(shops).filter((sh) => shops[sh].sealed === price).sort((a, b) => shopIdx(a) - shopIdx(b));
+      return { date: d, shops, price, best, sample: p.sample };
+    };
+    const history = [...p.dates].sort().map(asOf);
     const latest = history[history.length - 1];
     const prev = history[history.length - 2];
     const info = CATALOG[name] || {};
@@ -181,7 +196,7 @@ function shopTable(p) {
     const last = prof == null ? "—" : useRate() ? `${pct(best / p.retail)}<small class="muted">（${signed(prof)}）</small>` : signed(prof);
     return `<tr><th scope="row">${esc(label)}</th>${vals.map((v) => cell(v, best)).join("")}<td class="num ${prof != null ? sign(prof) : ""}">${last}</td></tr>`;
   }).join("");
-  const shopHead = shops.map((sh) => `<th class="num">${shopLink(sh)}</th>`).join("");
+  const shopHead = shops.map((sh) => `<th class="num">${shopLink(sh)}${p.latest.shops[sh].date < p.latest.date ? `<small class="stale">${p.latest.shops[sh].date.slice(5).replace("-", "/")}時点</small>` : ""}</th>`).join("");
   const hasColors = its.some((it) => it.colors);
   const body = hasColors
     ? rowsHtml(IPHONE_COLORS, (it, c) => (it.colors ? it.colors[c] ?? null : null))

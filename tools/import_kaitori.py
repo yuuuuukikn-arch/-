@@ -11,6 +11,7 @@
   - 買取ルデヤ形式: 新品 → 「機種 容量 色 型番 未開封 SIMフリー」 → JAN → 買取価格 → 000,000円
     （色ごとの行は機種ごとにまとめ、色別価格 colors と最高値 sealed を保存）
   - 買取商店形式: [機種 容量 色 型番 SIMフリー](URL) → JAN → 新品¥000,000 → 中古¥…
+  - 森森買取形式: [Apple iPhone18 Pro 256GB 色 SIMフリー](URL) → JAN → 通常/預かり/即フリの3価格（通常を使う）
 
 同じ日付・同じ店のデータがあれば上書きする（1日に何度送っても最新の1件になる）。
 """
@@ -194,7 +195,39 @@ def parse_shouten(text):
     return items
 
 
+YEN_LINE_RE = re.compile(r"^([\d,]+)\s*円$")
+
+
+def parse_morimori(text):
+    """森森買取形式（色ごとに「Apple iPhone18 Pro 256GB 色 SIMフリー → JAN → 通常/預かり/即フリの3価格」）。
+    使うのは1つ目の「通常買取価格」。"""
+    lines = [norm(MD_LINK_RE.sub(r"\1", l)) for l in text.splitlines()]
+    items = {}
+    for i, line in enumerate(lines):
+        name_line = re.sub(r"^Apple\s+", "", line)
+        name_line = re.sub(r"^iPhone\s*(\d)", r"iPhone \1", name_line)
+        m = re.match(r"^(iPhone .+? \d+(?:GB|TB)) (\S+) SIMフリー", name_line)
+        if not m:
+            continue
+        price = None
+        for l in lines[i + 1 : i + 4]:
+            pm = YEN_LINE_RE.match(l)
+            if pm:
+                price = int(pm.group(1).replace(",", ""))
+                break
+        if price is None:
+            continue
+        name, color = m.group(1), COLORS.get(m.group(2), m.group(2))
+        item = items.setdefault(name, {"note": "", "boost": False})
+        item.setdefault("colors", {})[color] = price
+        item["sealed"] = max(item.get("sealed", 0), price)
+    return items
+
+
 def detect_and_parse(text):
+    # 「通常買取価格・預かり買取価格・即フリ買取価格」の見出しがあれば森森買取形式
+    if "即フリ買取価格" in text or "預かり買取価格" in text:
+        return parse_morimori(text)
     # 「新品¥000,000」の行がある書き方なら買取商店形式
     if re.search(r"^\s*新品\s*[¥￥]\s*[\d,]+", text, re.M):
         return parse_shouten(text)
