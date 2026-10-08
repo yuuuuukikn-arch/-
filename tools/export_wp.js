@@ -2,7 +2,7 @@
 // WordPress プラグイン用のデータ（wp-plugin/sedori-hikaku/data/sedori.json）を書き出す。
 // 使い方: node tools/export_wp.js
 // assets/data.js と assets/history.js を読み、サイトと同じ計算（各店の最新価格を3日間有効として比較）をして保存する。
-// SHOPS で publish: false の店は書き出さない。
+// WP_EXCLUDE の店は書き出さない。
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
@@ -21,7 +21,9 @@ const { SHOPS, CATALOG, SHOW_ONLY, SNAPSHOTS } = ctx;
 
 const shopOrder = Object.keys(SHOPS);
 const shopIdx = (s) => (shopOrder.indexOf(s) < 0 ? shopOrder.length : shopOrder.indexOf(s));
-const published = (s) => !SHOPS[s] || SHOPS[s].publish !== false;
+// WordPress（公開）には出さない店。規約で「無断転載・引用お断り」としている店。
+const WP_EXCLUDE = ["買取商店"];
+const published = (s) => !WP_EXCLUDE.includes(s);
 const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5);
 const display = (n) => n.replace(/】\s+/g, "】");
 
