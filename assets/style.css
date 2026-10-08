@@ -314,7 +314,7 @@ h2 { margin: 0 0 16px; font-size: 1.25rem; }
   .table tr.detail { display: block; margin-top: -10px; }
   .table tr.detail > td { display: block; padding: 0; border: none; background: none; }
   .table tr td.empty { display: block; }
-  .detail-wrap { border-color: var(--accent); border-top: none; border-radius: 0 0 14px 14px; padding: 12px; }
+  .table tr.detail .detail-wrap { border-color: var(--accent); border-top: none; border-radius: 0 0 14px 14px; padding: 12px; }
   .chart-head h3 { font-size: .95rem; }
   .range { width: 100%; }
   .range button { flex: 1; padding: 9px 0; font-size: .85rem; }
