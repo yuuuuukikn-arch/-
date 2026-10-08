@@ -345,9 +345,9 @@ function productPage(p) {
     ${facts}
     ${official ? `<div class="btn-row">${official}</div>` : ""}
     ${aff}
+    <section class="cal-grid-wrap"><h2>発売・予約カレンダー</h2><div data-cal-grid></div>
+      <p class="note"><a href="../calendar.html">発売カレンダーの一覧を見る ›</a></p></section>
   </main>
-  <section class="container cal-grid-wrap in-article"><h2>発売・予約カレンダー</h2><div data-cal-grid></div>
-    <p class="note"><a href="../calendar.html">発売カレンダーの一覧を見る ›</a></p></section>
   ${footer()}
   ${p.chart ? itemScripts(p.chart.cat, p.chart.name) : ""}
   <script src="../assets/releases-public.js"></script>
