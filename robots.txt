@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yuuuuukikn-arch.github.io/-/sitemap.xml

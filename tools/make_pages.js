@@ -305,6 +305,18 @@ const listed = PAGES.filter((p) => published(p) && (p.kind === "yoyaku" || p.kin
 fs.writeFileSync(path.join(ROOT, "yoyaku.html"), yoyakuPage(listed));
 fs.writeFileSync(path.join(ROOT, "calendar.html"), calendarPage());
 
+// 検索エンジン用：sitemap.xml と robots.txt（公開中のページだけ）
+const SITE_URL = "https://yuuuuukikn-arch.github.io/-/";
+const sitemapPages = ["index.html", "news.html", "yoyaku.html", "calendar.html",
+  ...PAGES.filter(published).map((p) => `p/${p.id}.html`)];
+const today2 = new Date(Date.now() + 9 * 36e5).toISOString().slice(0, 10);
+fs.writeFileSync(path.join(ROOT, "sitemap.xml"),
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+  sitemapPages.map((f) => `  <url><loc>${esc(SITE_URL + f)}</loc><lastmod>${today2}</lastmod></url>`).join("\n") +
+  `\n</urlset>\n`);
+fs.writeFileSync(path.join(ROOT, "robots.txt"),
+  `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
+
 const relPub = RELEASES.filter(published);
 const allEvents = relPub.flatMap(releaseEvents).sort((a, b) => (a.start || a.day).localeCompare(b.start || b.day));
 fs.writeFileSync(path.join(ROOT, "calendar.ics"), icsFile(allEvents, "買取相場ナビ 発売カレンダー"));
