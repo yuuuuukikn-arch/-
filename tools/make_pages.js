@@ -353,7 +353,7 @@ fs.writeFileSync(path.join(ROOT, "calendar.html"), calendarPage());
 fs.writeFileSync(path.join(ROOT, "privacy.html"), privacyPage());
 
 // 検索エンジン用：sitemap.xml と robots.txt（公開中のページだけ）
-const SITE_URL = "https://yuuuuukikn-arch.github.io/-/";
+const SITE_URL = "https://yuuuuukikn-arch.github.io/kaitori-navi/";
 const sitemapPages = ["index.html", "news.html", "yoyaku.html", "calendar.html", "privacy.html",
   ...PAGES.filter(published).map((p) => `p/${p.id}.html`)];
 const today2 = new Date(Date.now() + 9 * 36e5).toISOString().slice(0, 10);

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://yuuuuukikn-arch.github.io/-/sitemap.xml
+Sitemap: https://yuuuuukikn-arch.github.io/kaitori-navi/sitemap.xml
