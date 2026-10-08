@@ -542,7 +542,7 @@ a.flash-inner:focus-visible { outline: 2px solid var(--accent); outline-offset: 
 .ext-btn { color: var(--accent); border: 1px solid var(--border); }
 
 /* ── マス目のカレンダー ── */
-.cal-grid-wrap { padding-block: 22px 8px; max-width: 760px; }
+.cal-grid-wrap { padding-block: 22px 8px; }
 .cal-grid-wrap h2 { font-size: 1.05rem; margin: 0 0 10px; }
 .cg { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; }
 .cg-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }

@@ -148,12 +148,11 @@ function render() {
       <td class="num sealed" data-label="買取価格">${yen(p.price)}</td>
       <td class="shop-cell" data-label="店舗別（高い順）">${shopRanking(p)}</td>
       <td class="num" data-label="前回比">${p.hasPrev ? `<span class="chg ${sign(p.change)}">${p.change > 0 ? "▲" : p.change < 0 ? "▼" : "±"}${yen(Math.abs(p.change))}</span>` : '<span class="na">—</span>'}</td>
-      <td class="spark-cell" data-label="推移">${Chart.sparkline(p.history.map((h) => h.price))}</td>
       <td class="num profit ${p.profit != null ? sign(p.profit) : ""}" data-label="利益">${p.profit != null ? signed(p.profit) : "—"}</td>
       <td class="num metric-cell" data-label="${useRate() ? "最高買取率" : "利益率"}">${rateCell(p)}</td>
     </tr>`;
-    return row + (openName === p.name ? `<tr class="detail"><td colspan="9">${detail(p)}</td></tr>` : "");
-  }).join("") : `<tr><td colspan="9" class="empty">条件に合う商品がありません</td></tr>`;
+    return row + (openName === p.name ? `<tr class="detail"><td colspan="8">${detail(p)}</td></tr>` : "");
+  }).join("") : `<tr><td colspan="8" class="empty">条件に合う商品がありません</td></tr>`;
 
   if (openName) drawChart(items.find((p) => p.name === openName));
 }
