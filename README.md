@@ -45,6 +45,16 @@ python3 tools/import_kaitori.py "data/raw/2026-10-08_森森買取_p2.txt" --date
 iPhone は 18 シリーズだけ表示します（`assets/data.js` の `SHOW_ONLY` で変更可。取り込んだデータはすべて記録されます）。
 各店の価格は、その店の最新の取り込みを3日間有効として比べます（店ごとに取り込む日がずれても比較から消えないように。古い店には「10/07時点」と表示）。
 
+## 予約・抽選・新発売・注目ページの作り方
+
+`assets/pages.js` の `PAGES` に1件ずつ書き、`node tools/make_pages.js` を実行すると、次が作られます。
+
+- `p/<id>.html`：商品ページ（`status: "draft"` は下書き。リンクは出ず、検索に出ない）
+- `yoyaku.html`：予約・抽選・新発売の一覧（公開分のみ）
+- TOP の「注目」欄：掲載中（`until` 前）の公開分を新しい順に6件まで
+
+アフィリエイトは `assets/pages.js` の `PAGE_CONFIG`（Amazon の ID・楽天の ID）を入れると、各商品ページに付きます。空のままなら付きません。抽選品など通販リンクを付けない商品は `buyable: false` にします。
+
 ## 速報の追加
 
 `assets/data.js` の `NEWS` に追加します。ランキングページの上部には `date` から `until` の日まで表示されます（`until` を省略すると `date` から `NEWS_DAYS` 日間）。

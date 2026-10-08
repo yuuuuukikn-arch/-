@@ -466,3 +466,40 @@ a.flash-inner:focus-visible { outline: 2px solid var(--accent); outline-offset: 
   .cmp tbody th { font-size: .72rem; }
   .cmp td small { font-size: .62rem; }
 }
+
+/* ── 注目・予約一覧・商品ページ ── */
+.attention { padding-block: 16px 4px; }
+.att-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.att-head h2 { margin: 0; font-size: 1.15rem; }
+.att-head a { font-size: .85rem; font-weight: 700; color: var(--accent); text-decoration: none; white-space: nowrap; }
+.att-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.att-list-full { grid-template-columns: 1fr; }
+.att-card {
+  display: grid; gap: 4px; align-content: start; padding: 12px 14px; border-radius: 12px; min-height: 48px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text); text-decoration: none;
+}
+.att-card:hover { border-color: var(--accent); }
+.att-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.att-card b { font-size: .95rem; line-height: 1.4; }
+.att-card small { font-size: .78rem; color: var(--muted); line-height: 1.5; }
+.att-card.ended { opacity: .7; }
+.att-kind { font-size: .72rem; font-weight: 800; color: var(--accent); }
+.att-date { font-variant-numeric: tabular-nums; }
+.page-article { padding-block: 22px 8px; max-width: 760px; }
+.page-article h1 { font-size: 1.45rem; line-height: 1.35; margin: 8px 0 10px; text-wrap: balance; }
+.page-article p { line-height: 1.85; }
+.crumb { font-size: .85rem; margin: 0; }
+.crumb a { color: var(--accent); }
+.lead { color: var(--muted); }
+.item-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; margin: 16px 0; }
+.item-facts div { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; min-width: 0; }
+.item-facts dt { font-size: .72rem; color: var(--muted); }
+.item-facts dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.btn-link { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 16px; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 700; text-decoration: none; }
+.aff { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--border); }
+.aff .pr { font-size: .75rem; color: var(--muted); margin: 0 0 8px; }
+.aff-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.aff-btn { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; font-weight: 700; text-decoration: none; color: #fff; }
+.aff-btn.amazon { background: #232f3e; }
+.aff-btn.rakuten { background: #bf0000; }

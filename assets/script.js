@@ -338,3 +338,19 @@ document.querySelector(".theme-toggle").addEventListener("click", () => {
 
 setSortOptions();
 render();
+
+// 注目（予約・抽選・新発売・注目商品）：掲載中のものだけ、新しい順に6件
+(function () {
+  if (typeof PAGES_PUBLIC === "undefined" || !$("attention")) return;
+  const today = new Date(Date.now() + 9 * 36e5).toISOString().slice(0, 10);
+  const items = PAGES_PUBLIC
+    .filter((p) => !p.until || p.until >= today)
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 6);
+  if (!items.length) return;
+  $("attList").innerHTML = items.map((p) =>
+    `<a class="att-card" href="p/${esc(p.id)}.html"><span class="att-kind">${esc(p.kindLabel)}</span><b>${esc(p.title)}</b><small>${esc(p.summary)}</small></a>`
+  ).join("");
+  $("attention").hidden = false;
+})();
+
