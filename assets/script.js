@@ -72,10 +72,13 @@ function shopRanking(p, limit = 3) {
 const STALE_DAYS = 3;
 const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5);
 
+// 表示しない店（規約で掲載を禁止している店）。記録（history.js）は残しています
+const HIDDEN_SHOPS = ["買取商店"];
+
 function buildProducts(cat) {
   // 商品 → 店 → 日付順の価格
   const map = new Map();
-  for (const snap of ALL.filter((s) => s.cat === cat)) {
+  for (const snap of ALL.filter((s) => s.cat === cat && !HIDDEN_SHOPS.includes(s.shop))) {
     for (const [name, it] of Object.entries(snap.items)) {
       if (it.sealed == null) continue;
       if (SHOW_ONLY[cat] && !SHOW_ONLY[cat].test(name)) continue;
