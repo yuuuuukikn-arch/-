@@ -503,3 +503,14 @@ a.flash-inner:focus-visible { outline: 2px solid var(--accent); outline-offset: 
 .aff-btn { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; font-weight: 700; text-decoration: none; color: #fff; }
 .aff-btn.amazon { background: #232f3e; }
 .aff-btn.rakuten { background: #bf0000; }
+
+/* ── 記事 ── */
+.articles { padding-block: 8px 24px; }
+.page-article h2 { font-size: 1.05rem; margin: 22px 0 8px; }
+.table-scroll { overflow-x: auto; }
+.art-table { width: 100%; border-collapse: collapse; font-size: .9rem; font-variant-numeric: tabular-nums; }
+.art-table th, .art-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+.art-table th { font-size: .75rem; color: var(--muted); font-weight: 600; }
+.art-table .num { text-align: right; }
+.art-chart { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 8px 4px; }
+.art-chart svg { display: block; }

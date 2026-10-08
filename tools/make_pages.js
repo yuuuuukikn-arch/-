@@ -14,8 +14,18 @@ vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(path.join(ROOT, "assets/pages.js"), "utf8").replace(/^const /gm, "var "), ctx);
 const { PAGES, PAGE_CONFIG } = ctx;
 
+// 記事用：価格の記録（data.js・history.js）を読む
+const dctx = {};
+vm.createContext(dctx);
+for (const f of ["assets/data.js", "assets/history.js"]) {
+  vm.runInContext(fs.readFileSync(path.join(ROOT, f), "utf8").replace(/^const /gm, "var "), dctx);
+}
+const DATA = { SNAPSHOTS: dctx.SNAPSHOTS, CATALOG: dctx.CATALOG };
+const ARTICLE_EXCLUDE = ["買取商店"]; // 公開しない店（規約で転載を禁止している）
+
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const KIND = { yoyaku: "予約・抽選", shinhatsu: "新発売", chumoku: "注目商品" };
+const KIND = { yoyaku: "予約・抽選", shinhatsu: "新発売", chumoku: "注目商品", article: "記事" };
+const yen = (n) => "¥" + Math.round(n).toLocaleString("ja-JP");
 const fmt = (d) => d.replaceAll("-", "/");
 const today = new Date(Date.now() + 9 * 36e5).toISOString().slice(0, 10); // 日本時間の日付
 const published = (p) => p.status === "published";
@@ -66,6 +76,81 @@ function footer(depth = 1) {
     </div></footer>`;
 }
 
+// 商品の記録（店ごとの最新の価格・推移）
+function articleStats(cfg) {
+  const byDate = new Map(); // 日付 → { 店: 価格 }
+  for (const snap of DATA.SNAPSHOTS.filter((x) => x.cat === cfg.cat && !ARTICLE_EXCLUDE.includes(x.shop))) {
+    const it = snap.items[cfg.name];
+    if (!it || it.sealed == null) continue;
+    if (!byDate.has(snap.date)) byDate.set(snap.date, {});
+    byDate.get(snap.date)[snap.shop] = it.sealed;
+  }
+  const dates = [...byDate.keys()].sort();
+  const latest = dates[dates.length - 1] || null;
+  return {
+    latest,
+    shops: latest ? byDate.get(latest) : {},
+    retail: (DATA.CATALOG[cfg.name] || {}).retail ?? null,
+    history: dates.map((d) => ({ date: d, price: Math.max(...Object.values(byDate.get(d))) })),
+  };
+}
+
+// 推移の折れ線（SVG）。記録が1日分のときは点だけ
+function chartSvg(history, retail) {
+  const W = 340, H = 200, L = 52, R = 12, T = 12, B = 26;
+  const vals = history.map((h) => h.price).concat(retail != null ? [retail] : []);
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  const pad = Math.max((hi - lo) * 0.15, hi * 0.02);
+  lo -= pad; hi += pad;
+  const t0 = Date.parse(history[0].date), t1 = Date.parse(history[history.length - 1].date);
+  const X = (d) => (t1 === t0 ? L + (W - L - R) / 2 : L + ((Date.parse(d) - t0) / (t1 - t0)) * (W - L - R));
+  const Y = (v) => T + (H - T - B) - ((v - lo) / (hi - lo)) * (H - T - B);
+  const man = (v) => (v / 10000).toFixed(1).replace(/\.0$/, "") + "万";
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="買取価格の推移">`;
+  for (let i = 0; i <= 3; i++) {
+    const v = lo + ((hi - lo) * i) / 3;
+    s += `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e3e6eb"/>`
+      + `<text x="${L - 6}" y="${Y(v)}" text-anchor="end" dominant-baseline="middle" font-size="10" fill="#667085">${man(v)}</text>`;
+  }
+  if (retail != null) {
+    s += `<line x1="${L}" x2="${W - R}" y1="${Y(retail)}" y2="${Y(retail)}" stroke="#667085" stroke-dasharray="5 4"/>`
+      + `<text x="${W - R}" y="${Y(retail) - 4}" text-anchor="end" font-size="10" fill="#667085">定価 ${man(retail)}</text>`;
+  }
+  if (history.length > 1) {
+    s += `<polyline fill="none" stroke="#2a78d6" stroke-width="2" stroke-linejoin="round" points="${history.map((h) => `${X(h.date)},${Y(h.price)}`).join(" ")}"/>`;
+  }
+  s += history.map((h) => `<circle cx="${X(h.date)}" cy="${Y(h.price)}" r="3.5" fill="#2a78d6"/>`).join("");
+  const first = history[0].date, last = history[history.length - 1].date;
+  if (history.length > 1) {
+    s += `<text x="${X(first)}" y="${H - 6}" font-size="10" fill="#667085">${fmt(first).slice(5)}</text>`
+      + `<text x="${X(last)}" y="${H - 6}" text-anchor="end" font-size="10" fill="#667085">${fmt(last).slice(5)}</text>`;
+  } else {
+    s += `<text x="${X(first)}" y="${H - 6}" text-anchor="middle" font-size="10" fill="#667085">${fmt(first).slice(5)}</text>`;
+  }
+  return s + "</svg>";
+}
+
+// 記事の本体（最新の価格の表・推移グラフ）
+function articleBody(p) {
+  if (!p.chart) return "";
+  const st = articleStats(p.chart);
+  if (!st.latest) return '<p class="note">この商品の価格の記録はまだありません。</p>';
+  const rows = Object.entries(st.shops).sort((a, b) => b[1] - a[1]);
+  const [topShop, topPrice] = rows[0];
+  const lines = [`${fmt(st.latest)}時点の買取価格の最高値は、${topShop}の${yen(topPrice)}です。`];
+  if (st.retail) {
+    const diff = topPrice - st.retail;
+    lines.push(`定価は${yen(st.retail)}で、買取率は${(topPrice / st.retail * 100).toFixed(1)}%、利益は${diff >= 0 ? "+" : ""}${yen(diff)}です。`);
+  }
+  return `<h2>最新の買取価格</h2>
+    <p>${lines.map(esc).join("")}</p>
+    <div class="table-scroll"><table class="art-table"><thead><tr><th>店舗</th><th class="num">買取価格</th></tr></thead>
+      <tbody>${rows.map(([sh, v]) => `<tr><td>${esc(sh)}</td><td class="num">${yen(v)}</td></tr>`).join("")}</tbody></table></div>
+    <h2>価格の推移</h2>
+    <div class="art-chart">${chartSvg(st.history, st.retail)}</div>
+    ${st.history.length < 2 ? '<p class="note">記録が2日分以上たまると、線のグラフになります。</p>' : ""}`;
+}
+
 function productPage(p) {
   const draft = !published(p);
   const status = !published(p) ? "下書き" : p.until && p.until < today ? "終了" : "掲載中";
@@ -73,7 +158,7 @@ function productPage(p) {
     `<a class="btn-link" href="${esc(o.url)}" target="_blank" rel="noopener">${esc(o.label)}<span aria-hidden="true">↗</span></a>`).join("");
   const facts = (p.facts || []).length
     ? `<dl class="item-facts">${p.facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>` : "";
-  const body = (p.body || []).map((t) => `<p>${esc(t)}</p>`).join("");
+  const body = (p.body || []).map((t) => `<p>${esc(t)}</p>`).join("") + articleBody(p);
   const buy = buyLinks(p);
   const aff = buy.length
     ? `<div class="aff"><p class="pr">${esc(PAGE_CONFIG.prText)}</p><div class="aff-btns">${buy.map((a) =>
@@ -140,6 +225,7 @@ const listed = PAGES.filter((p) => published(p) && (p.kind === "yoyaku" || p.kin
   .sort((a, b) => b.date.localeCompare(a.date));
 fs.writeFileSync(path.join(ROOT, "yoyaku.html"), yoyakuPage(listed));
 
+const articles = PAGES.filter((p) => published(p) && p.kind === "article");
 const pub = PAGES.filter(published).sort((a, b) => b.date.localeCompare(a.date)).map((p) => ({
   id: p.id, title: p.title, kind: p.kind, kindLabel: KIND[p.kind] || "注目", date: p.date,
   until: p.until || null, summary: p.summary || "",
@@ -150,3 +236,4 @@ fs.writeFileSync(path.join(ROOT, "assets/pages-public.js"),
 console.log(`商品ページ: ${PAGES.length}件（うち公開 ${pub.length}件、下書き ${PAGES.length - pub.length}件）`);
 console.log(`予約・抽選・新発売の一覧: ${listed.length}件 → yoyaku.html`);
 console.log(`掲載中（TOP の注目に出る）: ${PAGES.filter(isLive).length}件`);
+console.log(`記事: ${articles.length}件（ランキングの下に一覧）`);

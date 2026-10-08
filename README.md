@@ -55,6 +55,10 @@ iPhone は 18 シリーズだけ表示します（`assets/data.js` の `SHOW_ONL
 
 アフィリエイトは `assets/pages.js` の `PAGE_CONFIG`（Amazon の ID・楽天の ID）を入れると、各商品ページに付きます。空のままなら付きません。抽選品など通販リンクを付けない商品は `buyable: false` にします。
 
+## 記事（価格の比較・推移グラフ）
+
+`assets/pages.js` の `ARTICLES` に `kind: "article"` と `chart: { cat, name }` を書いて `node tools/make_pages.js` を実行すると、最新の価格の表と推移のグラフ付きの記事ができます。記事はランキングの下に並びます。公開しない店は `tools/make_pages.js` の `ARTICLE_EXCLUDE` に入れます（今は買取商店）。
+
 ## 速報の追加
 
 `assets/data.js` の `NEWS` に追加します。ランキングページの上部には `date` から `until` の日まで表示されます（`until` を省略すると `date` から `NEWS_DAYS` 日間）。

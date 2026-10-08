@@ -344,7 +344,7 @@ render();
   if (typeof PAGES_PUBLIC === "undefined" || !$("attention")) return;
   const today = new Date(Date.now() + 9 * 36e5).toISOString().slice(0, 10);
   const items = PAGES_PUBLIC
-    .filter((p) => !p.until || p.until >= today)
+    .filter((p) => p.kind !== "article" && (!p.until || p.until >= today))
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 6);
   if (!items.length) return;
@@ -352,5 +352,16 @@ render();
     `<a class="att-card" href="p/${esc(p.id)}.html"><span class="att-kind">${esc(p.kindLabel)}</span><b>${esc(p.title)}</b><small>${esc(p.summary)}</small></a>`
   ).join("");
   $("attention").hidden = false;
+})();
+
+// 記事（ランキングの下）：公開中の記事を新しい順に
+(function () {
+  if (typeof PAGES_PUBLIC === "undefined" || !$("articles")) return;
+  const items = PAGES_PUBLIC.filter((p) => p.kind === "article").sort((a, b) => b.date.localeCompare(a.date));
+  if (!items.length) return;
+  $("artList").innerHTML = items.map((p) =>
+    `<a class="att-card" href="p/${esc(p.id)}.html"><span class="att-kind">記事</span><b>${esc(p.title)}</b><small>${esc(p.summary)}</small></a>`
+  ).join("");
+  $("articles").hidden = false;
 })();
 
