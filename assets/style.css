@@ -514,3 +514,29 @@ a.flash-inner:focus-visible { outline: 2px solid var(--accent); outline-offset: 
 .art-table .num { text-align: right; }
 .art-chart { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 8px 4px; }
 .art-chart svg { display: block; }
+
+/* ── 発売カレンダー ── */
+.cal-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px 0 18px; }
+.cal-actions .muted { font-size: .8rem; }
+.rel-list { display: grid; gap: 12px; }
+.rel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; border-left: 5px solid var(--border); }
+.rel.st-open { border-left-color: var(--minus); }
+.rel.st-wait { border-left-color: var(--accent); }
+.rel.st-done { opacity: .7; }
+.rel-top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.rel-status { font-size: .75rem; font-weight: 800; padding: 2px 9px; border-radius: 999px; background: var(--row-hover); }
+.rel.st-open .rel-status { background: var(--minus); color: #fff; }
+.rel-on { font-size: .75rem; font-weight: 700; color: var(--plus); }
+.rel h2 { font-size: 1.05rem; line-height: 1.4; margin: 8px 0 6px; text-wrap: balance; }
+.rel-dates { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 0 0 8px; }
+.rel-dates div { background: var(--bg); border-radius: 10px; padding: 8px 10px; }
+.rel-dates dt { font-size: .72rem; color: var(--muted); }
+.rel-dates dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+.rel .note { font-size: .8rem; margin: 6px 0; }
+.rel .src { font-size: .72rem; color: var(--muted); margin: 6px 0 0; }
+.rel-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.rel-btns button, .rel-btns a { font: inherit; font-size: .85rem; font-weight: 700; min-height: 44px; padding: 0 14px; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; cursor: pointer; }
+.rsv-btn { background: var(--accent); color: #fff; border: 0; }
+.rsv-btn.on { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.ics-btn { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.ext-btn { color: var(--accent); border: 1px solid var(--border); }

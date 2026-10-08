@@ -3,13 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>予約・抽選・新発売｜せどり比較</title>
-  <meta name="description" content="ポケモンカードなどの予約・抽選・新発売の情報を、確認できたものから一覧にします。">
+  <title>発売カレンダー｜せどり比較</title>
+  <meta name="description" content="予約開始日と発売日をまとめた発売カレンダー。スマホのカレンダーに追加できます。">
   
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>¥</text></svg>">
   <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0f1115" media="(prefers-color-scheme: dark)">
   <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/releases-public.js" defer></script>
+  <script src="assets/calendar.js" defer></script>
 </head>
 <body>
   <header class="site-header"><div class="container nav">
@@ -18,10 +20,13 @@
       <button class="theme-toggle" aria-label="ライト／ダーク切り替え"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg></button>
     </div></header>
   <main class="container page-article">
-    <h1>予約・抽選・新発売</h1>
-    <p class="lead">確認できた予約・抽選・新発売の情報をまとめています。申し込みは各公式ページで行ってください。</p>
-    <div class="att-list att-list-full"><div class="news-empty"><p><b>掲載中の予約・抽選・新発売はまだありません。</b></p>
-    <p>確認できたものから順に載せます。</p></div></div>
+    <h1>発売カレンダー</h1>
+    <p class="lead">予約開始日と発売日をまとめています。「カレンダーに追加」を押すと、スマホのカレンダーに予定が入ります。</p>
+    <div class="cal-actions"><a class="btn-link" href="calendar.ics">全部をまとめて追加（購読）</a>
+      <span class="muted">購読すると、予定が増えたときに自動で反映されます（反映の間隔は、お使いのカレンダーの設定によります）。</span></div>
+    <div id="cal" class="rel-list"></div>
+    <noscript><p class="note">予定の一覧は、JavaScript が動くと表示されます。</p></noscript>
+    <p class="note">「予約した」の記録は、この端末のブラウザにだけ保存されます（別の端末とは共有されません）。</p>
   </main>
   <footer class="site-footer"><div class="container">
       <p>&copy; 2026 せどり比較 ・ <a href="index.html">ランキングへ</a> ・ <a href="yoyaku.html">予約・抽選・新発売</a> ・ <a href="calendar.html">発売カレンダー</a></p>

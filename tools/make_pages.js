@@ -12,7 +12,7 @@ const ROOT = path.resolve(__dirname, "..");
 const ctx = {};
 vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(path.join(ROOT, "assets/pages.js"), "utf8").replace(/^const /gm, "var "), ctx);
-const { PAGES, PAGE_CONFIG } = ctx;
+const { PAGES, PAGE_CONFIG, RELEASES } = ctx;
 
 // 記事用：価格の記録（data.js・history.js）を読む
 const dctx = {};
@@ -68,10 +68,82 @@ function header(depth = 1) {
     </div></header>`;
 }
 
+// ── 発売カレンダー（予約・発売のファイル）──
+const icsEsc = (t) => String(t ?? "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
+const icsUtc = (iso) => new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+const icsDay = (d) => d.replaceAll("-", "");
+function releaseEvents(r) {
+  const ev = [];
+  if (r.reserve && r.reserve.start) {
+    const start = Date.parse(r.reserve.start);
+    ev.push({ uid: `${r.id}-reserve@sedori-hikaku`, summary: `【予約開始】${r.title}`,
+      start: icsUtc(start), end: icsUtc(start + 36e5), alarm: true,
+      desc: `予約開始の日時です。${r.note || ""}${r.official ? "\n公式: " + r.official : ""}` });
+  }
+  if (r.release) {
+    const next = new Date(Date.parse(r.release + "T00:00:00+09:00") + 864e5).toISOString().slice(0, 10);
+    ev.push({ uid: `${r.id}-release@sedori-hikaku`, summary: `【発売日】${r.title}`,
+      day: icsDay(r.release), dayEnd: icsDay(next), alarm: false,
+      desc: `発売日です。${r.note || ""}${r.official ? "\n公式: " + r.official : ""}` });
+  }
+  return ev;
+}
+function icsFile(events, name) {
+  const stamp = icsUtc(Date.now());
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//せどり比較//発売カレンダー//JA",
+    "CALSCALE:GREGORIAN", "METHOD:PUBLISH", `X-WR-CALNAME:${icsEsc(name)}`];
+  for (const e of events) {
+    lines.push("BEGIN:VEVENT", `UID:${e.uid}`, `DTSTAMP:${stamp}`);
+    if (e.day) lines.push(`DTSTART;VALUE=DATE:${e.day}`, `DTEND;VALUE=DATE:${e.dayEnd}`);
+    else lines.push(`DTSTART:${e.start}`, `DTEND:${e.end}`);
+    lines.push(`SUMMARY:${icsEsc(e.summary)}`, `DESCRIPTION:${icsEsc(e.desc)}`);
+    if (e.alarm) lines.push("BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:予約開始の1時間前です", "TRIGGER:-PT1H", "END:VALARM");
+    lines.push("END:VEVENT");
+  }
+  lines.push("END:VCALENDAR");
+  // RFC 5545：1行は75バイト以内。超えたら改行して次行の先頭に空白を入れる（日本語はバイト数で数える）
+  const fold = (line) => {
+    const out = [];
+    let cur = "";
+    for (const ch of line) {
+      if (Buffer.byteLength(cur + ch, "utf8") > 75) { out.push(cur); cur = " " + ch; }
+      else cur += ch;
+    }
+    out.push(cur);
+    return out.join("\r\n");
+  };
+  return lines.map(fold).join("\r\n") + "\r\n";
+}
+
+function calendarPage() {
+  return `<!doctype html>
+<html lang="ja">
+<head>
+  ${head("発売カレンダー｜せどり比較", "予約開始日と発売日をまとめた発売カレンダー。スマホのカレンダーに追加できます。", { depth: 0 })}
+  <script src="assets/releases-public.js" defer></script>
+  <script src="assets/calendar.js" defer></script>
+</head>
+<body>
+  ${header(0)}
+  <main class="container page-article">
+    <h1>発売カレンダー</h1>
+    <p class="lead">予約開始日と発売日をまとめています。「カレンダーに追加」を押すと、スマホのカレンダーに予定が入ります。</p>
+    <div class="cal-actions"><a class="btn-link" href="calendar.ics">全部をまとめて追加（購読）</a>
+      <span class="muted">購読すると、予定が増えたときに自動で反映されます（反映の間隔は、お使いのカレンダーの設定によります）。</span></div>
+    <div id="cal" class="rel-list"></div>
+    <noscript><p class="note">予定の一覧は、JavaScript が動くと表示されます。</p></noscript>
+    <p class="note">「予約した」の記録は、この端末のブラウザにだけ保存されます（別の端末とは共有されません）。</p>
+  </main>
+  ${footer(0)}
+</body>
+</html>
+`;
+}
+
 function footer(depth = 1) {
   const up = "../".repeat(depth);
   return `<footer class="site-footer"><div class="container">
-      <p>&copy; ${new Date().getFullYear()} せどり比較 ・ <a href="${up}index.html">ランキングへ</a> ・ <a href="${up}yoyaku.html">予約・抽選・新発売</a></p>
+      <p>&copy; ${new Date().getFullYear()} せどり比較 ・ <a href="${up}index.html">ランキングへ</a> ・ <a href="${up}yoyaku.html">予約・抽選・新発売</a> ・ <a href="${up}calendar.html">発売カレンダー</a></p>
       <p class="muted">掲載の情報は確認時点のものです。申し込みや購入は、各公式ページ・販売店で行ってください。</p>
     </div></footer>`;
 }
@@ -224,6 +296,22 @@ for (const p of PAGES) {
 const listed = PAGES.filter((p) => published(p) && (p.kind === "yoyaku" || p.kind === "shinhatsu"))
   .sort((a, b) => b.date.localeCompare(a.date));
 fs.writeFileSync(path.join(ROOT, "yoyaku.html"), yoyakuPage(listed));
+fs.writeFileSync(path.join(ROOT, "calendar.html"), calendarPage());
+
+const relPub = RELEASES.filter(published);
+const allEvents = relPub.flatMap(releaseEvents).sort((a, b) => (a.start || a.day).localeCompare(b.start || b.day));
+fs.writeFileSync(path.join(ROOT, "calendar.ics"), icsFile(allEvents, "せどり比較 発売カレンダー"));
+fs.mkdirSync(path.join(ROOT, "ics"), { recursive: true });
+for (const f of fs.readdirSync(path.join(ROOT, "ics"))) if (f.endsWith(".ics")) fs.unlinkSync(path.join(ROOT, "ics", f));
+for (const r of relPub) {
+  fs.writeFileSync(path.join(ROOT, "ics", `${r.id}.ics`), icsFile(releaseEvents(r), r.title));
+}
+fs.writeFileSync(path.join(ROOT, "assets/releases-public.js"),
+  "// tools/make_pages.js が作成（直接編集しない）\nconst RELEASES_PUBLIC = " + JSON.stringify(relPub.map((r) => ({
+    id: r.id, title: r.title, reserve: r.reserve || null, release: r.release || null,
+    note: r.note || "", official: r.official || "", source: r.source || "",
+  })), null, 1) + ";\n");
+console.log(`発売カレンダー: ${relPub.length}件（予定 ${allEvents.length}件）→ calendar.html / calendar.ics / ics/`);
 
 const articles = PAGES.filter((p) => published(p) && p.kind === "article");
 const pub = PAGES.filter(published).sort((a, b) => b.date.localeCompare(a.date)).map((p) => ({

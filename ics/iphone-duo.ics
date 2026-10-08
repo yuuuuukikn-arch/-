@@ -1,0 +1,32 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//せどり比較//発売カレンダー//JA
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:iPhone Duo（折りたたみ）
+BEGIN:VEVENT
+UID:iphone-duo-reserve@sedori-hikaku
+DTSTAMP:20261008T035709Z
+DTSTART:20261016T120000Z
+DTEND:20261016T130000Z
+SUMMARY:【予約開始】iPhone Duo（折りたたみ）
+DESCRIPTION:予約開始の日時です。予約・発売日は報道によ
+ る日程です。公式の発表で最終確認してください。\n公
+ 式: https://www.apple.com/jp/iphone/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:予約開始の1時間前です
+TRIGGER:-PT1H
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:iphone-duo-release@sedori-hikaku
+DTSTAMP:20261008T035709Z
+DTSTART;VALUE=DATE:20261023
+DTEND;VALUE=DATE:20261023
+SUMMARY:【発売日】iPhone Duo（折りたたみ）
+DESCRIPTION:発売日です。予約・発売日は報道による日程で
+ す。公式の発表で最終確認してください。\n公式: https:/
+ /www.apple.com/jp/iphone/
+END:VEVENT
+END:VCALENDAR

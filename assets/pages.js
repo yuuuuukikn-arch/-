@@ -14,6 +14,17 @@ const PAGE_CONFIG = {
   prText: "※本ページは広告（アフィリエイトリンク）を含みます",
 };
 
+// 発売カレンダー（予約開始・発売日。確認できたものだけ入れる）
+//   reserve: { start: "YYYY-MM-DDTHH:MM+09:00" } … 予約の開始（分からなければ reserve を省略）
+//   release: "YYYY-MM-DD" … 発売日 ／ official: 公式ページ ／ source: 日程の出典
+//   status: "published" … 公開（カレンダーに出る）／ "draft" … 下書き
+const RELEASES = [
+  { id: "iphone-duo", status: "published", title: "iPhone Duo（折りたたみ）",
+    reserve: { start: "2026-10-16T21:00+09:00" }, release: "2026-10-23",
+    note: "予約・発売日は報道による日程です。公式の発表で最終確認してください。",
+    official: "https://www.apple.com/jp/iphone/", source: "iPhone Mania（予約・発売日の報道）" },
+];
+
 // 記事（価格の比較とグラフは、取り込んだ記録から自動で作る）
 //   chart: { cat, name } … 記録から「最新の価格の表」と「推移のグラフ」を作る商品
 const ARTICLES = [

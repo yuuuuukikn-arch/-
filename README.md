@@ -59,6 +59,16 @@ iPhone は 18 シリーズだけ表示します（`assets/data.js` の `SHOW_ONL
 
 `assets/pages.js` の `ARTICLES` に `kind: "article"` と `chart: { cat, name }` を書いて `node tools/make_pages.js` を実行すると、最新の価格の表と推移のグラフ付きの記事ができます。記事はランキングの下に並びます。公開しない店は `tools/make_pages.js` の `ARTICLE_EXCLUDE` に入れます（今は買取商店）。
 
+## 発売カレンダー
+
+`assets/pages.js` の `RELEASES` に予約開始日時と発売日を書いて `node tools/make_pages.js` を実行すると、次が作られます。
+
+- `calendar.html`：発売カレンダーのページ（予約開始・発売日、状態、「予約した」の記録、公式へのリンク）
+- `ics/<id>.ics`：その商品の予定ファイル（「カレンダーに追加」で、スマホのカレンダーに入る。予約開始の1時間前に通知）
+- `calendar.ics`：全部の予定（スマホのカレンダーで購読すると、増えた予定が自動で入る）
+
+「予約した」の記録は、この端末のブラウザにだけ保存されます。日程は必ず公式で確認してから公開してください。
+
 ## 速報の追加
 
 `assets/data.js` の `NEWS` に追加します。ランキングページの上部には `date` から `until` の日まで表示されます（`until` を省略すると `date` から `NEWS_DAYS` 日間）。
