@@ -20,7 +20,7 @@ vm.createContext(dctx);
 for (const f of ["assets/data.js", "assets/history.js"]) {
   vm.runInContext(fs.readFileSync(path.join(ROOT, f), "utf8").replace(/^const /gm, "var "), dctx);
 }
-const DATA = { SNAPSHOTS: dctx.SNAPSHOTS, CATALOG: dctx.CATALOG };
+const DATA = { SNAPSHOTS: dctx.SNAPSHOTS, CATALOG: dctx.CATALOG, SHOW_ONLY: dctx.SHOW_ONLY };
 const ARTICLE_EXCLUDE = ["買取商店"]; // 公開しない店（規約で転載を禁止している）
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -247,11 +247,7 @@ function articleStats(cfg) {
     latest,
     shops: latest ? byDate.get(latest) : {},
     retail: (DATA.CATALOG[cfg.name] || {}).retail ?? null,
-    history: dates.map((d) => {
-      const shops = byDate.get(d);
-      const top = Math.max(...Object.values(shops));
-      return { date: d, price: top, best: Object.keys(shops).filter((s) => shops[s] === top) };
-    }),
+    history: dates.map((d) => ({ date: d, price: Math.max(...Object.values(byDate.get(d))) })),
   };
 }
 
@@ -269,27 +265,56 @@ function articleBody(p) {
   }
   return `<h2>最新の買取価格</h2>
     <p>${lines.map(esc).join("")}</p>
-    <div class="table-scroll"><table class="art-table"><thead><tr><th>店舗</th><th class="num">買取価格</th></tr></thead>
-      <tbody>${rows.map(([sh, v]) => `<tr><td>${esc(sh)}</td><td class="num">${yen(v)}</td></tr>`).join("")}</tbody></table></div>
-    <div class="detail-wrap">
-      <div class="chart-head">
-        <div>
-          <h3>${esc(p.chart.name)} の買取価格推移</h3>
-          <div class="legend">
-            <span><i class="key s1"></i>最高値（各店で一番高い買取価格）</span>
-            ${st.retail != null ? '<span><i class="key ref-key"></i>定価</span>' : ""}
-          </div>
-        </div>
-        <div class="range" role="group" aria-label="期間"></div>
-      </div>
-      <div class="chart" id="chart"></div>
-      <div class="tooltip" id="tooltip" hidden></div>
-      ${st.history.length < 2 ? '<p class="note">データが2日分以上たまると線グラフになります。毎日価格を送ってもらうと推移が見えるようになります。</p>' : ""}
-      <div class="detail-stats" id="item-stats"></div>
-    </div>
-    <script>window.ITEM_CHART = ${JSON.stringify({ retail: st.retail, useRate: p.chart.cat === "iPhone", history: st.history }).replace(/</g, "\\u003c")};</script>
-    <script src="../assets/chart.js"></script>
-    <script src="../assets/item-chart.js"></script>`;
+    <h2>価格の推移・店舗別の比較</h2>
+    <div id="item-view"><p class="note">読み込み中…</p></div>
+    <div class="tooltip" id="tooltip" hidden></div>`;
+}
+
+// 個別ページ：ランキングの行から開く、商品ごとのページ（中身は assets/item.js が作る）
+const ITEM_CATS = [["iPhone", "iphone"], ["ポケカBOX", "pokeca"]];
+function itemList() {
+  const out = [];
+  for (const [cat, slug] of ITEM_CATS) {
+    const names = new Set();
+    for (const snap of DATA.SNAPSHOTS.filter((x) => x.cat === cat && !ARTICLE_EXCLUDE.includes(x.shop))) {
+      for (const [name, it] of Object.entries(snap.items)) {
+        if (it.sealed == null) continue;
+        if (DATA.SHOW_ONLY && DATA.SHOW_ONLY[cat] && !DATA.SHOW_ONLY[cat].test(name)) continue;
+        names.add(name);
+      }
+    }
+    [...names].sort((a, b) => a.localeCompare(b, "ja")).forEach((name, i) => {
+      out.push({ cat, name, file: `p/item-${slug}-${String(i + 1).padStart(2, "0")}.html` });
+    });
+  }
+  return out;
+}
+const ITEMS = itemList();
+const itemScripts = (cat, name) => `<script>window.ITEM_PAGE = ${JSON.stringify({ cat, name }).replace(/</g, "\\u003c")};</script>
+  <script src="../assets/data.js"></script>
+  <script src="../assets/history.js"></script>
+  <script src="../assets/chart.js"></script>
+  <script src="../assets/item-view.js"></script>
+  <script src="../assets/item.js"></script>`;
+function itemPage(cat, name) {
+  return `<!doctype html>
+<html lang="ja">
+<head>
+  ${head(`${name} の買取価格｜買取相場ナビ`, `${name}の買取価格を店舗別に比べます。価格の推移（7日・30日・全期間）と、定価との比較。`)}
+</head>
+<body>
+  ${header(1)}
+  <main class="container page-article">
+    <p class="crumb"><a href="../index.html">ランキングへ</a> ›</p>
+    <h1>${esc(name)}</h1>
+    <div id="item-view"><p class="note">読み込み中…</p></div>
+    <div class="tooltip" id="tooltip" hidden></div>
+  </main>
+  ${footer(1)}
+  ${itemScripts(cat, name)}
+</body>
+</html>
+`;
 }
 
 function productPage(p) {
@@ -324,6 +349,7 @@ function productPage(p) {
   <section class="container cal-grid-wrap"><h2>発売・予約カレンダー</h2><div data-cal-grid></div>
     <p class="note"><a href="../calendar.html">発売カレンダーの一覧を見る ›</a></p></section>
   ${footer()}
+  ${p.chart ? itemScripts(p.chart.cat, p.chart.name) : ""}
   <script src="../assets/releases-public.js"></script>
   <script src="../assets/calendar-grid.js"></script>
 </body>
@@ -371,12 +397,16 @@ const listed = PAGES.filter((p) => published(p) && (p.kind === "yoyaku" || p.kin
 fs.writeFileSync(path.join(ROOT, "yoyaku.html"), yoyakuPage(listed));
 fs.writeFileSync(path.join(ROOT, "calendar.html"), calendarPage());
 fs.writeFileSync(path.join(ROOT, "privacy.html"), privacyPage());
+for (const it of ITEMS) fs.writeFileSync(path.join(ROOT, it.file), itemPage(it.cat, it.name));
+const itemMap = {};
+for (const it of ITEMS) (itemMap[it.cat] ||= {})[it.name] = it.file;
+fs.writeFileSync(path.join(ROOT, "assets/item-pages.js"), "// 商品ごとの個別ページ（tools/make_pages.js が作る）\nconst ITEM_PAGES = " + JSON.stringify(itemMap, null, 2) + ";\n");
 fs.writeFileSync(path.join(ROOT, "about.html"), aboutPage());
 
 // 検索エンジン用：sitemap.xml と robots.txt（公開中のページだけ）
 const SITE_URL = "https://yuuuuukikn-arch.github.io/kaitori-navi/";
 const sitemapPages = ["index.html", "news.html", "yoyaku.html", "calendar.html", "privacy.html", "about.html",
-  ...PAGES.filter(published).map((p) => `p/${p.id}.html`)];
+  ...PAGES.filter(published).map((p) => `p/${p.id}.html`), ...ITEMS.map((it) => it.file)];
 const today2 = new Date(Date.now() + 9 * 36e5).toISOString().slice(0, 10);
 fs.writeFileSync(path.join(ROOT, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
