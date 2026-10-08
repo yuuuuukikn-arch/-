@@ -247,43 +247,12 @@ function articleStats(cfg) {
     latest,
     shops: latest ? byDate.get(latest) : {},
     retail: (DATA.CATALOG[cfg.name] || {}).retail ?? null,
-    history: dates.map((d) => ({ date: d, price: Math.max(...Object.values(byDate.get(d))) })),
+    history: dates.map((d) => {
+      const shops = byDate.get(d);
+      const top = Math.max(...Object.values(shops));
+      return { date: d, price: top, best: Object.keys(shops).filter((s) => shops[s] === top) };
+    }),
   };
-}
-
-// 推移の折れ線（SVG）。記録が1日分のときは点だけ
-function chartSvg(history, retail) {
-  const W = 340, H = 200, L = 52, R = 12, T = 12, B = 26;
-  const vals = history.map((h) => h.price).concat(retail != null ? [retail] : []);
-  let lo = Math.min(...vals), hi = Math.max(...vals);
-  const pad = Math.max((hi - lo) * 0.15, hi * 0.02);
-  lo -= pad; hi += pad;
-  const t0 = Date.parse(history[0].date), t1 = Date.parse(history[history.length - 1].date);
-  const X = (d) => (t1 === t0 ? L + (W - L - R) / 2 : L + ((Date.parse(d) - t0) / (t1 - t0)) * (W - L - R));
-  const Y = (v) => T + (H - T - B) - ((v - lo) / (hi - lo)) * (H - T - B);
-  const man = (v) => (v / 10000).toFixed(1).replace(/\.0$/, "") + "万";
-  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="買取価格の推移">`;
-  for (let i = 0; i <= 3; i++) {
-    const v = lo + ((hi - lo) * i) / 3;
-    s += `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e3e6eb"/>`
-      + `<text x="${L - 6}" y="${Y(v)}" text-anchor="end" dominant-baseline="middle" font-size="10" fill="#667085">${man(v)}</text>`;
-  }
-  if (retail != null) {
-    s += `<line x1="${L}" x2="${W - R}" y1="${Y(retail)}" y2="${Y(retail)}" stroke="#667085" stroke-dasharray="5 4"/>`
-      + `<text x="${W - R}" y="${Y(retail) - 4}" text-anchor="end" font-size="10" fill="#667085">定価 ${man(retail)}</text>`;
-  }
-  if (history.length > 1) {
-    s += `<polyline fill="none" stroke="#2a78d6" stroke-width="2" stroke-linejoin="round" points="${history.map((h) => `${X(h.date)},${Y(h.price)}`).join(" ")}"/>`;
-  }
-  s += history.map((h) => `<circle cx="${X(h.date)}" cy="${Y(h.price)}" r="3.5" fill="#2a78d6"/>`).join("");
-  const first = history[0].date, last = history[history.length - 1].date;
-  if (history.length > 1) {
-    s += `<text x="${X(first)}" y="${H - 6}" font-size="10" fill="#667085">${fmt(first).slice(5)}</text>`
-      + `<text x="${X(last)}" y="${H - 6}" text-anchor="end" font-size="10" fill="#667085">${fmt(last).slice(5)}</text>`;
-  } else {
-    s += `<text x="${X(first)}" y="${H - 6}" text-anchor="middle" font-size="10" fill="#667085">${fmt(first).slice(5)}</text>`;
-  }
-  return s + "</svg>";
 }
 
 // 記事の本体（最新の価格の表・推移グラフ）
@@ -303,8 +272,13 @@ function articleBody(p) {
     <div class="table-scroll"><table class="art-table"><thead><tr><th>店舗</th><th class="num">買取価格</th></tr></thead>
       <tbody>${rows.map(([sh, v]) => `<tr><td>${esc(sh)}</td><td class="num">${yen(v)}</td></tr>`).join("")}</tbody></table></div>
     <h2>価格の推移</h2>
-    <div class="art-chart">${chartSvg(st.history, st.retail)}</div>
-    ${st.history.length < 2 ? '<p class="note">記録が2日分以上たまると、線のグラフになります。</p>' : ""}`;
+    <div class="range" role="group" aria-label="期間"></div>
+    <div class="chart" id="chart"></div>
+    <div class="tooltip" id="tooltip" hidden></div>
+    ${st.history.length < 2 ? '<p class="note">データが2日分以上たまると線グラフになります。毎日価格を送ってもらうと推移が見えるようになります。</p>' : ""}
+    <script>window.ITEM_CHART = ${JSON.stringify({ retail: st.retail, history: st.history }).replace(/</g, "\\u003c")};</script>
+    <script src="../assets/chart.js"></script>
+    <script src="../assets/item-chart.js"></script>`;
 }
 
 function productPage(p) {
