@@ -26,12 +26,23 @@
     <p>2026/10/08時点の買取価格の最高値は、森森買取の¥14,500です。定価は¥5,400で、買取率は268.5%、利益は+¥9,100です。</p>
     <div class="table-scroll"><table class="art-table"><thead><tr><th>店舗</th><th class="num">買取価格</th></tr></thead>
       <tbody><tr><td>森森買取</td><td class="num">¥14,500</td></tr></tbody></table></div>
-    <h2>価格の推移</h2>
-    <div class="range" role="group" aria-label="期間"></div>
-    <div class="chart" id="chart"></div>
-    <div class="tooltip" id="tooltip" hidden></div>
-    
-    <script>window.ITEM_CHART = {"retail":5400,"history":[{"date":"2026-10-07","price":14000,"best":["買取一丁目"]},{"date":"2026-10-08","price":14500,"best":["森森買取"]}]};</script>
+    <div class="detail-wrap">
+      <div class="chart-head">
+        <div>
+          <h3>【MEGA】 インフェルノX BOX の買取価格推移</h3>
+          <div class="legend">
+            <span><i class="key s1"></i>最高値（各店で一番高い買取価格）</span>
+            <span><i class="key ref-key"></i>定価</span>
+          </div>
+        </div>
+        <div class="range" role="group" aria-label="期間"></div>
+      </div>
+      <div class="chart" id="chart"></div>
+      <div class="tooltip" id="tooltip" hidden></div>
+      
+      <div class="detail-stats" id="item-stats"></div>
+    </div>
+    <script>window.ITEM_CHART = {"retail":5400,"useRate":false,"history":[{"date":"2026-10-07","price":14000,"best":["買取一丁目"]},{"date":"2026-10-08","price":14500,"best":["森森買取"]}]};</script>
     <script src="../assets/chart.js"></script>
     <script src="../assets/item-chart.js"></script>
     

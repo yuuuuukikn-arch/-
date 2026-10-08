@@ -271,12 +271,23 @@ function articleBody(p) {
     <p>${lines.map(esc).join("")}</p>
     <div class="table-scroll"><table class="art-table"><thead><tr><th>店舗</th><th class="num">買取価格</th></tr></thead>
       <tbody>${rows.map(([sh, v]) => `<tr><td>${esc(sh)}</td><td class="num">${yen(v)}</td></tr>`).join("")}</tbody></table></div>
-    <h2>価格の推移</h2>
-    <div class="range" role="group" aria-label="期間"></div>
-    <div class="chart" id="chart"></div>
-    <div class="tooltip" id="tooltip" hidden></div>
-    ${st.history.length < 2 ? '<p class="note">データが2日分以上たまると線グラフになります。毎日価格を送ってもらうと推移が見えるようになります。</p>' : ""}
-    <script>window.ITEM_CHART = ${JSON.stringify({ retail: st.retail, history: st.history }).replace(/</g, "\\u003c")};</script>
+    <div class="detail-wrap">
+      <div class="chart-head">
+        <div>
+          <h3>${esc(p.chart.name)} の買取価格推移</h3>
+          <div class="legend">
+            <span><i class="key s1"></i>最高値（各店で一番高い買取価格）</span>
+            ${st.retail != null ? '<span><i class="key ref-key"></i>定価</span>' : ""}
+          </div>
+        </div>
+        <div class="range" role="group" aria-label="期間"></div>
+      </div>
+      <div class="chart" id="chart"></div>
+      <div class="tooltip" id="tooltip" hidden></div>
+      ${st.history.length < 2 ? '<p class="note">データが2日分以上たまると線グラフになります。毎日価格を送ってもらうと推移が見えるようになります。</p>' : ""}
+      <div class="detail-stats" id="item-stats"></div>
+    </div>
+    <script>window.ITEM_CHART = ${JSON.stringify({ retail: st.retail, useRate: p.chart.cat === "iPhone", history: st.history }).replace(/</g, "\\u003c")};</script>
     <script src="../assets/chart.js"></script>
     <script src="../assets/item-chart.js"></script>`;
 }
