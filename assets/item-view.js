@@ -80,7 +80,7 @@ function buildProducts(cat) {
 }
 // 店舗ごとの価格表（iPhone は色別）
 function shopTable(p) {
-  const shops = Object.keys(p.latest.shops).sort((a, b) => shopIdx(a) - shopIdx(b));
+  const shops = p.latest.best.slice().sort((a, b) => shopIdx(a) - shopIdx(b)); // 表は最高値（1位）の店舗だけ
   const its = shops.map((sh) => p.latest.shops[sh]);
   const head = `<th>店舗</th>`;
   const cell = (v, best) => `<td class="num ${v != null && v === best ? "best-price" : ""}">${v != null ? yen(v) : '<span class="na">—</span>'}</td>`;
