@@ -115,6 +115,52 @@ function icsFile(events, name) {
   return lines.map(fold).join("\r\n") + "\r\n";
 }
 
+// プライバシーポリシー（問い合わせ先・広告・アフィリエイトの説明）
+const CONTACT_EMAIL = "nexttrendmarket.jp@gmail.com";
+function privacyPage() {
+  return `<!doctype html>
+<html lang="ja">
+<head>
+  ${head("プライバシーポリシー｜買取相場ナビ", "買取相場ナビのプライバシーポリシー（個人情報の扱い、広告・アフィリエイト、お問い合わせ先）。", { depth: 0 })}
+</head>
+<body>
+  ${header(0)}
+  <main class="container page-article">
+    <h1>プライバシーポリシー</h1>
+    <p class="lead">買取相場ナビ（以下「当サイト」）における、情報の扱いについて定めています。</p>
+
+    <h2>1. 取得する情報</h2>
+    <p>当サイトは、会員登録を行っていません。お問い合わせをいただいた場合は、メールアドレスと、お問い合わせ内容を受け取ります。</p>
+    <p>アクセスの状況を知るために、アクセス解析のツールを使うことがあります。その場合は、閲覧されたページや、おおよその地域などの情報が、そのツールの提供者に送られることがあります。</p>
+
+    <h2>2. 広告について</h2>
+    <p>当サイトは、第三者配信の広告サービス（Google アドセンスなど）を利用することがあります。これらの広告は、Cookie（クッキー）を使って、利用者の興味に合わせた広告を表示することがあります。</p>
+    <p>Cookie の使用を無効にする方法や、パーソナライズ広告の設定については、各広告サービスのページをご覧ください。</p>
+
+    <h2>3. アフィリエイトについて</h2>
+    <p>当サイトには、Amazon.co.jp アソシエイトおよび楽天アフィリエイトのリンクを掲載しています。リンク先で商品を購入されると、当サイトに紹介料が入ることがあります。</p>
+    <p>商品の価格や在庫は、リンク先で必ずご確認ください。</p>
+
+    <h2>4. 掲載情報について</h2>
+    <p>当サイトに掲載している買取価格、定価、相場、発売日などは、掲載時点の情報です。実際の買取額や販売状況は、各店舗・各サイトでご確認ください。</p>
+    <p>公開する情報は、掲載の許可を得たもの、または公開されている情報に限ります。掲載について問題がある場合は、お問い合わせ先までご連絡ください。</p>
+
+    <h2>5. 外部のサイトについて</h2>
+    <p>当サイトから、外部のサイトへリンクすることがあります。外部のサイトの内容や、個人情報の扱いについては、当サイトは責任を負いません。</p>
+
+    <h2>6. お問い合わせ</h2>
+    <p>メール：<a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a></p>
+
+    <h2>7. 改定</h2>
+    <p>このポリシーは、必要に応じて変更することがあります。変更した場合は、このページに掲載します。</p>
+    <p class="note">制定日：2026年10月8日</p>
+  </main>
+  ${footer(0)}
+</body>
+</html>
+`;
+}
+
 function calendarPage() {
   return `<!doctype html>
 <html lang="ja">
@@ -145,7 +191,7 @@ function calendarPage() {
 function footer(depth = 1) {
   const up = "../".repeat(depth);
   return `<footer class="site-footer"><div class="container">
-      <p>&copy; ${new Date().getFullYear()} 買取相場ナビ ・ <a href="${up}index.html">ランキングへ</a> ・ <a href="${up}yoyaku.html">予約・抽選・新発売</a> ・ <a href="${up}calendar.html">発売カレンダー</a></p>
+      <p>&copy; ${new Date().getFullYear()} 買取相場ナビ ・ <a href="${up}index.html">ランキングへ</a> ・ <a href="${up}yoyaku.html">予約・抽選・新発売</a> ・ <a href="${up}calendar.html">発売カレンダー</a> ・ <a href="${up}privacy.html">プライバシーポリシー</a></p>
       <p class="muted">掲載の情報は確認時点のものです。申し込みや購入は、各公式ページ・販売店で行ってください。</p>
       ${PAGE_CONFIG.xUrl ? `<p><a href="${esc(PAGE_CONFIG.xUrl)}" target="_blank" rel="noopener">X（旧Twitter）で更新情報</a></p>` : ""}
     </div></footer>`;
@@ -304,10 +350,11 @@ const listed = PAGES.filter((p) => published(p) && (p.kind === "yoyaku" || p.kin
   .sort((a, b) => b.date.localeCompare(a.date));
 fs.writeFileSync(path.join(ROOT, "yoyaku.html"), yoyakuPage(listed));
 fs.writeFileSync(path.join(ROOT, "calendar.html"), calendarPage());
+fs.writeFileSync(path.join(ROOT, "privacy.html"), privacyPage());
 
 // 検索エンジン用：sitemap.xml と robots.txt（公開中のページだけ）
 const SITE_URL = "https://yuuuuukikn-arch.github.io/-/";
-const sitemapPages = ["index.html", "news.html", "yoyaku.html", "calendar.html",
+const sitemapPages = ["index.html", "news.html", "yoyaku.html", "calendar.html", "privacy.html",
   ...PAGES.filter(published).map((p) => `p/${p.id}.html`)];
 const today2 = new Date(Date.now() + 9 * 36e5).toISOString().slice(0, 10);
 fs.writeFileSync(path.join(ROOT, "sitemap.xml"),
