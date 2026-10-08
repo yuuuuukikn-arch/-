@@ -161,6 +161,41 @@ function privacyPage() {
 `;
 }
 
+// 運営者情報（サイトの目的・掲載の方針・連絡先）
+function aboutPage() {
+  return `<!doctype html>
+<html lang="ja">
+<head>
+  ${head("運営者情報｜買取相場ナビ", "買取相場ナビの目的、掲載の方針、運営者の連絡先。", { depth: 0 })}
+</head>
+<body>
+  ${header(0)}
+  <main class="container page-article">
+    <h1>運営者情報</h1>
+    <p class="lead">買取相場ナビは、iPhone と ポケモンカードゲーム（BOX）の買取価格を比べるための情報サイトです。</p>
+
+    <h2>サイトの目的</h2>
+    <p>店舗ごとの買取価格を並べて、どの店舗が高いかを分かりやすくお伝えします。新しい発売日や予約・抽選の情報も、あわせて掲載しています。</p>
+
+    <h2>掲載の方針</h2>
+    <p>掲載する価格は、確認できた時点のものです。確認日を併記し、古くなった情報は更新します。</p>
+    <p>実際の買取額や販売状況は、必ず各店舗・各公式サイトでご確認ください。当サイトの情報をもとに行った取引について、当サイトは責任を負いません。</p>
+    <p>当サイトは、店舗や商品の公式な情報ではありません。掲載に誤りや、掲載してほしくない情報がある場合は、お問い合わせください。</p>
+
+    <h2>広告・アフィリエイト</h2>
+    <p>当サイトは、広告（Google アドセンスなど）と、Amazon.co.jp アソシエイト・楽天アフィリエイトのリンクを掲載しています。詳しくは<a href="privacy.html">プライバシーポリシー</a>をご覧ください。</p>
+
+    <h2>運営者・お問い合わせ</h2>
+    <p>運営：買取相場ナビ運営チーム</p>
+    <p>メール：<a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a></p>
+    <p class="note">最終更新：2026年10月8日</p>
+  </main>
+  ${footer(0)}
+</body>
+</html>
+`;
+}
+
 function calendarPage() {
   return `<!doctype html>
 <html lang="ja">
@@ -191,7 +226,7 @@ function calendarPage() {
 function footer(depth = 1) {
   const up = "../".repeat(depth);
   return `<footer class="site-footer"><div class="container">
-      <p>&copy; ${new Date().getFullYear()} 買取相場ナビ ・ <a href="${up}index.html">ランキングへ</a> ・ <a href="${up}yoyaku.html">予約・抽選・新発売</a> ・ <a href="${up}calendar.html">発売カレンダー</a> ・ <a href="${up}privacy.html">プライバシーポリシー</a></p>
+      <p>&copy; ${new Date().getFullYear()} 買取相場ナビ ・ <a href="${up}index.html">ランキングへ</a> ・ <a href="${up}yoyaku.html">予約・抽選・新発売</a> ・ <a href="${up}calendar.html">発売カレンダー</a> ・ <a href="${up}about.html">運営者情報</a> ・ <a href="${up}privacy.html">プライバシーポリシー</a></p>
       <p class="muted">掲載の情報は確認時点のものです。申し込みや購入は、各公式ページ・販売店で行ってください。</p>
       ${PAGE_CONFIG.xUrl ? `<p><a href="${esc(PAGE_CONFIG.xUrl)}" target="_blank" rel="noopener">X（旧Twitter）で更新情報</a></p>` : ""}
     </div></footer>`;
@@ -351,10 +386,11 @@ const listed = PAGES.filter((p) => published(p) && (p.kind === "yoyaku" || p.kin
 fs.writeFileSync(path.join(ROOT, "yoyaku.html"), yoyakuPage(listed));
 fs.writeFileSync(path.join(ROOT, "calendar.html"), calendarPage());
 fs.writeFileSync(path.join(ROOT, "privacy.html"), privacyPage());
+fs.writeFileSync(path.join(ROOT, "about.html"), aboutPage());
 
 // 検索エンジン用：sitemap.xml と robots.txt（公開中のページだけ）
 const SITE_URL = "https://yuuuuukikn-arch.github.io/kaitori-navi/";
-const sitemapPages = ["index.html", "news.html", "yoyaku.html", "calendar.html", "privacy.html",
+const sitemapPages = ["index.html", "news.html", "yoyaku.html", "calendar.html", "privacy.html", "about.html",
   ...PAGES.filter(published).map((p) => `p/${p.id}.html`)];
 const today2 = new Date(Date.now() + 9 * 36e5).toISOString().slice(0, 10);
 fs.writeFileSync(path.join(ROOT, "sitemap.xml"),
