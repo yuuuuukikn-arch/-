@@ -309,9 +309,13 @@ function itemPage(cat, name) {
     <h1>${esc(name)}</h1>
     <div id="item-view"><p class="note">読み込み中…</p></div>
     <div class="tooltip" id="tooltip" hidden></div>
+    <section class="cal-grid-wrap"><h2>発売・予約カレンダー</h2><div data-cal-grid></div>
+      <p class="note"><a href="../calendar.html">発売カレンダーの一覧を見る ›</a></p></section>
   </main>
   ${footer(1)}
   ${itemScripts(cat, name)}
+  <script src="../assets/releases-public.js"></script>
+  <script src="../assets/calendar-grid.js"></script>
 </body>
 </html>
 `;
