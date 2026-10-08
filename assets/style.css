@@ -268,7 +268,7 @@ h2 { margin: 0 0 16px; font-size: 1.25rem; }
   /* 検索・並び替え */
   .toolbar { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 10px; }
   .toolbar input[type="search"] { grid-column: 1 / -1; }
-  .toolbar select { min-width: 0; }
+  .toolbar select { min-width: 0; grid-column: 1 / -1; }
   .toolbar .check { padding: 8px 12px; font-size: .85rem; }
 
   /* ランキング：スマホ専用カード */
