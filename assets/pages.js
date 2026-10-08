@@ -9,7 +9,7 @@
 
 // アフィリエイトの設定（ID はあなたが登録してから入れる。空のままなら通販リンクは出ない）
 const PAGE_CONFIG = {
-  amazonTag: "",   // Amazon アソシエイトの ID（例 example-22）
+  amazonTag: "nexttrend6-22",   // Amazon アソシエイトのトラッキングID
   rakutenId: "13792150.9ab0b7a4.13792151.e64838b7",   // 楽天アフィリエイトの ID
   prText: "※本ページは広告（アフィリエイトリンク）を含みます",
   xUrl: "",        // X（旧Twitter）のURL（例 https://x.com/アカウント名）。空のままなら表示しない
