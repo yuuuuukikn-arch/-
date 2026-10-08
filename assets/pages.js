@@ -12,6 +12,7 @@ const PAGE_CONFIG = {
   amazonTag: "",   // Amazon アソシエイトの ID（例 example-22）
   rakutenId: "",   // 楽天アフィリエイトの ID
   prText: "※本ページは広告（アフィリエイトリンク）を含みます",
+  xUrl: "",        // X（旧Twitter）のURL（例 https://x.com/アカウント名）。空のままなら表示しない
 };
 
 // 発売カレンダー（予約開始・発売日。確認できたものだけ入れる）

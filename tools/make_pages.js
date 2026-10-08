@@ -134,7 +134,9 @@ function calendarPage() {
     <noscript><p class="note">予定の一覧は、JavaScript が動くと表示されます。</p></noscript>
     <p class="note">「予約した」の記録は、この端末のブラウザにだけ保存されます（別の端末とは共有されません）。</p>
   </main>
+  <section class="container cal-grid-wrap"><h2>月ごとのカレンダー</h2><div data-cal-grid></div></section>
   ${footer(0)}
+  <script src="assets/calendar-grid.js" defer></script>
 </body>
 </html>
 `;
@@ -145,6 +147,7 @@ function footer(depth = 1) {
   return `<footer class="site-footer"><div class="container">
       <p>&copy; ${new Date().getFullYear()} せどり比較 ・ <a href="${up}index.html">ランキングへ</a> ・ <a href="${up}yoyaku.html">予約・抽選・新発売</a> ・ <a href="${up}calendar.html">発売カレンダー</a></p>
       <p class="muted">掲載の情報は確認時点のものです。申し込みや購入は、各公式ページ・販売店で行ってください。</p>
+      ${PAGE_CONFIG.xUrl ? `<p><a href="${esc(PAGE_CONFIG.xUrl)}" target="_blank" rel="noopener">X（旧Twitter）で更新情報</a></p>` : ""}
     </div></footer>`;
 }
 
@@ -252,7 +255,11 @@ function productPage(p) {
     ${official ? `<div class="btn-row">${official}</div>` : ""}
     ${aff}
   </main>
+  <section class="container cal-grid-wrap"><h2>発売・予約カレンダー</h2><div data-cal-grid></div>
+    <p class="note"><a href="../calendar.html">発売カレンダーの一覧を見る ›</a></p></section>
   ${footer()}
+  <script src="../assets/releases-public.js"></script>
+  <script src="../assets/calendar-grid.js"></script>
 </body>
 </html>
 `;
@@ -311,6 +318,8 @@ fs.writeFileSync(path.join(ROOT, "assets/releases-public.js"),
     id: r.id, title: r.title, reserve: r.reserve || null, release: r.release || null,
     note: r.note || "", official: r.official || "", source: r.source || "",
   })), null, 1) + ";\n");
+fs.writeFileSync(path.join(ROOT, "assets/site-config.js"),
+  "// tools/make_pages.js が作成（直接編集しない）\nconst SITE_CONFIG = " + JSON.stringify({ xUrl: PAGE_CONFIG.xUrl || "" }) + ";\n");
 console.log(`発売カレンダー: ${relPub.length}件（予定 ${allEvents.length}件）→ calendar.html / calendar.ics / ics/`);
 
 const articles = PAGES.filter((p) => published(p) && p.kind === "article");

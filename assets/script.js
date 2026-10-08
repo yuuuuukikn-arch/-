@@ -365,3 +365,10 @@ render();
   $("articles").hidden = false;
 })();
 
+// X のリンク（SITE_CONFIG.xUrl が設定されているときだけ表示）
+(function () {
+  if (typeof SITE_CONFIG === "undefined" || !SITE_CONFIG.xUrl || !$("xLink")) return;
+  $("xLink").href = SITE_CONFIG.xUrl;
+  $("xLink").hidden = false;
+})();
+

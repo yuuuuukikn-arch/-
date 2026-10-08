@@ -540,3 +540,28 @@ a.flash-inner:focus-visible { outline: 2px solid var(--accent); outline-offset: 
 .rsv-btn.on { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
 .ics-btn { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
 .ext-btn { color: var(--accent); border: 1px solid var(--border); }
+
+/* ── マス目のカレンダー ── */
+.cal-grid-wrap { padding-block: 22px 8px; max-width: 760px; }
+.cal-grid-wrap h2 { font-size: 1.05rem; margin: 0 0 10px; }
+.cg { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; }
+.cg-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cg-head b { font-size: 1rem; font-variant-numeric: tabular-nums; }
+.cg-nav { font: inherit; font-size: 1.3rem; width: 40px; height: 40px; border-radius: 999px; border: 1px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer; }
+.cg-week, .cg-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+.cg-week span { text-align: center; font-size: .72rem; color: var(--muted); font-weight: 700; padding: 4px 0; }
+.cg-week .sun { color: var(--minus); } .cg-week .sat { color: var(--series-1); }
+.cg-cell { min-height: 52px; border-radius: 8px; padding: 4px; display: flex; flex-direction: column; gap: 2px; background: var(--bg); font-variant-numeric: tabular-nums; min-width: 0; }
+.cg-cell.empty { background: none; }
+.cg-cell.today { outline: 2px solid var(--accent); outline-offset: -2px; }
+.cg-cell.has { background: color-mix(in srgb, var(--accent) 9%, var(--bg)); }
+.cg-d { font-size: .8rem; font-weight: 700; }
+.cg-mark { font-style: normal; font-size: .62rem; font-weight: 800; color: #fff; border-radius: 4px; padding: 0 4px; line-height: 1.5; overflow: hidden; white-space: nowrap; }
+.cg-mark.k予 { background: var(--accent); }
+.cg-mark.k発 { background: var(--plus); }
+.cg-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
+.cg-list li { font-size: .85rem; padding: 8px 10px; border-radius: 10px; background: var(--bg); line-height: 1.5; }
+.cg-list li small { display: block; color: var(--muted); font-size: .72rem; }
+.cg-k { display: inline-block; font-size: .7rem; font-weight: 800; color: #fff; border-radius: 4px; padding: 0 5px; }
+.cg-k.k予 { background: var(--accent); } .cg-k.k発 { background: var(--plus); }
+.cg-none { font-size: .85rem; color: var(--muted); margin: 10px 0 0; }
