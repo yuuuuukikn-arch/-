@@ -50,10 +50,7 @@ function render() {
   const q = $("q").value.trim().toLowerCase();
   const key = $("sort").value;
   const products = buildProducts(currentCat);
-  let items = products.filter((p) =>
-    (!q || p.name.toLowerCase().includes(q)) &&
-    (!$("onlyProfit").checked || p.profit > 0)
-  );
+  let items = products.filter((p) => !q || p.name.toLowerCase().includes(q));
   // 定価が未登録の商品は最後に
   items.sort((a, b) => (a[key] == null) - (b[key] == null) || b[key] - a[key]);
 
@@ -111,7 +108,7 @@ function renderUpdated() {
 
 // イベント
 $("year").textContent = new Date().getFullYear();
-["q", "sort", "onlyProfit"].forEach((id) => $(id).addEventListener("input", render));
+["q", "sort"].forEach((id) => $(id).addEventListener("input", render));
 
 function setCat(cat) {
   currentCat = cat;
