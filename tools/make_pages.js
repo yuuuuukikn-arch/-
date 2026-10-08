@@ -119,7 +119,7 @@ function icsFile(events, name) {
 const CONTACT_EMAIL = "nexttrendmarket.jp@gmail.com";
 function privacyPage() {
   return `<!doctype html>
-<html lang="ja">
+<html lang="ja" data-theme="dark">
 <head>
   ${head("プライバシーポリシー｜買取相場ナビ", "買取相場ナビのプライバシーポリシー（個人情報の扱い、広告・アフィリエイト、お問い合わせ先）。", { depth: 0 })}
 </head>
@@ -164,7 +164,7 @@ function privacyPage() {
 // 運営者情報（サイトの目的・掲載の方針・連絡先）
 function aboutPage() {
   return `<!doctype html>
-<html lang="ja">
+<html lang="ja" data-theme="dark">
 <head>
   ${head("運営者情報｜買取相場ナビ", "買取相場ナビの目的、掲載の方針、運営者の連絡先。", { depth: 0 })}
 </head>
@@ -198,7 +198,7 @@ function aboutPage() {
 
 function calendarPage() {
   return `<!doctype html>
-<html lang="ja">
+<html lang="ja" data-theme="dark">
 <head>
   ${head("発売カレンダー｜買取相場ナビ", "予約開始日と発売日をまとめた発売カレンダー。スマホのカレンダーに追加できます。", { depth: 0 })}
   <script src="assets/releases-public.js" defer></script>
@@ -298,7 +298,7 @@ const itemScripts = (cat, name) => `<script>window.ITEM_PAGE = ${JSON.stringify(
   <script src="../assets/item.js"></script>`;
 function itemPage(cat, name) {
   return `<!doctype html>
-<html lang="ja">
+<html lang="ja" data-theme="dark">
 <head>
   ${head(`${name} の買取価格｜買取相場ナビ`, `${name}の買取価格を店舗別に比べます。価格の推移（7日・30日・全期間）と、定価との比較。`)}
 </head>
@@ -330,7 +330,7 @@ function productPage(p) {
     ? `<div class="aff"><p class="pr">${esc(PAGE_CONFIG.prText)}</p><div class="aff-btns">${buy.map((a) =>
         `<a class="aff-btn ${a.cls}" href="${esc(a.url)}" target="_blank" rel="sponsored nofollow noopener">${esc(a.label)}</a>`).join("")}</div></div>` : "";
   return `<!doctype html>
-<html lang="ja">
+<html lang="ja" data-theme="dark">
 <head>
   ${head(`${p.title}｜買取相場ナビ`, p.summary || p.title, { noindex: draft })}
 </head>
@@ -367,7 +367,7 @@ function yoyakuPage(items) {
   }).join("") : `<div class="news-empty"><p><b>掲載中の予約・抽選・新発売はまだありません。</b></p>
     <p>確認できたものから順に載せます。</p></div>`;
   return `<!doctype html>
-<html lang="ja">
+<html lang="ja" data-theme="dark">
 <head>
   ${head("予約・抽選・新発売｜買取相場ナビ", "ポケモンカードなどの予約・抽選・新発売の情報を、確認できたものから一覧にします。", { depth: 0 })}
 </head>
