@@ -1,6 +1,6 @@
 {
-  "name": "せどり比較",
-  "short_name": "せどり比較",
+  "name": "買取相場ナビ",
+  "short_name": "買取相場ナビ",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f6f7f9",

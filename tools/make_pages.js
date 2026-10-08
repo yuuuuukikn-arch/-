@@ -62,7 +62,7 @@ function head(title, desc, { noindex = false, depth = 1 } = {}) {
 function header(depth = 1) {
   const up = "../".repeat(depth);
   return `<header class="site-header"><div class="container nav">
-      <a href="${up}index.html" class="logo"><span class="logo-mark">¥</span><span class="logo-text">せどり比較</span></a>
+      <a href="${up}index.html" class="logo"><span class="logo-mark">¥</span><span class="logo-text">買取相場ナビ</span></a>
       <a href="${up}yoyaku.html" class="back-link">予約・抽選</a>
       <button class="theme-toggle" aria-label="ライト／ダーク切り替え"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg></button>
     </div></header>`;
@@ -90,7 +90,7 @@ function releaseEvents(r) {
 }
 function icsFile(events, name) {
   const stamp = icsUtc(Date.now());
-  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//せどり比較//発売カレンダー//JA",
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//買取相場ナビ//発売カレンダー//JA",
     "CALSCALE:GREGORIAN", "METHOD:PUBLISH", `X-WR-CALNAME:${icsEsc(name)}`];
   for (const e of events) {
     lines.push("BEGIN:VEVENT", `UID:${e.uid}`, `DTSTAMP:${stamp}`);
@@ -119,7 +119,7 @@ function calendarPage() {
   return `<!doctype html>
 <html lang="ja">
 <head>
-  ${head("発売カレンダー｜せどり比較", "予約開始日と発売日をまとめた発売カレンダー。スマホのカレンダーに追加できます。", { depth: 0 })}
+  ${head("発売カレンダー｜買取相場ナビ", "予約開始日と発売日をまとめた発売カレンダー。スマホのカレンダーに追加できます。", { depth: 0 })}
   <script src="assets/releases-public.js" defer></script>
   <script src="assets/calendar.js" defer></script>
 </head>
@@ -145,7 +145,7 @@ function calendarPage() {
 function footer(depth = 1) {
   const up = "../".repeat(depth);
   return `<footer class="site-footer"><div class="container">
-      <p>&copy; ${new Date().getFullYear()} せどり比較 ・ <a href="${up}index.html">ランキングへ</a> ・ <a href="${up}yoyaku.html">予約・抽選・新発売</a> ・ <a href="${up}calendar.html">発売カレンダー</a></p>
+      <p>&copy; ${new Date().getFullYear()} 買取相場ナビ ・ <a href="${up}index.html">ランキングへ</a> ・ <a href="${up}yoyaku.html">予約・抽選・新発売</a> ・ <a href="${up}calendar.html">発売カレンダー</a></p>
       <p class="muted">掲載の情報は確認時点のものです。申し込みや購入は、各公式ページ・販売店で行ってください。</p>
       ${PAGE_CONFIG.xUrl ? `<p><a href="${esc(PAGE_CONFIG.xUrl)}" target="_blank" rel="noopener">X（旧Twitter）で更新情報</a></p>` : ""}
     </div></footer>`;
@@ -241,7 +241,7 @@ function productPage(p) {
   return `<!doctype html>
 <html lang="ja">
 <head>
-  ${head(`${p.title}｜せどり比較`, p.summary || p.title, { noindex: draft })}
+  ${head(`${p.title}｜買取相場ナビ`, p.summary || p.title, { noindex: draft })}
 </head>
 <body>
   ${header()}
@@ -277,7 +277,7 @@ function yoyakuPage(items) {
   return `<!doctype html>
 <html lang="ja">
 <head>
-  ${head("予約・抽選・新発売｜せどり比較", "ポケモンカードなどの予約・抽選・新発売の情報を、確認できたものから一覧にします。", { depth: 0 })}
+  ${head("予約・抽選・新発売｜買取相場ナビ", "ポケモンカードなどの予約・抽選・新発売の情報を、確認できたものから一覧にします。", { depth: 0 })}
 </head>
 <body>
   ${header(0)}
@@ -307,7 +307,7 @@ fs.writeFileSync(path.join(ROOT, "calendar.html"), calendarPage());
 
 const relPub = RELEASES.filter(published);
 const allEvents = relPub.flatMap(releaseEvents).sort((a, b) => (a.start || a.day).localeCompare(b.start || b.day));
-fs.writeFileSync(path.join(ROOT, "calendar.ics"), icsFile(allEvents, "せどり比較 発売カレンダー"));
+fs.writeFileSync(path.join(ROOT, "calendar.ics"), icsFile(allEvents, "買取相場ナビ 発売カレンダー"));
 fs.mkdirSync(path.join(ROOT, "ics"), { recursive: true });
 for (const f of fs.readdirSync(path.join(ROOT, "ics"))) if (f.endsWith(".ics")) fs.unlinkSync(path.join(ROOT, "ics", f));
 for (const r of relPub) {

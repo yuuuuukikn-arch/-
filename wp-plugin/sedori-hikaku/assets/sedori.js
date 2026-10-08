@@ -1,4 +1,4 @@
-// せどり比較（WordPress）：並び替え・検索・詳細のグラフ
+// 買取相場ナビ（WordPress）：並び替え・検索・詳細のグラフ
 (function () {
   "use strict";
   var yen = function (n) { return (n < 0 ? "-" : "") + "¥" + Math.abs(Math.round(n)).toLocaleString("ja-JP"); };

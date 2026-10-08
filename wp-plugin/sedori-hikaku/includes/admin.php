@@ -1,6 +1,6 @@
 <?php
 /**
- * 管理画面「設定 → せどり比較」
+ * 管理画面「設定 → 買取相場ナビ」
  */
 
 if (!defined('ABSPATH')) {
@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 }
 
 function sedori_admin_menu() {
-    add_options_page('せどり比較', 'せどり比較', 'manage_options', 'sedori-hikaku', 'sedori_admin_page');
+    add_options_page('買取相場ナビ', '買取相場ナビ', 'manage_options', 'sedori-hikaku', 'sedori_admin_page');
 }
 add_action('admin_menu', 'sedori_admin_menu');
 
@@ -64,7 +64,7 @@ function sedori_admin_page() {
     $source = file_exists(sedori_upload_path()) ? 'アップロードしたファイル' : ($v('data_url') ? 'URL' : 'プラグイン同梱のデータ');
     ?>
     <div class="wrap">
-        <h1>せどり比較</h1>
+        <h1>買取相場ナビ</h1>
         <?php settings_errors('sedori'); ?>
 
         <h2>使い方</h2>

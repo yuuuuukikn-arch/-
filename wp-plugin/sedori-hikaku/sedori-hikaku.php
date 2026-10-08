@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: せどり比較
+ * Plugin Name: 買取相場ナビ
  * Description: iPhone・ポケカBOXの買取価格ランキング（店舗比較・価格推移グラフ・速報バナー）をショートコード [sedori] で表示します。
  * Version: 1.0.0
  * Requires at least: 6.0
@@ -20,7 +20,7 @@ require_once SEDORI_DIR . 'includes/data.php';
 require_once SEDORI_DIR . 'includes/render.php';
 require_once SEDORI_DIR . 'includes/admin.php';
 
-/** 設定値（管理画面「設定 → せどり比較」） */
+/** 設定値（管理画面「設定 → 買取相場ナビ」） */
 function sedori_opt($key, $default = '') {
     $opts = get_option('sedori_options', array());
     return isset($opts[$key]) && $opts[$key] !== '' ? $opts[$key] : $default;
@@ -46,7 +46,7 @@ function sedori_shortcode($atts) {
     $data = sedori_get_data();
     if (!$data || empty($data['categories'][$cat])) {
         return current_user_can('manage_options')
-            ? '<p class="sdr-error">せどり比較：「' . esc_html($cat) . '」のデータがありません。設定画面でデータを確認してください。</p>'
+            ? '<p class="sdr-error">買取相場ナビ：「' . esc_html($cat) . '」のデータがありません。設定画面でデータを確認してください。</p>'
             : '';
     }
     sedori_enqueue();
