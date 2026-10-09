@@ -46,9 +46,18 @@ function buyLinks(p) {
   return out;
 }
 
+const GA_TAG = `<!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-B6RYE9VRH1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-B6RYE9VRH1");
+  </script>
+  `;
 function head(title, desc, { noindex = false, depth = 1 } = {}) {
   const up = "../".repeat(depth);
-  return `<meta charset="utf-8">
+  return `${GA_TAG}<meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(desc)}">
