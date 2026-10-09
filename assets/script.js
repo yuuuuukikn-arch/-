@@ -18,6 +18,16 @@ function setSortOptions() {
   $("sort").innerHTML = keys.map((k) => `<option value="${SORTS[k][0]}">${SORTS[k][1]}</option>`).join("");
   $("colRate").textContent = useRate() ? "買取率" : "利益率";
 }
+// 表彰台の「最高値の推移」：小さな線グラフに、前回比と期間を文字で添える
+function podTrend(p) {
+  const h = p.history;
+  if (h.length < 2) return `<div class="pod-trend"><span class="muted">推移は記録が2日分たまると表示</span></div>`;
+  const prev = h[h.length - 2], last = h[h.length - 1];
+  const d = last.price - prev.price;
+  const label = d === 0 ? "前回と同じ" : `前回比 ${signed(d)}`;
+  return `<div class="pod-trend">${Chart.sparkline(h.map((x) => x.price), 96, 26)}<span><b class="${sign(d)}">${label}</b><small>${mdw(prev.date)} → ${mdw(last.date)} の最高値</small></span></div>`;
+}
+
 function rateCell(p) {
   if (useRate()) return p.rate != null ? `<span class="roi ${sign(p.rate - 1)}">${pct(p.rate)}</span>` : "—";
   return p.roi != null ? `<span class="roi ${sign(p.roi)}">${pct(p.roi)}</span>` : "—";
@@ -77,7 +87,7 @@ function renderPodium(items) {
         <span>定価 ${p.retail != null ? yen(p.retail) : "—"}</span>
       </div>
       <div class="pod-shop">最高値の店：<b>${p.latest.best.map(esc).join("・")}</b></div>
-      <div class="pod-spark">${Chart.sparkline(p.history.map((h) => h.price), 120, 30)}</div>
+      ${podTrend(p)}
     </article>`).join("");
 }
 
