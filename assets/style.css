@@ -122,6 +122,7 @@ h2 { margin: 0 0 16px; font-size: 1.25rem; }
 
 /* カテゴリタブ */
 .updated { margin: 6px 0 0; font-size: .8rem; color: var(--muted); }
+.shops-line { margin: 12px 0 0; }
 
 /* 表彰台 */
 .podium { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
@@ -605,3 +606,8 @@ a.flash-inner:focus-visible { outline: 2px solid var(--accent); outline-offset: 
 .seo-summary h3 { font-size: .95rem; margin: 14px 0 6px; }
 .seo-summary ol { padding-left: 1.4em; margin: 0; }
 .seo-summary li { margin: 4px 0; }
+
+/* 商品ページの解説 */
+.item-note { margin-top: 18px; }
+.item-note h2 { font-size: 1.05rem; margin: 0 0 8px; }
+.item-note p { margin: 0 0 10px; line-height: 1.8; }

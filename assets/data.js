@@ -26,17 +26,33 @@ const SHOPS = {
   "森森買取":   { url: "https://www.morimori-kaitori.jp/" },
 };
 
-// iPhone 18 の色（色別価格の表の並び順）
-const IPHONE_COLORS = ["バーガンディ", "ブラック", "グレイシャー", "シルバー"];
+// iPhone の色（色別価格の表の並び順）。機種名の先頭が長く一致するものを使う
+const IPHONE_COLORS = {
+  "iPhone 18":     ["バーガンディ", "ブラック", "グレイシャー", "シルバー"],
+  "iPhone 17 Pro": ["オレンジ", "ブルー", "シルバー"],   // 店の表記（orange / blue / silver）に合わせた呼び方
+};
+const colorsFor = (name) => {
+  const key = Object.keys(IPHONE_COLORS).filter((k) => name.startsWith(k)).sort((a, b) => b.length - a.length)[0];
+  return key ? IPHONE_COLORS[key] : [];
+};
 
 // サイトに表示する商品の絞り込み（取り込んだデータ自体はすべて記録されます）
 const SHOW_ONLY = {
-  iPhone: /^iPhone 18/,   // iPhone は 18 シリーズだけ表示
+  iPhone: /^iPhone 1[78] Pro/,            // iPhone は 18 Pro / Pro Max と 17 Pro / Pro Max だけ表示
+  "ポケカBOX": /^(?!.*シュリンク無し)/,   // シュリンク無しの BOX は表示しない
 };
 
 // 定価（仕入れ値）の一覧。利益 = 買取価格（未開封） − 定価 で計算します。
 // estimated: true は推定の定価です。正しい金額がわかったら書き換えて false にしてください。
 const CATALOG = {
+  // iPhone 17 Pro / Pro Max（2026年7月の価格改定後の Apple 税込定価。2026-10-09 にユーザーから受け取った金額）
+  "iPhone 17 Pro 256GB":     { cat: "iPhone", retail: 194800 },
+  "iPhone 17 Pro 512GB":     { cat: "iPhone", retail: 229800 },
+  "iPhone 17 Pro 1TB":       { cat: "iPhone", retail: 264800 },
+  "iPhone 17 Pro Max 256GB": { cat: "iPhone", retail: 214800 },
+  "iPhone 17 Pro Max 512GB": { cat: "iPhone", retail: 249800 },
+  "iPhone 17 Pro Max 1TB":   { cat: "iPhone", retail: 284800 },
+  "iPhone 17 Pro Max 2TB":   { cat: "iPhone", retail: 354800 },
   // iPhone 18 Pro / Pro Max（Apple Store SIMフリー税込定価・2026年10月確認）
   "iPhone 18 Pro 256GB":     { cat: "iPhone", retail: 219800 },
   "iPhone 18 Pro 512GB":     { cat: "iPhone", retail: 254800 },

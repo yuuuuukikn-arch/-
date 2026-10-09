@@ -98,7 +98,10 @@ function renderUpdated() {
   const last = dates[dates.length - 1];
   // 掲載店：各商品の比較に使っている店（各店の最新価格が有効期間内のもの）
   const shops = [...new Set(buildProducts(currentCat).flatMap((p) => Object.keys(p.latest.shops)))].sort((a, b) => shopIdx(a) - shopIdx(b));
-  $("updated").innerHTML = last ? `価格更新日：${last.replaceAll("-", ".")} ・ 記録 ${new Set(dates).size}日分 ・ 掲載店：${shops.map((sh) => shopLink(sh)).join("")}` : "";
+  $("updated").innerHTML = last ? `価格更新日：${last.replaceAll("-", ".")} ・ 記録 ${new Set(dates).size}日分` : "";
+  // 掲載店の一覧はランキングの下に出す
+  const shopsEl = $("shops");
+  if (shopsEl) shopsEl.innerHTML = last && shops.length ? `掲載店：${shops.map((sh) => shopLink(sh)).join("")}` : "";
 }
 
 // イベント

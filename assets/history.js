@@ -360,9 +360,9 @@ const SNAPSHOTS = [
     "note": "",
     "boost": false,
     "colors": {
-     "orange": 166000,
+     "オレンジ": 166000,
      "シルバー": 172000,
-     "blue": 170000
+     "ブルー": 170000
     },
     "sealed": 172000
    },
@@ -370,9 +370,9 @@ const SNAPSHOTS = [
     "note": "",
     "boost": false,
     "colors": {
-     "orange": 198000,
+     "オレンジ": 198000,
      "シルバー": 198000,
-     "blue": 198000
+     "ブルー": 198000
     },
     "sealed": 198000
    },
@@ -380,9 +380,9 @@ const SNAPSHOTS = [
     "note": "",
     "boost": false,
     "colors": {
-     "orange": 213000,
+     "オレンジ": 213000,
      "シルバー": 215000,
-     "blue": 215000
+     "ブルー": 215000
     },
     "sealed": 215000
    },
@@ -390,9 +390,9 @@ const SNAPSHOTS = [
     "note": "",
     "boost": false,
     "colors": {
-     "orange": 184000,
+     "オレンジ": 184000,
      "シルバー": 186000,
-     "blue": 184000
+     "ブルー": 184000
     },
     "sealed": 186000
    },
@@ -400,9 +400,9 @@ const SNAPSHOTS = [
     "note": "",
     "boost": false,
     "colors": {
-     "orange": 215000,
+     "オレンジ": 215000,
      "シルバー": 215000,
-     "blue": 215000
+     "ブルー": 215000
     },
     "sealed": 215000
    },
@@ -410,9 +410,9 @@ const SNAPSHOTS = [
     "note": "",
     "boost": false,
     "colors": {
-     "orange": 238500,
+     "オレンジ": 238500,
      "シルバー": 238500,
-     "blue": 238500
+     "ブルー": 238500
     },
     "sealed": 238500
    },
@@ -420,9 +420,9 @@ const SNAPSHOTS = [
     "note": "",
     "boost": false,
     "colors": {
-     "orange": 277000,
+     "オレンジ": 277000,
      "シルバー": 277000,
-     "blue": 277000
+     "ブルー": 277000
     },
     "sealed": 277000
    }
@@ -461,7 +461,12 @@ const SNAPSHOTS = [
    "iPhone 17 Pro 256GB": {
     "sealed": 172000,
     "note": "Orange -6000 Blue -2000",
-    "boost": false
+    "boost": false,
+    "colors": {
+     "オレンジ": 166000,
+     "ブルー": 170000,
+     "シルバー": 172000
+    }
    },
    "iPhone 17 Pro 512GB": {
     "sealed": 198000,
@@ -481,7 +486,12 @@ const SNAPSHOTS = [
    "iPhone 17 Pro Max 256GB": {
     "sealed": 186000,
     "note": "ブルー、オレンジ　-2000",
-    "boost": false
+    "boost": false,
+    "colors": {
+     "オレンジ": 184000,
+     "ブルー": 184000,
+     "シルバー": 186000
+    }
    },
    "iPhone 17 Pro Max 512GB": {
     "sealed": 215000,
