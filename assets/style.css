@@ -591,3 +591,10 @@ a.flash-inner:focus-visible { outline: 2px solid var(--accent); outline-offset: 
 .cg-k { display: inline-block; font-size: .7rem; font-weight: 800; color: #fff; border-radius: 4px; padding: 0 5px; }
 .cg-k.k予 { background: var(--accent); } .cg-k.k発 { background: var(--plus); }
 .cg-none { font-size: .85rem; color: var(--muted); margin: 10px 0 0; }
+
+/* 検索エンジン向けのまとめ（JavaScript が動けば隠れる。動かない環境ではこれが一覧になる） */
+.seo-summary { margin-top: 18px; font-size: .9rem; }
+.seo-summary h2 { font-size: 1.05rem; margin: 0 0 6px; }
+.seo-summary h3 { font-size: .95rem; margin: 14px 0 6px; }
+.seo-summary ol { padding-left: 1.4em; margin: 0; }
+.seo-summary li { margin: 4px 0; }

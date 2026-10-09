@@ -424,6 +424,52 @@ fs.writeFileSync(path.join(ROOT, "about.html"), aboutPage());
 
 // 検索エンジン用：sitemap.xml と robots.txt（公開中のページだけ）
 const SITE_URL = "https://yuuuuukikn-arch.github.io/kaitori-navi/";
+
+// ランキングページ（index.html）に、検索エンジン向けの文字と構造化データを書き込む。
+// 順位・価格は JavaScript で描いているので、HTML だけ読む検索エンジンには中身が見えない。
+// そこで同じ内容を文字でも書いておき、画面では JavaScript が描いたあとに隠す（assets/script.js）。
+const { buildCategory } = require("./export_wp.js");
+const pct1 = (r) => (r * 100).toFixed(1) + "%";
+function staticRanking() {
+  const cats = [["iPhone", "iPhone 18 シリーズ", "買取率"], ["ポケカBOX", "ポケカ BOX", "利益"]];
+  let html = "", ld = [];
+  for (const [cat, label, metricName] of cats) {
+    if (!DATA.SNAPSHOTS.some((x) => x.cat === cat)) continue;
+    const c = buildCategory(cat);
+    const top = c.products.slice(0, 10);
+    const pageOf = (name) => (ITEMS.find((it) => it.cat === cat && it.name === name) || {}).file;
+    html += `<h3>${esc(label)}の買取価格ランキング（${fmt(c.updated)} 更新・${metricName}順）</h3>\n<ol>\n` + top.map((pr) => {
+      const link = pageOf(pr.name);
+      const name = link ? `<a href="${esc(link)}">${esc(pr.display)}</a>` : esc(pr.display);
+      const m = pr.retail == null ? "定価未登録" : cat === "iPhone"
+        ? `定価 ${yen(pr.retail)}・買取率 ${pct1(pr.rate)}（${pr.profit >= 0 ? "+" : "-"}${yen(Math.abs(pr.profit))}）`
+        : `定価 ${yen(pr.retail)}・利益 ${pr.profit >= 0 ? "+" : "-"}${yen(Math.abs(pr.profit))}`;
+      return `  <li>${name}：最高値 ${yen(pr.price)}（${esc(pr.shops.filter((x) => x.price === pr.price).map((x) => x.shop).join("・"))}）・${m}</li>`;
+    }).join("\n") + "\n</ol>\n";
+    ld.push({
+      "@context": "https://schema.org", "@type": "ItemList",
+      name: `${label}の買取価格ランキング（${metricName}順）`, dateModified: c.updated,
+      numberOfItems: top.length,
+      itemListElement: top.map((pr, i) => ({ "@type": "ListItem", position: i + 1, name: pr.display, ...(pageOf(pr.name) ? { url: SITE_URL + pageOf(pr.name) } : {}) })),
+    });
+  }
+  const shops = [...new Set(DATA.SNAPSHOTS.filter((x) => x.shop !== "買取商店").map((x) => x.shop))];
+  const intro = `<p>${esc(shops.join("・"))} の掲載価格を毎日記録し、定価で買って買取店に売ったときの損得を比べています。最高値の店名と、定価に対する買取率（ポケカは利益）を一覧にしました。</p>\n`;
+  return `<section class="seo-summary" id="staticRanking">\n<h2>本日の買取価格まとめ</h2>\n${intro}${html}</section>\n` +
+    ld.map((x) => `<script type="application/ld+json">${JSON.stringify(x).replace(/</g, "\\u003c")}</script>`).join("\n") + "\n";
+}
+{
+  const file = path.join(ROOT, "index.html");
+  const src = fs.readFileSync(file, "utf8");
+  const S = "<!-- static-ranking:start -->", E = "<!-- static-ranking:end -->";
+  if (src.includes(S) && src.includes(E)) {
+    const out = src.slice(0, src.indexOf(S) + S.length) + "\n" + staticRanking() + src.slice(src.indexOf(E));
+    if (out !== src) fs.writeFileSync(file, out);
+    console.log("ランキングページ: 検索エンジン向けのまとめを更新");
+  } else {
+    console.warn("index.html に static-ranking の目印がないため、まとめを書き込めませんでした");
+  }
+}
 const sitemapPages = ["index.html", "news.html", "yoyaku.html", "calendar.html", "privacy.html", "about.html",
   ...PAGES.filter(published).map((p) => `p/${p.id}.html`), ...ITEMS.map((it) => it.file)];
 const today2 = new Date(Date.now() + 9 * 36e5).toISOString().slice(0, 10);

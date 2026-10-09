@@ -40,6 +40,8 @@ function goToItem(name) {
 }
 
 function render() {
+  const sr = $("staticRanking"); // 検索エンジン向けの文字のまとめ（tools/make_pages.js が書く）。画面では表の方を見せる
+  if (sr) sr.hidden = true;
   const q = $("q").value.trim().toLowerCase();
   const key = $("sort").value;
   const products = buildProducts(currentCat);
