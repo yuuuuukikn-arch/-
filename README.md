@@ -17,7 +17,27 @@
 - **スマホ優先のデザイン**：上位3つは横スワイプ、ランキングはスマホ専用カード、店舗は1行まるごと押せるボタン。ホーム画面に追加できるアイコン付き
 - ライト／ダークモード
 
-## 毎日の価格の取り込み
+## 毎日の価格の取り込み（自動：GitHub にファイルを置くだけ）
+
+買取店のページをコピーしたテキストを、次の名前で `data/raw/` に置くと、GitHub が自動で取り込んでサイトを更新します
+（`.github/workflows/import.yml` → `tools/import_changed.sh`）。チャットに送る必要はありません。
+
+| 一覧 | ファイル名 |
+|---|---|
+| 買取一丁目の iPhone | `2026-10-10_買取一丁目.txt` |
+| 買取ホムラ（一丁目のホムラ）の iPhone | `2026-10-10_買取ホムラ.txt` |
+| 同じ日・同じ店の 2 ページ目（Pro Max など） | `2026-10-10_買取ホムラ_p2.txt` |
+| ポケカ BOX の一覧 | `2026-10-10_森森買取_ポケカ.txt` |
+
+- 日付は `YYYY-MM-DD`、店名は `assets/data.js` の `SHOPS` と同じ字（買取一丁目 / 買取ホムラ / 買取ルデヤ / 買取商店 / 森森買取）。
+- 置き方（自動）：パソコンに `tools/pc/upload.ps1` を設定すると、`Downloads\blog_articles` に保存するだけで送られます（手順は [tools/pc/README.md](tools/pc/README.md)）。
+- 置き方（手動）：GitHub でリポジトリの `data/raw` フォルダを開く → 右上「Add file」→「Upload files」→ ファイルをドラッグ →「Commit changes」。
+  公開ブランチ（`claude/site-creation-7inu0t`）に置くこと。
+- 置いてから 2〜5 分で、取り込み → ページ生成 → WordPress 用データ → 整合性チェック → コミット → 公開まで進みます。
+  結果はリポジトリの「Actions」タブで見られます（赤い × なら、ファイル名か中身に問題があります）。
+- 同じ名前で置き直すと、その日・その店の記録を上書きします。
+
+## 毎日の価格の取り込み（手動）
 
 買取店のページをコピーしたテキストをファイルに保存し、`tools/update.sh` を1回実行します。
 保存・取り込み・ページ生成・WordPress 用データの書き出し・整合性チェックまでをまとめて行います。
@@ -128,6 +148,8 @@ iPhone は 18 シリーズだけ表示します（`assets/data.js` の `SHOW_ONL
 - `assets/data.js` — 定価の一覧、ポケカのサンプルデータ
 - `assets/history.js` — 買取価格の履歴（自動生成）
 - `tools/update.sh` — 毎日の更新（保存・取り込み・生成・書き出し・チェックを1回で）
+- `tools/import_changed.sh` — data/raw に置かれたファイルをファイル名から取り込む（GitHub Actions が使う）
+- `.github/workflows/import.yml` — data/raw にファイルが置かれたら自動で取り込む
 - `tools/import_kaitori.py` — 取り込みスクリプト
 - `tools/check.js` — データの整合性チェック
 - `tools/remove_snapshot.py` — 取り込んだ記録を1つ消す
