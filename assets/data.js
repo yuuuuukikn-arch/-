@@ -2,7 +2,7 @@
 // url はリンク先。カテゴリごとに別のページへ飛ばすときは urls: { "ポケカBOX": "…" } を足す（ないカテゴリは url）
 const SHOPS = {
   "買取一丁目": { url: "https://www.1-chome.com/", urls: { "ポケカBOX": "https://www.1-chome.com/tradeCards?category=IIzyMdayU5wp7T4G" } },
-  "ホムラプレミアム": { url: "https://www.1-chome.com/" }, // 買取一丁目のプレミアム買取（通常価格とは別の店として載せる）
+  "買取ホムラ":   { url: "https://www.1-chome.com/" }, // 買取一丁目のホムラ（プレミアム）買取。通常価格とは別の店として載せる
   "買取ルデヤ": { url: "https://kaitori-rudeya.com/", hours: "10時〜19時（月〜土・祝）／日曜定休" },
   "買取商店":   { url: "https://www.kaitorishouten-co.jp/" },
   "森森買取":   { url: "https://www.morimori-kaitori.jp/" },

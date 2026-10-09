@@ -265,7 +265,7 @@ const SNAPSHOTS = [
  },
  {
   "date": "2026-10-09",
-  "shop": "ホムラプレミアム",
+  "shop": "買取ホムラ",
   "cat": "iPhone",
   "items": {
    "iPhone 18 Pro 2TB": {
