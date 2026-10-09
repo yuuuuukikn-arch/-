@@ -18,16 +18,20 @@ const useRate = () => currentCat === "iPhone";
 const SHOP_ORDER = Object.keys(SHOPS);
 const shopIdx = (shop) => { const i = SHOP_ORDER.indexOf(shop); return i < 0 ? SHOP_ORDER.length : i; };
 
-// 店のリンク先（カテゴリ別の URL があればそれ、なければ店の URL）
-function shopUrl(shop, cat = currentCat) {
+// 店のリンク先：商品別ページ（pages、商品名の先頭が長く一致するもの）→ カテゴリ別（urls）→ 店の URL。どれもなければ空
+function shopUrl(shop, cat = currentCat, name = "") {
   const info = SHOPS[shop];
   if (!info) return "";
+  if (name && info.pages) {
+    const key = Object.keys(info.pages).filter((k) => name.startsWith(k)).sort((a, b) => b.length - a.length)[0];
+    if (key) return info.pages[key];
+  }
   return (info.urls && info.urls[cat]) || info.url || "";
 }
 
-// 店舗名（公式サイトへのリンク付き）
-function shopLink(shop, cls = "") {
-  const url = shopUrl(shop);
+// 店舗名（公式サイトへのリンク付き）。name を渡すと商品別ページへ
+function shopLink(shop, cls = "", name = "") {
+  const url = shopUrl(shop, currentCat, name);
   if (!url) return `<span class="shop ${cls}">${esc(shop)}</span>`;
   return `<a class="shop ${cls}" href="${esc(url)}" target="_blank" rel="noopener">${esc(shop)}<span aria-hidden="true">↗</span></a>`;
 }
@@ -91,7 +95,7 @@ function buildProducts(cat) {
 function verdict(p) {
   const top = p.latest.best[0];
   const it = p.latest.shops[top];
-  const url = shopUrl(top);
+  const url = shopUrl(top, currentCat, p.name);
   const stale = it.date < p.latest.date ? `<small class="stale">${it.date.slice(5).replace("-", "/")}時点</small>` : "";
   const others = p.latest.best.length > 1 ? `<small class="muted">同額 ${p.latest.best.slice(1).map(esc).join("・")}</small>` : "";
   let judge;
@@ -125,7 +129,7 @@ function shopRanking(p, limit = 3) {
   let rank = 0;
   return `<ol class="shop-rank">${list.slice(0, limit).map((x, i) => {
     if (i === 0 || x.price < list[i - 1].price) rank = i + 1; // 同じ価格は同じ順位
-    const url = shopUrl(x.shop);
+    const url = shopUrl(x.shop, currentCat, p.name);
     const metric = p.retail == null ? "" : useRate()
       ? `<span class="sr-metric ${sign(x.price - p.retail)}">${pct(x.price / p.retail)}</span>`
       : `<span class="sr-metric ${sign(x.price - p.retail)}">${signed(x.price - p.retail)}</span>`;
@@ -152,7 +156,7 @@ function shopTable(p) {
     const last = prof == null ? "—" : useRate() ? `${pct(best / p.retail)}<small class="muted">（${signed(prof)}）</small>` : signed(prof);
     return `<tr><th scope="row">${esc(label)}</th>${vals.map((v) => cell(v, best)).join("")}<td class="num ${prof != null ? sign(prof) : ""}">${last}</td></tr>`;
   }).join("");
-  const shopHead = shops.map((sh) => `<th class="num">${shopLink(sh)}${p.latest.shops[sh].date < p.latest.date ? `<small class="stale">${p.latest.shops[sh].date.slice(5).replace("-", "/")}時点</small>` : ""}</th>`).join("");
+  const shopHead = shops.map((sh) => `<th class="num">${shopLink(sh, "", p.name)}${p.latest.shops[sh].date < p.latest.date ? `<small class="stale">${p.latest.shops[sh].date.slice(5).replace("-", "/")}時点</small>` : ""}</th>`).join("");
   const hasColors = its.some((it) => it.colors);
   const body = hasColors
     ? rowsHtml(IPHONE_COLORS, (it, c) => (it.colors ? it.colors[c] ?? null : null))
@@ -160,7 +164,7 @@ function shopTable(p) {
   const notes = shops.map((sh) => {
     const it = p.latest.shops[sh], info = SHOPS[sh] || {};
     const bits = [it.noShrink != null ? `シュリンクなし ${yen(it.noShrink)}` : "", it.note || "", info.hours ? `営業時間 ${info.hours}` : ""].filter(Boolean);
-    return bits.length ? `<li>${shopLink(sh)}：${esc(bits.join(" ／ "))}</li>` : "";
+    return bits.length ? `<li>${shopLink(sh, "", p.name)}：${esc(bits.join(" ／ "))}</li>` : "";
   }).join("");
   return `<div class="shop-compare">
     <h4>店舗別の買取価格（${p.latest.date.replaceAll("-", "/")}）</h4>

@@ -399,6 +399,7 @@ a.sr-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; 
   .table tr.row td.shop-cell { grid-area: shops; font-size: inherit; margin-top: 4px; }
   .shop-rank { min-width: 0; gap: 6px; }
   .sr-row { min-height: 46px; padding: 6px 10px; font-size: .9rem; border-radius: 10px; }
+  .sr-name { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.2; overflow-wrap: anywhere; } /* 店名を「買取ホ…」と切らず、折り返す */
   .sr-pos { font-size: .75rem; }
   .sr-metric { font-size: .82rem; }
   .sr-go { font-size: 1.4rem; }
@@ -428,6 +429,12 @@ a.sr-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; 
   .seg button { padding: 7px 0; font-size: .95rem; min-height: 38px; }
 }
 @media (max-width: 380px) {
+  /* 幅の狭い端末：買取率を価格の下に回して、店名の幅を確保する */
+  .sr-row { font-size: .82rem; gap: 2px 6px; padding: 6px 8px; grid-template-columns: auto minmax(0, 1fr) auto 12px; grid-template-rows: auto auto; }
+  .sr-pos, .sr-name, .sr-go { grid-row: 1 / span 2; }
+  .sr-price { grid-column: 3; grid-row: 1; }
+  .sr-metric { grid-column: 3; grid-row: 2; font-size: .72rem; min-width: 0; }
+  .sr-go { grid-column: 4; }
   .logo-text { display: none; }
 }
 

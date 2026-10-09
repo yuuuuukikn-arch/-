@@ -1,9 +1,27 @@
 // 買取店（並び順がグラフの線の色の順になります）
-// url はリンク先。カテゴリごとに別のページへ飛ばすときは urls: { "ポケカBOX": "…" } を足す（ないカテゴリは url）
+// url: 店のリンク先。urls: カテゴリごとのページ（{ "ポケカBOX": … }）。pages: 商品名の先頭が一致するページ
+// （{ "iPhone 18 Pro Max": … }。長く一致するものを優先）。探す順は pages → urls → url。ないものはリンクなし。
+// URL はユーザーから受け取ったものだけを書く。分からないときは空にする（推測で埋めない）。
 const SHOPS = {
-  "買取一丁目": { url: "https://www.1-chome.com/", urls: { "ポケカBOX": "https://www.1-chome.com/tradeCards?category=IIzyMdayU5wp7T4G" } },
-  "買取ホムラ":   { url: "https://www.1-chome.com/" }, // 買取一丁目のホムラ（プレミアム）買取。通常価格とは別の店として載せる
-  "買取ルデヤ": { url: "https://kaitori-rudeya.com/", hours: "10時〜19時（月〜土・祝）／日曜定休" },
+  "買取一丁目": {
+    url: "https://www.1-chome.com/index",
+    urls: { "ポケカBOX": "https://www.1-chome.com/tradeCards?category=IIzyMdayU5wp7T4G" },
+  },
+  "買取ホムラ": { // 買取一丁目のホムラ（プレミアム）買取。別サイト kaitori-homura.com。トップページの URL は未確認のため url は空
+    urls: { "ポケカBOX": "https://kaitori-homura.com/products?q%5Bproduct_sub_category_id_eq%5D=128&q%5Bproduct_sub_category_product_category_id_eq%5D=14" },
+    pages: {
+      "iPhone 18 Pro Max": "https://kaitori-homura.com/products?q%5Bproduct_sub_category_id_eq%5D=192&q%5Bproduct_sub_category_product_category_id_eq%5D=10",
+      "iPhone 18 Pro":     "https://kaitori-homura.com/products?q%5Bproduct_sub_category_id_eq%5D=193&q%5Bproduct_sub_category_product_category_id_eq%5D=10",
+    },
+  },
+  "買取ルデヤ": {
+    url: "https://kaitori-rudeya.com/", hours: "10時〜19時（月〜土・祝）／日曜定休",
+    urls: { "ポケカBOX": "https://kaitori-rudeya.com/category/detail/114" },
+    pages: {
+      "iPhone 18 Pro Max": "https://kaitori-rudeya.com/category/detail/253",
+      "iPhone 18 Pro":     "https://kaitori-rudeya.com/category/detail/254",
+    },
+  },
   "買取商店":   { url: "https://www.kaitorishouten-co.jp/" },
   "森森買取":   { url: "https://www.morimori-kaitori.jp/" },
 };
