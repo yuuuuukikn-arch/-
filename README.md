@@ -40,9 +40,10 @@ git add -A && git commit -m "Import 森森買取 2026-10-10 (iPhone)"
 
 - 店名が `assets/data.js` の `SHOPS` にない（先に店を登録する）
 - 同じ日・同じ店の元テキストがすでにある（取り直すなら `--force`、2ページ目なら `--append`）
-- 「ホムラプレミアム」「会員限定」など、通常の買取価格ではない欄らしい語がある（その欄を除いてから実行する。通常価格だと確認できたら `--force`）
 
+プレミアム・会員限定などの価格は、その店の価格としてそのまま取り込みます（条件の詳細は店舗で確認）。
 元テキストは `data/raw/日付_店名.txt` に残るので、あとから価格の出典を確認できます。
+出典が確認できない記録を消すときは `python3 tools/remove_snapshot.py --date 日付 --shop 店名 [--cat ポケカBOX]` を実行し、続けて `node tools/make_pages.js` と `node tools/export_wp.js` を実行します。
 整合性チェック（`node tools/check.js`）は単独でも実行でき、元テキストのない記録、未登録の店、古い WordPress 用データを知らせます。
 
 ### 手動で1つずつ行う場合
@@ -128,6 +129,7 @@ iPhone は 18 シリーズだけ表示します（`assets/data.js` の `SHOW_ONL
 - `tools/update.sh` — 毎日の更新（保存・取り込み・生成・書き出し・チェックを1回で）
 - `tools/import_kaitori.py` — 取り込みスクリプト
 - `tools/check.js` — データの整合性チェック
+- `tools/remove_snapshot.py` — 取り込んだ記録を1つ消す
 - `data/raw/` — 取り込んだ元テキストの保管
 
 ## WordPress で公開する

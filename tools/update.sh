@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # 毎日の更新を1コマンドで行う。
 #   tools/update.sh <元テキスト> --date 2026-10-10 --shop 森森買取 [--cat ポケカBOX] [--append]
-# 1) 通常価格ではない欄（ホムラプレミアム等）が混ざっていないか確認
+# 1) プレミアム・会員限定などの価格が含まれていれば知らせる（止めない）
 # 2) 元テキストを data/raw/<日付>_<店>[_ポケカ][_p2].txt に保存
 # 3) 取り込み → ページ生成 → WordPress 用データ書き出し → 整合性チェック
-# 読み取り結果の確認だけなら --dry-run。別枠の語があっても進めるなら --force。
+# 読み取り結果の確認だけなら --dry-run。同じ日・同じ店を取り直すなら --force。
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
@@ -28,14 +28,11 @@ done
 grep -q "\"$SHOP\":" assets/data.js || { echo "店 \"$SHOP\" が assets/data.js の SHOPS にありません。先に登録してください。" >&2; exit 2; }
 [ "$CAT" = "iPhone" ] || [ "$CAT" = "ポケカBOX" ] || { echo "--cat は iPhone か ポケカBOX です: $CAT" >&2; exit 2; }
 
-# 1) 別枠の価格が混ざっていないか（保存する前に見る）
-SPECIAL='ホムラ|プレミアム買取|会員限定|限定価格|キャンペーン価格|まとめ売り'
+# 1) プレミアム・会員限定などの価格が含まれていれば知らせる（止めない。その店の価格として取り込む。詳細は店舗で確認してもらう）
+SPECIAL='ホムラ|プレミアム|会員限定|限定価格|キャンペーン'
 if grep -nE "$SPECIAL" "$SRC" >/dev/null; then
-  echo "△ 通常価格ではない欄らしい語が含まれています:"
-  grep -nE "$SPECIAL" "$SRC" | head -10
-  if [ -z "$FORCE" ]; then
-    echo "その欄を元テキストから除いてから実行するか、通常価格だと確認できたら --force を付けてください。" >&2; exit 3
-  fi
+  echo "ℹ プレミアム・会員限定などの価格が含まれています。そのまま店の価格として取り込みます:"
+  grep -nE "$SPECIAL" "$SRC" | head -5
 fi
 
 # 2) 元テキストを保存

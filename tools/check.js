@@ -14,8 +14,6 @@ for (const f of ["assets/data.js", "assets/history.js"]) {
 }
 const { SHOPS, CATALOG, SNAPSHOTS, SHOW_ONLY } = ctx;
 const shown = (cat, name) => !(SHOW_ONLY && SHOW_ONLY[cat]) || SHOW_ONLY[cat].test(name); // サイトに出る商品だけ定価を見る
-// 店の通常価格ではない欄のキーワード。備考や元テキストに出てきたら確認する
-const SPECIAL = /ホムラ|プレミアム買取|会員限定|限定価格|キャンペーン価格|まとめ売り/;
 
 const errors = [], warns = [];
 const rawDir = path.join(ROOT, "data/raw");
@@ -32,12 +30,7 @@ for (const s of SNAPSHOTS) {
   if (unknown.length) warns.push(`${tag}: 定価未登録の商品 ${unknown.length}件（${unknown.slice(0, 3).join("、")}${unknown.length > 3 ? " ほか" : ""}）`);
   for (const [n, it] of Object.entries(s.items)) {
     if (typeof it.sealed !== "number" || it.sealed <= 0) errors.push(`${tag}: ${n} の未開封価格が数値ではありません`);
-    if (SPECIAL.test(it.note || "")) warns.push(`${tag}: ${n} の備考に別枠の価格らしい語があります（${it.note}）`);
   }
-}
-for (const f of rawFiles) {
-  const text = fs.readFileSync(path.join(rawDir, f), "utf8");
-  if (SPECIAL.test(text)) warns.push(`data/raw/${f}: 別枠の価格らしい語（${text.match(SPECIAL)[0]}）が含まれます。通常価格と混ざっていないか確認`);
 }
 
 // WordPress 用データが最新の取り込みを含んでいるか
