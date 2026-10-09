@@ -34,7 +34,6 @@ const ITEM_PAGES = {
     "【S＆V】 楽園ドラゴーナ BOX": "p/item-pokeca-21.html",
     "【S＆V】 超電ブレイカー BOX": "p/item-pokeca-22.html",
     "【S＆V】 熱風のアリーナ BOX": "p/item-pokeca-23.html",
-    "【S＆V】 変幻の仮面 BOX": "p/item-pokeca-24.html",
-    "【シュリンク無しBOX】 ストームエメラルダ": "p/item-pokeca-25.html"
+    "【S＆V】 変幻の仮面 BOX": "p/item-pokeca-24.html"
   }
 };
