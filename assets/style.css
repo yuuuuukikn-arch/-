@@ -192,7 +192,25 @@ h2 { margin: 0 0 16px; font-size: 1.25rem; }
 .tooltip div { display: flex; align-items: center; gap: 6px; }
 .tooltip span { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 600; }
 
-.detail-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px; }
+/* 結論（いま売るなら／定価で買うと） */
+.verdict { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-bottom: 14px; }
+.verdict > div { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.verdict span { flex-basis: 100%; font-size: .78rem; color: var(--muted); }
+.verdict b { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.verdict .v-price { color: var(--plus); }
+.verdict small { font-size: .78rem; color: var(--muted); }
+.verdict .v-go { flex-basis: 100%; margin-top: 6px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 40px; padding: 0 14px; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 700; text-decoration: none; }
+.verdict .v-go span { flex-basis: auto; color: inherit; font-size: .85em; }
+.v-judge.plus { border-color: color-mix(in srgb, var(--plus) 45%, var(--border)); background: color-mix(in srgb, var(--plus) 8%, var(--bg)); }
+.v-judge.minus { border-color: color-mix(in srgb, var(--minus) 45%, var(--border)); background: color-mix(in srgb, var(--minus) 8%, var(--bg)); }
+.v-judge b.plus { color: var(--plus); } .v-judge b.minus { color: var(--minus); } .v-judge b.zero { color: var(--muted); }
+.chart-note { margin: 6px 0 0; font-size: .8rem; color: var(--muted); }
+.chart .mark { fill: color-mix(in srgb, var(--hot) 12%, transparent); }
+.chart .axis.mark-day { fill: var(--hot); font-weight: 700; }
+.key.wed-key { background: color-mix(in srgb, var(--hot) 45%, transparent); height: 10px; border-radius: 2px; }
+.tooltip .mark-tag { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 999px; font-size: .7rem; background: color-mix(in srgb, var(--hot) 20%, transparent); color: var(--hot); }
+.aff-head { margin: 0 0 2px; font-weight: 700; font-size: .9rem; }
+.detail-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
 .detail-stats div { background: var(--bg); border-radius: 8px; padding: 8px 12px; }
 .detail-stats span, .detail-stats small { display: block; font-size: .72rem; color: var(--muted); }
 .detail-stats b { font-variant-numeric: tabular-nums; }
@@ -210,7 +228,8 @@ h2 { margin: 0 0 16px; font-size: 1.25rem; }
 .chart .series.s3 { stroke: var(--series-3); }
 .chart .dot.s3 { fill: var(--series-3); }
 
-.shop-compare { margin-top: 14px; }
+.shop-compare { margin: 0 0 14px; }
+.shop-compare + .chart-head { margin-top: 18px; }
 .shop-compare h4 { margin: 0 0 8px; font-size: .9rem; }
 .cmp-wrap { overflow-x: auto; }
 .cmp { border-collapse: collapse; width: 100%; font-size: .85rem; }
@@ -319,7 +338,9 @@ h2 { margin: 0 0 16px; font-size: 1.25rem; }
   .chart-head h3 { font-size: .95rem; }
   .range { width: 100%; }
   .range button { flex: 1; padding: 9px 0; font-size: .85rem; }
-  .detail-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .detail-stats { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .verdict { grid-template-columns: 1fr; }
+  .verdict b { font-size: 1.15rem; }
   .detail-stats div { padding: 8px 10px; }
   .cmp { font-size: .8rem; }
   .cmp th, .cmp td { padding: 8px 6px; }

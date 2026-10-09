@@ -256,6 +256,12 @@ function sedori_jsonld($cat, $products) {
 
 function sedori_render($cat, $data, $args) {
     $c = $data['categories'][$cat];
+    // 店にカテゴリ別のリンク先（urls）があれば、このカテゴリではそれを使う
+    foreach ($data['shops'] as $shop => $info) {
+        if (!empty($info['urls'][$cat])) {
+            $data['shops'][$shop]['url'] = $info['urls'][$cat];
+        }
+    }
     $metric = $c['metric'];
     $products = $c['products'];
     if ($args['limit']) {

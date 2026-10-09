@@ -93,7 +93,7 @@ function buildCategory(cat) {
 const cats = [...new Set(SNAPSHOTS.map((s) => s.cat))];
 const out = {
   generated: new Date().toISOString(),
-  shops: Object.fromEntries(Object.entries(SHOPS).filter(([s]) => published(s)).map(([s, v]) => [s, { url: v.url, ...(v.hours ? { hours: v.hours } : {}) }])),
+  shops: Object.fromEntries(Object.entries(SHOPS).filter(([s]) => published(s)).map(([s, v]) => [s, { url: v.url, ...(v.urls ? { urls: v.urls } : {}), ...(v.hours ? { hours: v.hours } : {}) }])),
   categories: Object.fromEntries(cats.map((c) => [c, buildCategory(c)])),
 };
 fs.mkdirSync(path.dirname(OUT), { recursive: true });

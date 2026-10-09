@@ -98,7 +98,13 @@ function releaseEvents(r) {
   return ev;
 }
 function icsFile(events, name) {
-  const stamp = icsUtc(Date.now());
+  // DTSTAMP は予定の元データ（assets/pages.js）を最後に変えた時刻にする。
+  // 現在時刻にすると生成のたびに ics が変わり、何が本当に変わったか分からなくなるため。
+  let stamp;
+  try {
+    const t = require("child_process").execSync("git log -1 --format=%ct -- assets/pages.js", { cwd: ROOT, stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+    stamp = icsUtc(t ? Number(t) * 1000 : Date.now());
+  } catch { stamp = icsUtc(Date.now()); }
   const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//買取相場ナビ//発売カレンダー//JA",
     "CALSCALE:GREGORIAN", "METHOD:PUBLISH", `X-WR-CALNAME:${icsEsc(name)}`];
   for (const e of events) {
@@ -272,9 +278,9 @@ function articleBody(p) {
     const diff = topPrice - st.retail;
     lines.push(`定価は${yen(st.retail)}で、買取率は${(topPrice / st.retail * 100).toFixed(1)}%、利益は${diff >= 0 ? "+" : ""}${yen(diff)}です。`);
   }
-  return `<h2>最新の買取価格</h2>
-    <p>${lines.map(esc).join("")}</p>
-    <h2>価格の推移・店舗別の比較</h2>
+  // 文章は検索エンジン向けの要約。表示時は assets/item.js が同じ記録から作る結論の箱に置き換える
+  return `<h2>いま売るならどこで、いくら得か</h2>
+    <p id="item-lead">${lines.map(esc).join("")}</p>
     <div id="item-view"><p class="note">読み込み中…</p></div>
     <div class="tooltip" id="tooltip" hidden></div>`;
 }
@@ -340,7 +346,7 @@ function productPage(p) {
   const body = (p.body || []).map((t) => `<p>${esc(t)}</p>`).join("") + articleBody(p);
   const buy = buyLinks(p);
   const aff = buy.length
-    ? `<div class="aff"><p class="pr">${esc(PAGE_CONFIG.prText)}</p><div class="aff-btns">${buy.map((a) =>
+    ? `<div class="aff"><p class="aff-head">新品を買うなら（参考）</p><p class="pr">${esc(PAGE_CONFIG.prText)}</p><div class="aff-btns">${buy.map((a) =>
         `<a class="aff-btn ${a.cls}" href="${esc(a.url)}" target="_blank" rel="sponsored nofollow noopener">${esc(a.label)}</a>`).join("")}</div></div>` : "";
   return `<!doctype html>
 <html lang="ja" data-theme="dark">
