@@ -295,6 +295,30 @@ def parse_ichome_boxes(text):
     return items
 
 
+def parse_ichome_unsealed(text):
+    """買取一丁目の「【未開封】iPhone 18 Pro Max 256GB burgundy」形式（色ごとの買取金額）"""
+    COLOR_JA = {"burgundy": "バーガンディ", "black": "ブラック", "glacier": "グレイシャー", "silver": "シルバー"}
+    lines = [l.strip() for l in text.splitlines()]
+    items = {}
+    for i, line in enumerate(lines):
+        m = re.match(r"【未開封】\s*(iPhone .+?)\s+(\w+)$", line)
+        if not m:
+            continue
+        name, color = m.group(1), COLOR_JA.get(m.group(2).lower(), m.group(2))
+        price = None
+        for j in range(i + 1, min(i + 6, len(lines))):
+            pm = re.search(r"[¥￥]\s*([\d,]+)", lines[j])
+            if pm:
+                price = int(pm.group(1).replace(",", ""))
+                break
+        if price is None:
+            continue
+        item = items.setdefault(name, {"note": "", "boost": False, "colors": {}})
+        item["colors"][color] = price
+        item["sealed"] = max(item["colors"].values())
+    return items
+
+
 def detect_and_parse(text):
     # 「通常買取価格・預かり買取価格・即フリ買取価格」の見出しがあれば森森買取形式
     # （見出しを含めずにコピーした場合も「Apple iPhone18 …」の商品名で見分ける）
@@ -308,6 +332,8 @@ def detect_and_parse(text):
         return parse_rudeya(text)
     if "商品価格一覧" in text and "未開封価格" in text:
         return parse_ichome_list(text)
+    if re.search(r"【未開封】\s*iPhone", text):
+        return parse_ichome_unsealed(text)
     if "買取金額（税込）" in text:
         return parse_ichome_boxes(text)
     items = parse(text)
@@ -346,6 +372,11 @@ def main():
         base = lambda j: j[-13:]  # 買取一丁目は先頭に 11 / 12 が付くので、後ろ13桁で比べる
         known = {base(it["jan"]): name for s in load() if s["cat"] == args.cat
                  for name, it in s["items"].items() if it.get("jan")}
+        # 記録を消したあとも商品をたどれるように、JAN の一覧（data/jan_master.json）も使う
+        master = ROOT / "data" / "jan_master.json"
+        if args.cat == "ポケカBOX" and master.exists():
+            for j, name in json.loads(master.read_text(encoding="utf-8")).items():
+                known.setdefault(j, name)
         if known:
             renamed, skipped = {}, []
             for name, it in items.items():
