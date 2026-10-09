@@ -262,5 +262,231 @@ const SNAPSHOTS = [
     "jan": "4521329431161"
    }
   }
+ },
+ {
+  "date": "2026-10-09",
+  "shop": "ホムラプレミアム",
+  "cat": "iPhone",
+  "items": {
+   "iPhone 18 Pro 2TB": {
+    "note": "",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 380000,
+     "グレイシャー": 370000,
+     "シルバー": 370000,
+     "ブラック": 370000
+    },
+    "sealed": 380000
+   },
+   "iPhone 18 Pro 1TB": {
+    "note": "",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 308000,
+     "グレイシャー": 295000,
+     "シルバー": 295000,
+     "ブラック": 295000
+    },
+    "sealed": 308000
+   },
+   "iPhone 18 Pro 512GB": {
+    "note": "",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 247000,
+     "グレイシャー": 235000,
+     "シルバー": 229000,
+     "ブラック": 235000
+    },
+    "sealed": 247000
+   },
+   "iPhone 18 Pro 256GB": {
+    "note": "",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 211000,
+     "グレイシャー": 195000,
+     "シルバー": 192000,
+     "ブラック": 195000
+    },
+    "sealed": 211000
+   }
+  }
+ },
+ {
+  "date": "2026-10-09",
+  "shop": "買取一丁目",
+  "cat": "iPhone",
+  "items": {
+   "iPhone 16 Pro 128GB": {
+    "sealed": 149000,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 16 Pro 256GB": {
+    "sealed": 168500,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 17 256GB": {
+    "sealed": 139000,
+    "note": "ミストブルー -1000",
+    "boost": false
+   },
+   "iPhone 17 512GB": {
+    "sealed": 156000,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 17 Pro 1TB": {
+    "sealed": 215000,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 17 Pro 256GB": {
+    "sealed": 172000,
+    "note": "Orange -6000 Blue -2000",
+    "boost": false
+   },
+   "iPhone 17 Pro 512GB": {
+    "sealed": 198000,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 17 Pro Max 1TB": {
+    "sealed": 238500,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 17 Pro Max 2TB": {
+    "sealed": 277000,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 17 Pro Max 256GB": {
+    "sealed": 186000,
+    "note": "ブルー、オレンジ　-2000",
+    "boost": false
+   },
+   "iPhone 17 Pro Max 512GB": {
+    "sealed": 215000,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 17e 256GB": {
+    "sealed": 105000,
+    "note": "△-4000 pink-1500",
+    "boost": false
+   },
+   "iPhone 17e 512GB": {
+    "sealed": 117000,
+    "note": "開封△-2000",
+    "boost": false
+   },
+   "iPhone 18 Pro 1TB": {
+    "sealed": 308000,
+    "note": "ブラック,シルバー,グレイシャー -13,000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 308000,
+     "ブラック": 295000,
+     "グレイシャー": 295000,
+     "シルバー": 295000
+    }
+   },
+   "iPhone 18 Pro 2TB": {
+    "sealed": 380000,
+    "note": "ブラック，シルバー ,グレイシャー -10000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 380000,
+     "ブラック": 370000,
+     "グレイシャー": 370000,
+     "シルバー": 370000
+    }
+   },
+   "iPhone 18 Pro 256GB": {
+    "sealed": 211000,
+    "note": "ブラック,グレイシャー‐16000,シルバー-19000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 211000,
+     "ブラック": 195000,
+     "グレイシャー": 195000,
+     "シルバー": 192000
+    }
+   },
+   "iPhone 18 Pro 512GB": {
+    "sealed": 247000,
+    "note": "ブラック,グレイシャー -12000,シルバー-18000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 247000,
+     "ブラック": 235000,
+     "グレイシャー": 235000,
+     "シルバー": 229000
+    }
+   },
+   "iPhone 18 Pro Max 1TB": {
+    "sealed": 342000,
+    "note": "ブラック,グレイシャー,シルバー-15000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 342000,
+     "ブラック": 327000,
+     "グレイシャー": 327000,
+     "シルバー": 327000
+    }
+   },
+   "iPhone 18 Pro Max 2TB": {
+    "sealed": 397000,
+    "note": "ブラック,グレイシャー,シルバー -10000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 397000,
+     "ブラック": 387000,
+     "グレイシャー": 387000,
+     "シルバー": 387000
+    }
+   },
+   "iPhone 18 Pro Max 256GB": {
+    "sealed": 238000,
+    "note": "ブラック ,グレイシャ-13000,シルバー -15000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 238000,
+     "ブラック": 225000,
+     "グレイシャー": 225000,
+     "シルバー": 223000
+    }
+   },
+   "iPhone 18 Pro Max 512GB": {
+    "sealed": 278000,
+    "note": "ブラック,グレイシャー-15000,シルバー-18000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 278000,
+     "ブラック": 263000,
+     "グレイシャー": 263000,
+     "シルバー": 260000
+    }
+   },
+   "iPhone Air 1TB": {
+    "sealed": 152000,
+    "note": "Blue -4000",
+    "boost": false
+   },
+   "iPhone Air 256GB": {
+    "sealed": 134000,
+    "note": "Blue -2000",
+    "boost": false
+   },
+   "iPhone Air 512GB": {
+    "sealed": 141000,
+    "note": "Blue -4000",
+    "boost": false
+   }
+  }
  }
 ];
