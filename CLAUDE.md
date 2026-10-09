@@ -8,7 +8,9 @@
 ## 価格の取り込み（最重要）
 
 **自動取り込みがある。** ユーザーが `data/raw/<日付>_<店名>[_ポケカ][_p2].txt` を公開ブランチに置くと、
-GitHub Actions（`.github/workflows/import.yml`）が `tools/import_changed.sh` で取り込んでコミットする。
+GitHub Actions（`.github/workflows/import.yml`）が `tools/import_auto.py` で取り込んでコミットする。
+取り込み済みの記録は `data/raw/.imported.json`。出典が確認できず消した記録の元テキストは、ここに
+ハッシュを残しておくことで二度と自動で取り込まれない（消すときは記録も残すこと）。
 Claude がチャットで取り込むのは、ユーザーがテキストを直接送ってきたときだけ。Actions が失敗したら、
 「Actions」タブのログを読んで原因（ファイル名・形式・未登録の店）を直す。
 

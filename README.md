@@ -20,7 +20,7 @@
 ## 毎日の価格の取り込み（自動：GitHub にファイルを置くだけ）
 
 買取店のページをコピーしたテキストを、次の名前で `data/raw/` に置くと、GitHub が自動で取り込んでサイトを更新します
-（`.github/workflows/import.yml` → `tools/import_changed.sh`）。チャットに送る必要はありません。
+（`.github/workflows/import.yml` → `tools/import_auto.py`）。チャットに送る必要はありません。
 
 | 一覧 | ファイル名 |
 |---|---|
@@ -35,7 +35,7 @@
   公開ブランチ（`claude/site-creation-7inu0t`）に置くこと。
 - 置いてから 2〜5 分で、取り込み → ページ生成 → WordPress 用データ → 整合性チェック → コミット → 公開まで進みます。
   結果はリポジトリの「Actions」タブで見られます（赤い × なら、ファイル名か中身に問題があります）。
-- 同じ名前で置き直すと、その日・その店の記録を上書きします。
+- 同じ名前で置き直すと、その日・その店の記録を上書きします。取り込み済みかどうかは `data/raw/.imported.json` で判断しているので、わざと取り込み直すときはそのファイルの行を消します。
 
 ## 毎日の価格の取り込み（手動）
 
@@ -148,7 +148,7 @@ iPhone は 18 シリーズだけ表示します（`assets/data.js` の `SHOW_ONL
 - `assets/data.js` — 定価の一覧、ポケカのサンプルデータ
 - `assets/history.js` — 買取価格の履歴（自動生成）
 - `tools/update.sh` — 毎日の更新（保存・取り込み・生成・書き出し・チェックを1回で）
-- `tools/import_changed.sh` — data/raw に置かれたファイルをファイル名から取り込む（GitHub Actions が使う）
+- `tools/import_auto.py` — data/raw のまだ取り込んでいないファイルをファイル名から取り込む（GitHub Actions が使う）。取り込み済みは `data/raw/.imported.json` に記録
 - `.github/workflows/import.yml` — data/raw にファイルが置かれたら自動で取り込む
 - `tools/import_kaitori.py` — 取り込みスクリプト
 - `tools/check.js` — データの整合性チェック

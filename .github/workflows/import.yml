@@ -1,5 +1,6 @@
 # data/raw にテキストが追加・更新されたら、自動で取り込んでサイトを更新する。
-# ファイル名の決まりは tools/import_changed.sh の先頭に書いてある（<日付>_<店名>[_ポケカ][_p2].txt）。
+# 何を取り込むかは tools/import_auto.py が data/raw/.imported.json（取り込み済みの記録）と比べて決める。
+# 途中の実行が取り消されても、次の実行で残りをまとめて拾う。
 name: 価格の自動取り込み
 
 on:
@@ -20,33 +21,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: 追加・更新された元テキストを集める
-        run: |
-          before="${{ github.event.before }}"
-          if [ -z "$before" ] || [ "$before" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$before" 2>/dev/null; then
-            before="HEAD~1"
-          fi
-          git diff --name-only --diff-filter=AM "$before" HEAD -- 'data/raw/*.txt' | sort > changed.txt || true
-          echo "取り込む元テキスト:"; cat changed.txt
-
-      - name: 公開ブランチの最新に合わせる（前の取り込みの結果を取り込んでから作業する）
+      - name: 公開ブランチの最新に合わせる（前の取り込みの結果の上で作業する）
         run: git pull --rebase origin "${{ github.ref_name }}"
 
-      - name: 取り込み・ページ生成・チェック
-        run: |
-          if [ ! -s changed.txt ]; then echo "新しい元テキストはありません"; exit 0; fi
-          xargs -d '\n' tools/import_changed.sh < changed.txt
+      - name: まだ取り込んでいない元テキストを取り込む → ページ生成 → チェック
+        run: python3 tools/import_auto.py
 
       - name: 結果をコミットして公開ブランチに戻す
+        if: always()
         run: |
-          rm -f changed.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git -c core.quotePath=false add -A
           if git diff --cached --quiet; then echo "変更なし"; exit 0; fi
-          names="$(git diff --cached --name-only | grep '^data/raw/' | xargs -n1 basename 2>/dev/null | tr '\n' ' ')"
-          git commit -m "Import (auto): ${names}"
+          names="$(git -c core.quotePath=false diff --cached --name-only | grep '^data/raw/' | grep -v '\.imported\.json' | xargs -n1 basename 2>/dev/null | tr '\n' ' ')"
+          git commit -m "Import (auto): ${names:-regenerate}"
+          git pull --rebase origin "${{ github.ref_name }}"
           git push
