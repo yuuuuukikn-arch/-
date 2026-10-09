@@ -621,5 +621,247 @@ const SNAPSHOTS = [
     "jan": "4521329431161"
    }
   }
+ },
+ {
+  "date": "2026-10-09",
+  "shop": "買取一丁目",
+  "cat": "iPhone",
+  "items": {
+   "iPhone 16 Pro 1TB": {
+    "sealed": 185000,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 16 Pro 128GB": {
+    "sealed": 149000,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 17 256GB": {
+    "sealed": 137000,
+    "note": "ミストブルー -1000",
+    "boost": false
+   },
+   "iPhone 17 512GB": {
+    "sealed": 156000,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 17 Pro 1TB": {
+    "sealed": 215000,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 17 Pro 256GB": {
+    "sealed": 172000,
+    "note": "Orange -6000 Blue -2000",
+    "boost": false
+   },
+   "iPhone 17 Pro 512GB": {
+    "sealed": 198000,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 17 Pro Max 1TB": {
+    "sealed": 238500,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 17 Pro Max 2TB": {
+    "sealed": 277000,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 17 Pro Max 256GB": {
+    "sealed": 186000,
+    "note": "ブルー、オレンジ　-2000",
+    "boost": false
+   },
+   "iPhone 17 Pro Max 512GB": {
+    "sealed": 215000,
+    "note": "",
+    "boost": false
+   },
+   "iPhone 17e 256GB": {
+    "sealed": 105000,
+    "note": "△-4000 pink-1500",
+    "boost": false
+   },
+   "iPhone 17e 512GB": {
+    "sealed": 117000,
+    "note": "開封△-2000",
+    "boost": false
+   },
+   "iPhone 18 Pro 1TB": {
+    "sealed": 305000,
+    "note": "ブラック,シルバー,グレイシャー -10000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 305000,
+     "ブラック": 295000,
+     "グレイシャー": 295000,
+     "シルバー": 295000
+    }
+   },
+   "iPhone 18 Pro 2TB": {
+    "sealed": 380000,
+    "note": "ブラック，シルバー ,グレイシャー -10000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 380000,
+     "ブラック": 370000,
+     "グレイシャー": 370000,
+     "シルバー": 370000
+    }
+   },
+   "iPhone 18 Pro 256GB": {
+    "sealed": 210000,
+    "note": "ブラック,グレイシャー‐16000,シルバー-19000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 210000,
+     "ブラック": 194000,
+     "グレイシャー": 194000,
+     "シルバー": 191000
+    }
+   },
+   "iPhone 18 Pro 512GB": {
+    "sealed": 244000,
+    "note": "ブラック,グレイシャー -10000,シルバー-15000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 244000,
+     "ブラック": 234000,
+     "グレイシャー": 234000,
+     "シルバー": 229000
+    }
+   },
+   "iPhone 18 Pro Max 1TB": {
+    "sealed": 338000,
+    "note": "ブラック,グレイシャー,シルバー-15000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 338000,
+     "ブラック": 323000,
+     "グレイシャー": 323000,
+     "シルバー": 323000
+    }
+   },
+   "iPhone 18 Pro Max 2TB": {
+    "sealed": 395000,
+    "note": "ブラック,グレイシャー,シルバー -10000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 395000,
+     "ブラック": 385000,
+     "グレイシャー": 385000,
+     "シルバー": 385000
+    }
+   },
+   "iPhone 18 Pro Max 256GB": {
+    "sealed": 238000,
+    "note": "ブラック ,グレイシャ-15000,シルバー -17000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 238000,
+     "ブラック": 223000,
+     "グレイシャー": 223000,
+     "シルバー": 221000
+    }
+   },
+   "iPhone 18 Pro Max 512GB": {
+    "sealed": 276000,
+    "note": "ブラック,グレイシャー-16000,シルバー-18000",
+    "boost": false,
+    "colors": {
+     "バーガンディ": 276000,
+     "ブラック": 260000,
+     "グレイシャー": 260000,
+     "シルバー": 258000
+    }
+   },
+   "iPhone Air 1TB": {
+    "sealed": 152000,
+    "note": "Blue -4000",
+    "boost": false
+   },
+   "iPhone Air 256GB": {
+    "sealed": 134000,
+    "note": "Blue -2000",
+    "boost": false
+   },
+   "iPhone Air 512GB": {
+    "sealed": 141000,
+    "note": "Blue -4000",
+    "boost": false
+   }
+  }
+ },
+ {
+  "date": "2026-10-09",
+  "shop": "買取一丁目",
+  "cat": "ポケカBOX",
+  "items": {
+   "【MEGA】 30th CELEBRATION BOX": {
+    "sealed": 25300,
+    "jan": "114521329462424",
+    "boost": true
+   },
+   "【MEGA】 ストームエメラルダ BOX": {
+    "sealed": 9600,
+    "jan": "114521329462233",
+    "boost": true
+   },
+   "【MEGA】 アビスアイ BOX": {
+    "sealed": 8500,
+    "jan": "114521329462127",
+    "boost": true
+   },
+   "【MEGA】 ニンジャスピナー BOX": {
+    "sealed": 8500,
+    "jan": "114521329432786",
+    "boost": true
+   },
+   "【MEGA】 ムニキスゼロ BOX": {
+    "sealed": 8200,
+    "jan": "114521329432274",
+    "boost": true
+   },
+   "【MEGA】 MEGAドリームex BOX": {
+    "sealed": 12000,
+    "jan": "114521329431932",
+    "boost": true
+   },
+   "【S＆V】 バトルパートナーズ BOX": {
+    "sealed": 10500,
+    "jan": "114521329362649",
+    "boost": true
+   },
+   "【S＆V】 ステラミラクル BOX": {
+    "sealed": 11000,
+    "jan": "114521329361000",
+    "boost": true
+   },
+   "【S＆V】 ナイトワンダラー BOX": {
+    "sealed": 11000,
+    "jan": "114521329362496",
+    "boost": true
+   },
+   "【シュリンク無しBOX】 ストームエメラルダ": {
+    "sealed": 8500,
+    "jan": "124521329462233",
+    "boost": true
+   },
+   "【MEGA】 30th CELEBRATION FUTURISTIC BOX": {
+    "sealed": 60000,
+    "jan": "4521329463872",
+    "boost": true
+   },
+   "【MEGA】 30th CELEBRATION プレミアムデッキセット エーフィ・ブラッキー": {
+    "sealed": 17500,
+    "jan": "4521329462189",
+    "boost": true
+   }
+  }
  }
 ];

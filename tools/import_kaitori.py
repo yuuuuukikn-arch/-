@@ -246,6 +246,55 @@ def parse_morimori(text):
     return items
 
 
+def parse_ichome_list(text):
+    """買取一丁目「商品価格一覧」形式（未開封価格・開封済未使用品価格・価格調整表記）"""
+    items = {}
+    for block in re.split(r"\n(?=【\d+】)", text):
+        m = re.match(r"【\d+】\s*(.+)", block.strip())
+        if not m:
+            continue
+        name = norm(m.group(1))
+        note = (re.search(r"価格調整表記[：:]\s*(.+)", block) or [None, ""])[1].strip()
+        if note == "記載なし":
+            note = ""
+        sealed = re.search(r"未開封価格[：:]\s*([\d,]+)\s*円", block)
+        if not sealed:
+            continue
+        price = int(sealed.group(1).replace(",", ""))
+        item = {"sealed": price, "note": note, "boost": False}
+        colors = color_prices(name, price, note)
+        if colors:
+            item["colors"] = colors
+        items[name] = item
+    return items
+
+
+def parse_ichome_boxes(text):
+    """買取一丁目の BOX 一覧（JAN・買取金額（税込）・強化の印）。同じ商品が2回載るので最初の1件だけ使う"""
+    lines = [l.strip() for l in text.splitlines()]
+    items = {}
+    for i, line in enumerate(lines):
+        if not re.fullmatch(r"\d{13,15}", line):
+            continue
+        name = next((lines[j] for j in range(i - 1, -1, -1) if lines[j]), "")
+        if not name or name in items:
+            continue
+        price = None
+        boost = False
+        for j in range(i + 1, min(i + 12, len(lines))):
+            pm = re.search(r"[¥￥]\s*([\d,]+)", lines[j])
+            if pm and price is None:
+                price = int(pm.group(1).replace(",", ""))
+            if lines[j] in ("買取強化", "強化", "強"):
+                boost = True
+            if re.fullmatch(r"\d{13,15}", lines[j]) and j != i:
+                break
+        if price is None:
+            continue
+        items[norm(name)] = {"sealed": price, "jan": line, "boost": boost}
+    return items
+
+
 def detect_and_parse(text):
     # 「通常買取価格・預かり買取価格・即フリ買取価格」の見出しがあれば森森買取形式
     # （見出しを含めずにコピーした場合も「Apple iPhone18 …」の商品名で見分ける）
@@ -257,6 +306,10 @@ def detect_and_parse(text):
     # 「買取価格」の次に「000,000円」が来る書き方ならルデヤ形式
     if re.search(r"買取価格\s*\n\s*[\d,]+\s*円", text):
         return parse_rudeya(text)
+    if "商品価格一覧" in text and "未開封価格" in text:
+        return parse_ichome_list(text)
+    if "買取金額（税込）" in text:
+        return parse_ichome_boxes(text)
     items = parse(text)
     for name, it in items.items():
         colors = color_prices(name, it["sealed"], it.get("note", ""))
@@ -290,13 +343,16 @@ def main():
     # トレカなど店ごとに商品名の書き方が違うものは、JAN が同じ登録済み商品の名前にそろえる。
     # 登録済みの商品と JAN が合わないものは取り込まない（ほかのジャンルの商品が混ざるため）。
     if args.cat != "iPhone" and any("jan" in it for it in items.values()):
-        known = {it["jan"]: name for s in load() if s["cat"] == args.cat
+        base = lambda j: j[-13:]  # 買取一丁目は先頭に 11 / 12 が付くので、後ろ13桁で比べる
+        known = {base(it["jan"]): name for s in load() if s["cat"] == args.cat
                  for name, it in s["items"].items() if it.get("jan")}
         if known:
             renamed, skipped = {}, []
             for name, it in items.items():
-                if it.get("jan") in known:
-                    renamed[known[it["jan"]]] = it
+                if "シュリンク無し" in name:  # JAN の土台が同じでも、別の商品（シュリンク無し）として残す
+                    renamed[name] = it
+                elif it.get("jan") and base(it["jan"]) in known:
+                    renamed[known[base(it["jan"])]] = it
                 elif name in known.values():
                     renamed[name] = it
                 else:
@@ -333,7 +389,7 @@ def main():
         extra = f" / シュリンクなし {it['noShrink']:,}" if "noShrink" in it else ""
         if "colors" in it:
             extra += "  [" + ", ".join(f"{c} {p:,}" for c, p in it["colors"].items()) + "]"
-        print(f"  {name}: 未開封 {it['sealed']:,}{extra}  {it['note']}")
+        print(f"  {name}: 未開封 {it["sealed"]:,}{extra}  {it.get("note", "")}")
 
 
 if __name__ == "__main__":
