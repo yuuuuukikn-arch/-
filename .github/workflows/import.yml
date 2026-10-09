@@ -32,6 +32,9 @@ jobs:
           git diff --name-only --diff-filter=AM "$before" HEAD -- 'data/raw/*.txt' | sort > changed.txt || true
           echo "取り込む元テキスト:"; cat changed.txt
 
+      - name: 公開ブランチの最新に合わせる（前の取り込みの結果を取り込んでから作業する）
+        run: git pull --rebase origin "${{ github.ref_name }}"
+
       - name: 取り込み・ページ生成・チェック
         run: |
           if [ ! -s changed.txt ]; then echo "新しい元テキストはありません"; exit 0; fi

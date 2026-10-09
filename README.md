@@ -30,7 +30,8 @@
 | ポケカ BOX の一覧 | `2026-10-10_森森買取_ポケカ.txt` |
 
 - 日付は `YYYY-MM-DD`、店名は `assets/data.js` の `SHOPS` と同じ字（買取一丁目 / 買取ホムラ / 買取ルデヤ / 買取商店 / 森森買取）。
-- 置き方：GitHub でリポジトリの `data/raw` フォルダを開く → 右上「Add file」→「Upload files」→ ファイルをドラッグ →「Commit changes」。
+- 置き方（自動）：パソコンに `tools/pc/upload.ps1` を設定すると、`Downloads\blog_articles` に保存するだけで送られます（手順は [tools/pc/README.md](tools/pc/README.md)）。
+- 置き方（手動）：GitHub でリポジトリの `data/raw` フォルダを開く → 右上「Add file」→「Upload files」→ ファイルをドラッグ →「Commit changes」。
   公開ブランチ（`claude/site-creation-7inu0t`）に置くこと。
 - 置いてから 2〜5 分で、取り込み → ページ生成 → WordPress 用データ → 整合性チェック → コミット → 公開まで進みます。
   結果はリポジトリの「Actions」タブで見られます（赤い × なら、ファイル名か中身に問題があります）。
