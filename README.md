@@ -19,12 +19,40 @@
 
 ## 毎日の価格の取り込み
 
-買取店のページをコピーしたテキストを保存して、取り込みスクリプトを実行します。
+買取店のページをコピーしたテキストをファイルに保存し、`tools/update.sh` を1回実行します。
+保存・取り込み・ページ生成・WordPress 用データの書き出し・整合性チェックまでをまとめて行います。
+
+```sh
+# 1. コピペしたテキストをどこかに保存（例: ~/Desktop/morimori.txt）
+# 2. 1コマンドで更新
+tools/update.sh ~/Desktop/morimori.txt --date 2026-10-10 --shop 森森買取
+# ポケカBOX のリストの場合
+tools/update.sh ~/Desktop/morimori_box.txt --date 2026-10-10 --shop 森森買取 --cat ポケカBOX
+# 2ページ目以降は --append
+tools/update.sh ~/Desktop/morimori_p2.txt --date 2026-10-10 --shop 森森買取 --append
+# 読み取り結果を見るだけ（何も変えない）
+tools/update.sh ~/Desktop/morimori.txt --date 2026-10-10 --shop 森森買取 --dry-run
+# 3. 表示されたファイルをコミット
+git add -A && git commit -m "Import 森森買取 2026-10-10 (iPhone)"
+```
+
+スクリプトは次の場合に止まります（データは変わりません）。
+
+- 店名が `assets/data.js` の `SHOPS` にない（先に店を登録する）
+- 同じ日・同じ店の元テキストがすでにある（取り直すなら `--force`、2ページ目なら `--append`）
+- 「ホムラプレミアム」「会員限定」など、通常の買取価格ではない欄らしい語がある（その欄を除いてから実行する。通常価格だと確認できたら `--force`）
+
+元テキストは `data/raw/日付_店名.txt` に残るので、あとから価格の出典を確認できます。
+整合性チェック（`node tools/check.js`）は単独でも実行でき、元テキストのない記録、未登録の店、古い WordPress 用データを知らせます。
+
+### 手動で1つずつ行う場合
+
+`tools/update.sh` がしていることは次のとおりです。
 
 ```sh
 # 1. コピペしたテキストを保存
 #    data/raw/2026-10-08_買取一丁目.txt
-# 2. 取り込み（assets/history.js に追記されます。同じ日付・同じ店なら上書き）
+# 2. 取り込み（assets/history.js に追記されます。同じ日付・同じ店なら上書き）。続けて node tools/make_pages.js と node tools/export_wp.js と node tools/check.js
 python3 tools/import_kaitori.py "data/raw/2026-10-08_買取一丁目.txt" --date 2026-10-08 --shop 買取一丁目
 # ポケカBOXのリストの場合
 python3 tools/import_kaitori.py "data/raw/2026-10-08_買取一丁目_ポケカ.txt" --date 2026-10-08 --shop 買取一丁目 --cat ポケカBOX
@@ -97,7 +125,9 @@ iPhone は 18 シリーズだけ表示します（`assets/data.js` の `SHOW_ONL
 - `news.html` / `assets/news.js` — 速報ページ
 - `assets/data.js` — 定価の一覧、ポケカのサンプルデータ
 - `assets/history.js` — 買取価格の履歴（自動生成）
+- `tools/update.sh` — 毎日の更新（保存・取り込み・生成・書き出し・チェックを1回で）
 - `tools/import_kaitori.py` — 取り込みスクリプト
+- `tools/check.js` — データの整合性チェック
 - `data/raw/` — 取り込んだ元テキストの保管
 
 ## WordPress で公開する

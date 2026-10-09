@@ -51,9 +51,10 @@ iPhone・ポケカBOX の買取価格ランキングを、WordPress の固定ペ
 価格の取り込みはこれまでどおりリポジトリで行い、WordPress 用のデータを書き出します。
 
 ```sh
-python3 tools/import_kaitori.py …   # 価格の取り込み（いつもの作業）
-node tools/export_wp.js             # wp-plugin/sedori-hikaku/data/sedori.json を書き出す
+tools/update.sh <元テキスト> --date 2026-10-10 --shop 森森買取   # 取り込みから sedori.json の書き出しまで1回で
 ```
+
+（`tools/update.sh` の中で `node tools/export_wp.js` が走り、`wp-plugin/sedori-hikaku/data/sedori.json` が更新されます。）
 
 WordPress への反映は次のどれかです。
 

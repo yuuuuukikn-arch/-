@@ -98,7 +98,13 @@ function releaseEvents(r) {
   return ev;
 }
 function icsFile(events, name) {
-  const stamp = icsUtc(Date.now());
+  // DTSTAMP は予定の元データ（assets/pages.js）を最後に変えた時刻にする。
+  // 現在時刻にすると生成のたびに ics が変わり、何が本当に変わったか分からなくなるため。
+  let stamp;
+  try {
+    const t = require("child_process").execSync("git log -1 --format=%ct -- assets/pages.js", { cwd: ROOT, stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+    stamp = icsUtc(t ? Number(t) * 1000 : Date.now());
+  } catch { stamp = icsUtc(Date.now()); }
   const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//買取相場ナビ//発売カレンダー//JA",
     "CALSCALE:GREGORIAN", "METHOD:PUBLISH", `X-WR-CALNAME:${icsEsc(name)}`];
   for (const e of events) {
