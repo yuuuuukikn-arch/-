@@ -140,7 +140,8 @@ function shopRanking(p, limit = 3) {
 
 // 店舗ごとの価格表（iPhone は色別）
 function shopTable(p) {
-  const shops = p.latest.best.slice().sort((a, b) => shopIdx(a) - shopIdx(b)); // 表は最高値（1位）の店舗だけ
+  // 表には比較に使っている店を全部出す（価格の高い順）。色ごとに一番高い金額が太字になるので、自分の色で選べる
+  const shops = Object.keys(p.latest.shops).sort((a, b) => p.latest.shops[b].sealed - p.latest.shops[a].sealed || shopIdx(a) - shopIdx(b));
   const its = shops.map((sh) => p.latest.shops[sh]);
   const head = `<th>店舗</th>`;
   // 価格の色は定価との比較（定価以上は緑、未満は赤）。店の中で一番高い価格は太字
@@ -152,9 +153,7 @@ function shopTable(p) {
   const rowsHtml = (labels, valueOf) => labels.map((label) => {
     const vals = its.map((it) => valueOf(it, label));
     const best = Math.max(...vals.filter((v) => v != null));
-    const prof = p.retail != null && isFinite(best) ? best - p.retail : null;
-    const last = prof == null ? "—" : useRate() ? `${pct(best / p.retail)}<small class="muted">（${signed(prof)}）</small>` : signed(prof);
-    return `<tr><th scope="row">${esc(label)}</th>${vals.map((v) => cell(v, best)).join("")}<td class="num ${prof != null ? sign(prof) : ""}">${last}</td></tr>`;
+    return `<tr><th scope="row">${esc(label)}</th>${vals.map((v) => cell(v, best)).join("")}</tr>`;
   }).join("");
   const shopHead = shops.map((sh) => `<th class="num">${shopLink(sh, "", p.name)}${p.latest.shops[sh].date < p.latest.date ? `<small class="stale">${p.latest.shops[sh].date.slice(5).replace("-", "/")}時点</small>` : ""}</th>`).join("");
   const hasColors = its.some((it) => it.colors);
@@ -163,13 +162,16 @@ function shopTable(p) {
     : rowsHtml(["未開封"], (it) => it.sealed);
   const notes = shops.map((sh) => {
     const it = p.latest.shops[sh], info = SHOPS[sh] || {};
-    const bits = [it.noShrink != null ? `シュリンクなし ${yen(it.noShrink)}` : "", it.note || "", info.hours ? `営業時間 ${info.hours}` : ""].filter(Boolean);
+    // 色の減額メモ（例「ブラック,グレイシャー -13000」）は色の表に反映済みなので出さない
+    const isColorMemo = it.colors && it.note && /[-‐−－]\s*\d/.test(it.note) && colorsFor(p.name).some((c) => it.note.includes(c) || /orange|blue|silver|black|burgundy|glacier/i.test(it.note));
+    const bits = [it.noShrink != null ? `シュリンクなし ${yen(it.noShrink)}` : "", isColorMemo ? "" : (it.note || ""), info.hours ? `営業時間 ${info.hours}` : ""].filter(Boolean);
     return bits.length ? `<li>${shopLink(sh, "", p.name)}：${esc(bits.join(" ／ "))}</li>` : "";
   }).join("");
   return `<div class="shop-compare">
-    <h4>店舗別の買取価格（${p.latest.date.replaceAll("-", "/")}）</h4>
+    <h4>${hasColors ? "色別・店舗別の買取価格" : "店舗別の買取価格"}（${p.latest.date.replaceAll("-", "/")}）</h4>
+    ${hasColors ? `<p class="cmp-hint">色ごとに一番高い金額が太字です。緑は定価以上、赤は定価未満。</p>` : ""}
     <div class="cmp-wrap"><table class="cmp">
-      <thead><tr><th>${hasColors ? "色" : ""}</th>${shopHead}<th class="num">${useRate() ? "買取率（最高値）" : "利益（最高値）"}</th></tr></thead>
+      <thead><tr><th>${hasColors ? "色" : ""}</th>${shopHead}</tr></thead>
       <tbody>${body}</tbody>
     </table></div>
     ${notes ? `<ul class="shop-notes">${notes}</ul>` : ""}
