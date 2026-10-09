@@ -69,8 +69,11 @@ const Chart = (() => {
       svg += `<text class="axis" x="${m.l - 8}" y="${Y(v)}" text-anchor="end" dominant-baseline="middle">${man(v)}</text>`;
     }
     const step = Math.max(1, Math.ceil(dates.length / Math.floor(iw / 64)));
+    const lastI = dates.length - 1;
     dates.forEach((d, i) => {
-      if (i % step === 0 || i === dates.length - 1)
+      // 最後の日付は必ず出す。その直前の目盛りは、最後の日付と重なるなら省く
+      const show = i === lastI || (i % step === 0 && X(lastI) - X(i) > 60);
+      if (show)
         svg += `<text class="axis ${opts.markDay && wday(d) === opts.markDay.day ? "mark-day" : ""}" x="${X(i)}" y="${H - 8}" text-anchor="middle">${mdw(d)}</text>`;
     });
     // 定価の基準線
@@ -91,11 +94,12 @@ const Chart = (() => {
       const last = [...pts].reverse().find(Boolean);
       if (last) labels.push({ y: last[1], text: s.name, cls: s.cls });
     }
-    // 線の右端にラベル（重ならないようにずらす）
+    // 線の右端にラベル（重ならないようにずらす）。定価のラベルとも重ならないようにする
+    if (ref) labels.push({ y: Y(ref.value), text: "", cls: "ref-slot" });
     labels.sort((a, b) => a.y - b.y);
     for (let i = 1; i < labels.length; i++) if (labels[i].y - labels[i - 1].y < 14) labels[i].y = labels[i - 1].y + 14;
     const lastX = X(dates.length - 1);
-    for (const l of labels) svg += `<text class="direct ${l.cls}" x="${lastX + 8}" y="${l.y}" dominant-baseline="middle">${l.text}</text>`;
+    for (const l of labels) if (l.text) svg += `<text class="direct ${l.cls}" x="${lastX + 8}" y="${l.y}" dominant-baseline="middle">${l.text}</text>`;
 
     svg += `<line class="crosshair" y1="${m.t}" y2="${m.t + ih}" visibility="hidden"/>`;
     svg += `<rect class="hit" x="${m.l - 10}" y="${m.t}" width="${iw + 20}" height="${ih}" fill="transparent"/></svg>`;
