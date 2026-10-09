@@ -112,6 +112,7 @@ def color_prices(name, base, note):
     if not name.startswith("iPhone 18") or not note:
         return None
     deduct, pending = {}, []
+    note = re.sub(r"(\d),(\d{3})\b", r"\1\2", note)  # 「-13,000」の桁区切りは色の区切りではない
     for tok in re.split(r"[,，、]", note):
         tok = tok.strip()
         m = re.match(rf"^(.*?)\s*[{DASH}]\s*(\d+)$", tok)
