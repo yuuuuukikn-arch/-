@@ -32,8 +32,21 @@ function sedori_metric($p, $metric) {
 }
 
 /** 店のリンク（アフィリエイトではないので nofollow は付けない） */
-function sedori_shop_url($data, $shop) {
-    return isset($data['shops'][$shop]['url']) ? $data['shops'][$shop]['url'] : '';
+function sedori_shop_url($data, $shop, $name = '') {
+    $info = isset($data['shops'][$shop]) ? $data['shops'][$shop] : array();
+    // 商品別ページ（商品名の先頭が長く一致するもの）→ カテゴリ別（sedori_render で url に入れ替え済み）→ 店の URL
+    if ($name !== '' && !empty($info['pages'])) {
+        $best = '';
+        foreach ($info['pages'] as $prefix => $url) {
+            if (strpos($name, $prefix) === 0 && strlen($prefix) > strlen($best)) {
+                $best = $prefix;
+            }
+        }
+        if ($best !== '') {
+            return $info['pages'][$best];
+        }
+    }
+    return isset($info['url']) ? $info['url'] : '';
 }
 
 /** 仕入れ先（Amazon / 楽天）のアフィリエイトリンク。ID が設定されているものだけ */
@@ -88,7 +101,7 @@ function sedori_render_shops($p, $data, $metric) {
             $rank = $i + 1;
         }
         $prev = $s['price'];
-        $url = sedori_shop_url($data, $s['shop']);
+        $url = sedori_shop_url($data, $s['shop'], $p['name']);
         $m = '';
         if ($p['retail']) {
             $m = $metric === 'rate'
@@ -128,7 +141,7 @@ function sedori_render_detail($p, $data, $metric) {
     // 店舗別（iPhone は色別）
     $html .= '<h4>店舗別の買取価格</h4><div class="sdr-table-wrap"><table class="sdr-table"><thead><tr><th>' . ($colors ? '色' : '') . '</th>';
     foreach ($p['shops'] as $s) {
-        $url = sedori_shop_url($data, $s['shop']);
+        $url = sedori_shop_url($data, $s['shop'], $p['name']);
         $name = $url ? '<a href="' . esc_url($url) . '" target="_blank" rel="noopener">' . esc_html($s['shop']) . '</a>' : esc_html($s['shop']);
         $html .= '<th class="num">' . $name . ($s['date'] < $p['date'] ? '<small>' . esc_html(sedori_md($s['date'])) . '時点</small>' : '') . '</th>';
     }
