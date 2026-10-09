@@ -16,11 +16,18 @@ const useRate = () => currentCat === "iPhone";
 const SHOP_ORDER = Object.keys(SHOPS);
 const shopIdx = (shop) => { const i = SHOP_ORDER.indexOf(shop); return i < 0 ? SHOP_ORDER.length : i; };
 
+// 店のリンク先（カテゴリ別の URL があればそれ、なければ店の URL）
+function shopUrl(shop, cat = currentCat) {
+  const info = SHOPS[shop];
+  if (!info) return "";
+  return (info.urls && info.urls[cat]) || info.url || "";
+}
+
 // 店舗名（公式サイトへのリンク付き）
 function shopLink(shop, cls = "") {
-  const info = SHOPS[shop];
-  if (!info || !info.url) return `<span class="shop ${cls}">${esc(shop)}</span>`;
-  return `<a class="shop ${cls}" href="${esc(info.url)}" target="_blank" rel="noopener">${esc(shop)}<span aria-hidden="true">↗</span></a>`;
+  const url = shopUrl(shop);
+  if (!url) return `<span class="shop ${cls}">${esc(shop)}</span>`;
+  return `<a class="shop ${cls}" href="${esc(url)}" target="_blank" rel="noopener">${esc(shop)}<span aria-hidden="true">↗</span></a>`;
 }
 
 // 商品ごとに、日付 → 店舗ごとの価格 をまとめる
