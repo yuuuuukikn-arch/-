@@ -143,7 +143,9 @@ function sedori_render_detail($p, $data, $metric) {
         $best = $nums ? max($nums) : null;
         $html .= '<tr><th scope="row">' . esc_html($label) . '</th>';
         foreach ($vals as $v) {
-            $html .= '<td class="num' . ($v !== null && $v === $best ? ' best' : '') . '">' . ($v !== null ? sedori_yen($v) : '—') . '</td>';
+            // 価格の色は定価との比較（定価以上は緑、未満は赤）。店の中で一番高い価格は太字
+            $tone = ($v !== null && $p['retail']) ? ' ' . sedori_sign($v - $p['retail']) : '';
+            $html .= '<td class="num price' . $tone . ($v !== null && $v === $best ? ' best' : '') . '">' . ($v !== null ? sedori_yen($v) : '—') . '</td>';
         }
         $last = '—';
         if ($best !== null && $p['retail']) {

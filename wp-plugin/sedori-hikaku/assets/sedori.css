@@ -167,6 +167,7 @@
 .sdr .sdr-table th small { display: block; font-size: .85em; font-weight: 600; }
 .sdr .sdr-table .num { text-align: right; }
 .sdr .sdr-table td.best { color: var(--sdr-plus); font-weight: 700; }
+.sdr .sdr-table td.price.plus { color: var(--sdr-plus); } .sdr .sdr-table td.price.minus { color: var(--sdr-minus); } .sdr .sdr-table td.price.zero { color: inherit; }
 .sdr .sdr-notes { margin: 8px 0 0; padding-left: 18px; font-size: .75em; color: var(--sdr-muted); }
 
 /* グラフの値（ページの一番下に1つだけ作る） */

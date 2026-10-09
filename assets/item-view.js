@@ -139,7 +139,12 @@ function shopTable(p) {
   const shops = p.latest.best.slice().sort((a, b) => shopIdx(a) - shopIdx(b)); // 表は最高値（1位）の店舗だけ
   const its = shops.map((sh) => p.latest.shops[sh]);
   const head = `<th>店舗</th>`;
-  const cell = (v, best) => `<td class="num ${v != null && v === best ? "best-price" : ""}">${v != null ? yen(v) : '<span class="na">—</span>'}</td>`;
+  // 価格の色は定価との比較（定価以上は緑、未満は赤）。店の中で一番高い価格は太字
+  const cell = (v, best) => {
+    if (v == null) return '<td class="num"><span class="na">—</span></td>';
+    const tone = p.retail != null ? sign(v - p.retail) : "";
+    return `<td class="num price ${tone} ${v === best ? "best-price" : ""}">${yen(v)}</td>`;
+  };
   const rowsHtml = (labels, valueOf) => labels.map((label) => {
     const vals = its.map((it) => valueOf(it, label));
     const best = Math.max(...vals.filter((v) => v != null));
