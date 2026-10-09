@@ -278,9 +278,9 @@ function articleBody(p) {
     const diff = topPrice - st.retail;
     lines.push(`定価は${yen(st.retail)}で、買取率は${(topPrice / st.retail * 100).toFixed(1)}%、利益は${diff >= 0 ? "+" : ""}${yen(diff)}です。`);
   }
-  return `<h2>最新の買取価格</h2>
-    <p>${lines.map(esc).join("")}</p>
-    <h2>価格の推移・店舗別の比較</h2>
+  // 文章は検索エンジン向けの要約。表示時は assets/item.js が同じ記録から作る結論の箱に置き換える
+  return `<h2>いま売るならどこで、いくら得か</h2>
+    <p id="item-lead">${lines.map(esc).join("")}</p>
     <div id="item-view"><p class="note">読み込み中…</p></div>
     <div class="tooltip" id="tooltip" hidden></div>`;
 }
@@ -346,7 +346,7 @@ function productPage(p) {
   const body = (p.body || []).map((t) => `<p>${esc(t)}</p>`).join("") + articleBody(p);
   const buy = buyLinks(p);
   const aff = buy.length
-    ? `<div class="aff"><p class="pr">${esc(PAGE_CONFIG.prText)}</p><div class="aff-btns">${buy.map((a) =>
+    ? `<div class="aff"><p class="aff-head">新品を買うなら（参考）</p><p class="pr">${esc(PAGE_CONFIG.prText)}</p><div class="aff-btns">${buy.map((a) =>
         `<a class="aff-btn ${a.cls}" href="${esc(a.url)}" target="_blank" rel="sponsored nofollow noopener">${esc(a.label)}</a>`).join("")}</div></div>` : "";
   return `<!doctype html>
 <html lang="ja" data-theme="dark">

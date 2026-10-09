@@ -5,6 +5,8 @@ const sign = (n) => (n > 0 ? "plus" : n < 0 ? "minus" : "zero");
 const signed = (n) => (n > 0 ? "+" : "") + yen(n);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const $ = (id) => document.getElementById(id);
+const WDAY = ["日", "月", "火", "水", "木", "金", "土"];
+const mdw = (d) => `${d.slice(5).replace("-", "/")}(${WDAY[new Date(d + "T00:00:00").getDay()]})`; // 10/07(火)
 const disp = (name) => esc(name.replace(/】\s+/g, "】")); // 表示用（【MEGA】 30th → 【MEGA】30th）
 let currentCat = "iPhone";
 let range = 30;
@@ -85,6 +87,53 @@ function buildProducts(cat) {
     };
   });
 }
+// 結論：いま売るならどこで、定価で買うといくら得か
+function verdict(p) {
+  const top = p.latest.best[0];
+  const it = p.latest.shops[top];
+  const url = shopUrl(top);
+  const stale = it.date < p.latest.date ? `<small class="stale">${it.date.slice(5).replace("-", "/")}時点</small>` : "";
+  const others = p.latest.best.length > 1 ? `<small class="muted">同額 ${p.latest.best.slice(1).map(esc).join("・")}</small>` : "";
+  let judge;
+  if (p.retail == null) {
+    judge = `<span>定価が未登録のため、損得は計算できません</span>`;
+  } else {
+    const d = p.profit;
+    const rate = useRate() ? `買取率 ${pct(p.rate)}` : "";
+    const head = `<span>定価 ${yen(p.retail)}${p.estimated ? "（推定）" : ""} で買って売ると</span>`;
+    judge = d > 0
+      ? `${head}<b class="plus">${signed(d)} の得</b><small>${rate}</small>`
+      : d < 0
+        ? `${head}<b class="minus">${signed(d)} の損</b><small>${rate}${rate ? " ・ " : ""}今は見送り</small>`
+        : `${head}<b class="zero">±¥0</b><small>${rate}</small>`;
+  }
+  return `<div class="verdict">
+    <div class="v-sell">
+      <span>いま売るなら（${p.latest.date.replaceAll("-", "/")} 時点の最高値）</span>
+      <b>${esc(top)}</b><b class="v-price">${yen(p.price)}</b>${stale}${others}
+      ${url ? `<a class="v-go" href="${esc(url)}" target="_blank" rel="noopener">${esc(top)}のサイトへ<span aria-hidden="true">↗</span></a>` : ""}
+    </div>
+    <div class="v-judge ${p.profit == null ? "" : sign(p.profit)}">${judge}</div>
+  </div>`;
+}
+
+// 店舗を買取価格の高い順に並べた一覧（1行まるごと店のサイトへのリンク）
+function shopRanking(p, limit = 3) {
+  const list = Object.entries(p.latest.shops)
+    .map(([shop, it]) => ({ shop, price: it.sealed, date: it.date }))
+    .sort((a, b) => b.price - a.price || shopIdx(a.shop) - shopIdx(b.shop));
+  let rank = 0;
+  return `<ol class="shop-rank">${list.slice(0, limit).map((x, i) => {
+    if (i === 0 || x.price < list[i - 1].price) rank = i + 1; // 同じ価格は同じ順位
+    const url = shopUrl(x.shop);
+    const metric = p.retail == null ? "" : useRate()
+      ? `<span class="sr-metric ${sign(x.price - p.retail)}">${pct(x.price / p.retail)}</span>`
+      : `<span class="sr-metric ${sign(x.price - p.retail)}">${signed(x.price - p.retail)}</span>`;
+    const inner = `<span class="sr-pos r${rank}">${rank}位</span><span class="sr-name">${esc(x.shop)}${x.date < p.latest.date ? `<small>${x.date.slice(5).replace("-", "/")}時点</small>` : ""}</span><span class="sr-price">${yen(x.price)}</span>${metric}<span class="sr-go" aria-hidden="true">${url ? "›" : ""}</span>`;
+    return `<li>${url ? `<a class="sr-row ${rank === 1 ? "top" : ""}" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(x.shop)}のサイトを開く（${yen(x.price)}）">${inner}</a>` : `<div class="sr-row ${rank === 1 ? "top" : ""}">${inner}</div>`}</li>`;
+  }).join("")}</ol>`;
+}
+
 // 店舗ごとの価格表（iPhone は色別）
 function shopTable(p) {
   const shops = p.latest.best.slice().sort((a, b) => shopIdx(a) - shopIdx(b)); // 表は最高値（1位）の店舗だけ
@@ -120,16 +169,23 @@ function shopTable(p) {
 
 function detail(p) {
   const h = p.history;
-  const first = h[0], last = h[h.length - 1];
+  const first = h[0], last = h[h.length - 1], prev = h[h.length - 2];
   const hi = h.reduce((a, b) => (b.price > a.price ? b : a));
-  const lo = h.reduce((a, b) => (b.price < a.price ? b : a));
+  const wed = currentCat === "iPhone"; // iPhone は水曜に上がりやすい傾向があるので、水曜の記録に印を付ける
   return `<div class="detail-wrap">
+    ${verdict(p)}
+    <div class="shop-compare">
+      <h4>店舗別ランキング（高い順・押すとその店のサイトへ）</h4>
+      ${shopRanking(p, 5)}
+    </div>
+    ${shopTable(p)}
     <div class="chart-head">
       <div>
         <h3>${disp(p.name)} の買取価格推移</h3>
         <div class="legend">
           <span><i class="key s1"></i>最高値（各店で一番高い買取価格）</span>
           ${p.retail != null ? `<span><i class="key ref-key"></i>定価${p.estimated ? "（推定）" : ""}</span>` : ""}
+          ${wed ? `<span><i class="key wed-key"></i>水曜の記録</span>` : ""}
         </div>
       </div>
       <div class="range" role="group" aria-label="期間">
@@ -137,13 +193,12 @@ function detail(p) {
       </div>
     </div>
     <div class="chart" id="chart"></div>
+    ${wed ? `<p class="chart-note">iPhone の買取価格は水曜に上がりやすい傾向があります。水曜の記録に色を付けているので、曜日ごとの動きを見比べてください。</p>` : ""}
     <div class="detail-stats">
-      <div><span>期間内の最高値</span><b>${yen(hi.price)}</b><small>${hi.date.replaceAll("-", "/")}</small></div>
-      <div><span>期間内の最安値</span><b>${yen(lo.price)}</b><small>${lo.date.replaceAll("-", "/")}</small></div>
-      <div><span>記録開始からの変化</span><b class="${sign(last.price - first.price)}">${signed(last.price - first.price)}</b><small>${first.date.replaceAll("-", "/")} から</small></div>
-      <div><span>${useRate() ? "買取率" : "定価との差"}</span><b class="${p.profit != null ? sign(p.profit) : ""}">${useRate() ? (p.rate != null ? pct(p.rate) : "—") : (p.profit != null ? signed(p.profit) : "—")}</b><small>${p.retail != null ? (useRate() ? `利益 ${signed(p.profit)} ・ ` : "") + "定価 " + yen(p.retail) : "定価未登録"}</small></div>
+      <div><span>前回比</span><b class="${prev ? sign(last.price - prev.price) : "zero"}">${prev ? signed(last.price - prev.price) : "—"}</b><small>${prev ? mdw(prev.date) + " → " + mdw(last.date) : "記録は1日分"}</small></div>
+      <div><span>記録開始からの変化</span><b class="${sign(last.price - first.price)}">${signed(last.price - first.price)}</b><small>${mdw(first.date)} から ${h.length}日分</small></div>
+      <div><span>期間内の最高値</span><b>${yen(hi.price)}</b><small>${mdw(hi.date)}</small></div>
     </div>
-    ${shopTable(p)}
   </div>`;
 }
 
@@ -160,5 +215,6 @@ function drawChart(p) {
     series: [{ name: "最高値", cls: "s1", values: h.map((x) => x.price) }],
     extra: (i) => `<div class="muted">${esc(h[i].best.join("・"))}${p.retail != null ? ` ・ 買取率 ${pct(h[i].price / p.retail)}` : ""}</div>`,
     ref: p.retail != null ? { label: "定価", value: p.retail } : null,
+    markDay: currentCat === "iPhone" ? { day: 3, label: "水曜" } : null, // 水曜の記録に色を付ける
   }, $("tooltip"));
 }

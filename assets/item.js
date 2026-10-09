@@ -10,6 +10,8 @@
     const p = buildProducts(cfg.cat).find((x) => x.name === cfg.name);
     view.innerHTML = p ? detail(p) : '<p class="note">この商品の価格データはまだありません。</p>';
     if (p) drawChart(p);
+    const lead = document.getElementById("item-lead"); // 生成時の固定文（検索エンジン向け）は、同じ内容の結論の箱に置き換える
+    if (lead && p) lead.hidden = true;
   }
 
   view.addEventListener("click", (e) => {

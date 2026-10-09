@@ -3,7 +3,10 @@ const Chart = (() => {
   const NS = "http://www.w3.org/2000/svg";
   const man = (n) => (Math.abs(n) >= 10000 ? +(n / 10000).toFixed(2) + "万" : n.toLocaleString("ja-JP"));
   const yenFull = (n) => "¥" + Math.round(n).toLocaleString("ja-JP");
+  const WDAY = ["日", "月", "火", "水", "木", "金", "土"];
+  const wday = (d) => new Date(d + "T00:00:00").getDay();
   const md = (d) => d.slice(5).replace("-", "/");
+  const mdw = (d) => `${md(d)}(${WDAY[wday(d)]})`;
 
   function niceTicks(min, max, count = 4) {
     const span = max - min || Math.abs(max) || 1;
@@ -30,7 +33,8 @@ const Chart = (() => {
   }
 
   // 詳細用の折れ線グラフ
-  // opts: { dates: [...], series: [{ name, cls, values }], ref: { label, value } }
+  // opts: { dates: [...], series: [{ name, cls, values }], ref: { label, value }, markDay: { day, label } }
+  //   markDay: その曜日（0=日 … 6=土）の記録の背景に色を付ける（例: iPhone は水曜に上がりやすい）
   function line(el, opts, tooltip) {
     const W = Math.max(280, el.clientWidth), H = 240;
     const m = { l: 46, r: W < 500 ? 52 : 88, t: 14, b: 28 };
@@ -47,15 +51,27 @@ const Chart = (() => {
     const Y = (v) => m.t + ih - ((v - y0) / (y1 - y0)) * ih;
 
     let svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="価格推移">`;
+    // 曜日の帯（markDay の曜日に当たる記録の背景）。隣の記録との中間までを帯にする
+    if (opts.markDay) {
+      const edge = (i) => {
+        const half = dates.length > 1 ? Math.min(...dates.slice(1).map((_, k) => X(k + 1) - X(k))) / 2 : 18;
+        return [Math.max(m.l, X(i) - half), Math.min(m.l + iw, X(i) + half)];
+      };
+      dates.forEach((d, i) => {
+        if (wday(d) !== opts.markDay.day) return;
+        const [a, b] = edge(i);
+        svg += `<rect class="mark" x="${a.toFixed(1)}" y="${m.t}" width="${(b - a).toFixed(1)}" height="${ih}"/>`;
+      });
+    }
     // 目盛り
     for (const v of ticks) {
       svg += `<line class="grid" x1="${m.l}" x2="${m.l + iw}" y1="${Y(v)}" y2="${Y(v)}"/>`;
       svg += `<text class="axis" x="${m.l - 8}" y="${Y(v)}" text-anchor="end" dominant-baseline="middle">${man(v)}</text>`;
     }
-    const step = Math.max(1, Math.ceil(dates.length / Math.floor(iw / 56)));
+    const step = Math.max(1, Math.ceil(dates.length / Math.floor(iw / 64)));
     dates.forEach((d, i) => {
       if (i % step === 0 || i === dates.length - 1)
-        svg += `<text class="axis" x="${X(i)}" y="${H - 8}" text-anchor="middle">${md(d)}</text>`;
+        svg += `<text class="axis ${opts.markDay && wday(d) === opts.markDay.day ? "mark-day" : ""}" x="${X(i)}" y="${H - 8}" text-anchor="middle">${mdw(d)}</text>`;
     });
     // 定価の基準線
     if (ref) {
@@ -93,7 +109,7 @@ const Chart = (() => {
       let best = 0;
       dates.forEach((_, i) => { if (Math.abs(X(i) - px) < Math.abs(X(best) - px)) best = i; });
       cross.setAttribute("x1", X(best)); cross.setAttribute("x2", X(best)); cross.setAttribute("visibility", "visible");
-      tooltip.innerHTML = `<b>${dates[best].replaceAll("-", "/")}</b>` +
+      tooltip.innerHTML = `<b>${dates[best].slice(0, 4)}/${mdw(dates[best])}${opts.markDay && wday(dates[best]) === opts.markDay.day ? ` <span class="mark-tag">${opts.markDay.label}</span>` : ""}</b>` +
         series.map((s) => `<div><i class="key ${s.cls}"></i>${s.name}<span>${s.values[best] == null ? "—" : yenFull(s.values[best])}</span></div>`).join("") +
         (ref ? `<div class="muted"><i class="key ref-key"></i>定価<span>${yenFull(ref.value)}</span></div>` : "") +
         (opts.extra ? opts.extra(best) : "");

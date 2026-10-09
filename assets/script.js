@@ -23,23 +23,6 @@ function rateCell(p) {
   return p.roi != null ? `<span class="roi ${sign(p.roi)}">${pct(p.roi)}</span>` : "—";
 }
 
-// 店舗を買取価格の高い順に並べた一覧（1行まるごと店のサイトへのリンク）
-function shopRanking(p, limit = 3) {
-  const list = Object.entries(p.latest.shops)
-    .map(([shop, it]) => ({ shop, price: it.sealed, date: it.date }))
-    .sort((a, b) => b.price - a.price || shopIdx(a.shop) - shopIdx(b.shop));
-  let rank = 0;
-  return `<ol class="shop-rank">${list.slice(0, limit).map((x, i) => {
-    if (i === 0 || x.price < list[i - 1].price) rank = i + 1; // 同じ価格は同じ順位
-    const url = shopUrl(x.shop);
-    const metric = p.retail == null ? "" : useRate()
-      ? `<span class="sr-metric ${sign(x.price - p.retail)}">${pct(x.price / p.retail)}</span>`
-      : `<span class="sr-metric ${sign(x.price - p.retail)}">${signed(x.price - p.retail)}</span>`;
-    const inner = `<span class="sr-pos r${rank}">${rank}位</span><span class="sr-name">${esc(x.shop)}${x.date < p.latest.date ? `<small>${x.date.slice(5).replace("-", "/")}時点</small>` : ""}</span><span class="sr-price">${yen(x.price)}</span>${metric}<span class="sr-go" aria-hidden="true">${url ? "›" : ""}</span>`;
-    return `<li>${url ? `<a class="sr-row ${rank === 1 ? "top" : ""}" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(x.shop)}のサイトを開く（${yen(x.price)}）">${inner}</a>` : `<div class="sr-row ${rank === 1 ? "top" : ""}">${inner}</div>`}</li>`;
-  }).join("")}</ol>`;
-}
-
 // 商品の個別ページへ移動（行・カードを押したとき）。場所は tools/make_pages.js が作る assets/item-pages.js
 function goToItem(name) {
   const url = typeof ITEM_PAGES !== "undefined" && ITEM_PAGES[currentCat] && ITEM_PAGES[currentCat][name];
