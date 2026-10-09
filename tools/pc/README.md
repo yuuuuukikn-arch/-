@@ -6,8 +6,8 @@
 
 ## 1. ファイルを置く
 
-1. `C:\Users\81803` の中に `blog_upload` というフォルダを作る
-2. この `upload.ps1` をそのフォルダに入れる（GitHub のページで `upload.ps1` を開き、右上の「Download raw file」）
+この `upload.ps1` を、テキストを保存しているフォルダ `C:\Users\81803\Downloads\blog_articles` に入れる
+（GitHub のページで `upload.ps1` を開き、右上の「Download raw file」で保存）。別のフォルダは作らなくてよい。
 
 ## 2. GitHub の鍵（トークン）を作る
 
@@ -21,7 +21,7 @@ GitHub に「このパソコンから送っていい」と教えるための文�
    - Repository access：**Only select repositories** → `kaitori-navi` を選ぶ
    - Permissions → Repository permissions → **Contents** を **Read and write**
 4. **Generate token** を押すと `github_pat_...` で始まる文字列が出る。これをコピー
-5. `C:\Users\81803\blog_upload` に `token.txt` というファイルを作り、その文字列だけを貼って保存
+5. 同じフォルダ `C:\Users\81803\Downloads\blog_articles` に `token.txt` というファイルを作り、その文字列だけを貼って保存
 
 この文字列は合鍵と同じなので、人に見せないでください。
 
@@ -30,7 +30,7 @@ GitHub に「このパソコンから送っていい」と教えるための文�
 スタートボタンを右クリック → **ターミナル（管理者）** または **PowerShell（管理者）** を開き、次の 1 行を貼って Enter。
 
 ```
-schtasks /create /sc minute /mo 10 /tn "kaitori-upload" /tr "powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File C:\Users\81803\blog_upload\upload.ps1" /f
+schtasks /create /sc minute /mo 10 /tn "kaitori-upload" /tr "powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File C:\Users\81803\Downloads\blog_articles\upload.ps1" /f
 ```
 
 「成功」と出れば完了です。
@@ -40,12 +40,12 @@ schtasks /create /sc minute /mo 10 /tn "kaitori-upload" /tr "powershell -NoProfi
 同じ画面で次を貼って Enter すると、すぐに 1 回動きます。
 
 ```
-powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\81803\blog_upload\upload.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\81803\Downloads\blog_articles\upload.ps1
 ```
 
 - `送信: ...` と出れば成功。`blog_articles` の中の「取り込み済み」フォルダに移ります
 - 判別できなかったファイルは「要確認」フォルダに移ります（店の見出しや「ホムラプレミアム」の文字がないもの）
-- 記録は `C:\Users\81803\blog_upload\upload_log.txt` に残ります
+- 記録は同じフォルダの `upload_log.txt` に残ります（`token.txt` と `upload_log.txt` は送信の対象外）
 
 数分後に GitHub の「Actions」タブで取り込みが緑のチェックになり、サイトが更新されます。
 
