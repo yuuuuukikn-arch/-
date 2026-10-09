@@ -42,6 +42,13 @@ if [ -n "$APPEND" ]; then
   n=2; while [ -f "${RAW}_p${n}.txt" ]; do n=$((n+1)); done; RAW="${RAW}_p${n}"
 fi
 RAW="${RAW}.txt"
+if [ -n "$DRY" ]; then
+  echo "（--dry-run のため保存も取り込みもしません。読み取り結果の確認だけ行います。保存先の予定: $RAW）"
+  cp assets/history.js "$ROOT/.history.bak"
+  python3 tools/import_kaitori.py "$SRC" --date "$DATE" --shop "$SHOP" --cat "$CAT" $APPEND || { mv "$ROOT/.history.bak" assets/history.js; exit 1; }
+  mv "$ROOT/.history.bak" assets/history.js
+  exit 0
+fi
 if [ "$(cd "$(dirname "$SRC")" && pwd)/$(basename "$SRC")" != "$ROOT/$RAW" ]; then
   if [ -f "$RAW" ] && [ -z "$FORCE" ]; then
     echo "すでに $RAW があります。同じ日・同じ店を取り直すなら --force、2ページ目なら --append を付けてください。" >&2; exit 2
@@ -51,13 +58,6 @@ fi
 echo "元テキスト: $RAW（$(wc -l < "$RAW") 行）"
 
 # 3) 取り込み → 生成 → 書き出し → チェック
-if [ -n "$DRY" ]; then
-  echo "（--dry-run のため取り込みません。読み取り結果の確認だけ行います）"
-  cp assets/history.js "$ROOT/.history.bak"
-  python3 tools/import_kaitori.py "$RAW" --date "$DATE" --shop "$SHOP" --cat "$CAT" $APPEND || { mv "$ROOT/.history.bak" assets/history.js; exit 1; }
-  mv "$ROOT/.history.bak" assets/history.js
-  exit 0
-fi
 python3 tools/import_kaitori.py "$RAW" --date "$DATE" --shop "$SHOP" --cat "$CAT" $APPEND
 node tools/make_pages.js
 node tools/export_wp.js
