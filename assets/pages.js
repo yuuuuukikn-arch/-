@@ -28,18 +28,7 @@ const RELEASES = [
 
 // 記事（価格の比較とグラフは、取り込んだ記録から自動で作る）
 //   chart: { cat, name } … 記録から「最新の価格の表」と「推移のグラフ」を作る商品
-const ARTICLES = [
-  { id: "iphone18-promax-256", kind: "article", status: "published", date: "2026-10-08",
-    title: "iPhone 18 Pro Max 256GB の買取価格｜店舗比較と推移",
-    summary: "定価・各店の買取価格・買取率を、毎日の記録からまとめます。",
-    body: ["このページは、買取店の掲載価格を毎日記録して作っています。価格は日々変わるため、売る前に各店で最新の額を確認してください。"],
-    chart: { cat: "iPhone", name: "iPhone 18 Pro Max 256GB" }, search: "iPhone 18 Pro Max 256GB" },
-  { id: "pokeca-infernox", kind: "article", status: "published", date: "2026-10-08",
-    title: "【MEGA】インフェルノX BOX の買取価格｜店舗比較と推移",
-    summary: "定価と各店の買取価格を、毎日の記録からまとめます。",
-    body: ["このページは、買取店の掲載価格を毎日記録して作っています。シュリンク付きの価格で比べています。売る前に各店で最新の額を確認してください。"],
-    chart: { cat: "ポケカBOX", name: "【MEGA】 インフェルノX BOX" }, search: "インフェルノX BOX" },
-];
+const ARTICLES = []; // 記事は使わない。商品ごとの解説は assets/notes.js に書く
 
 const PAGES = [...ARTICLES,
   // 下書きの例（確認用のひな形。公開されず、リンクも出ない。不要なら削除してOK）

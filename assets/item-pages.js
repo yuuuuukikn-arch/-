@@ -1,14 +1,21 @@
 // 商品ごとの個別ページ（tools/make_pages.js が作る）
 const ITEM_PAGES = {
   "iPhone": {
-    "iPhone 18 Pro 1TB": "p/item-iphone-01.html",
-    "iPhone 18 Pro 256GB": "p/item-iphone-02.html",
-    "iPhone 18 Pro 2TB": "p/item-iphone-03.html",
-    "iPhone 18 Pro 512GB": "p/item-iphone-04.html",
-    "iPhone 18 Pro Max 1TB": "p/item-iphone-05.html",
-    "iPhone 18 Pro Max 256GB": "p/item-iphone-06.html",
-    "iPhone 18 Pro Max 2TB": "p/item-iphone-07.html",
-    "iPhone 18 Pro Max 512GB": "p/item-iphone-08.html"
+    "iPhone 17 Pro 1TB": "p/item-iphone-01.html",
+    "iPhone 17 Pro 256GB": "p/item-iphone-02.html",
+    "iPhone 17 Pro 512GB": "p/item-iphone-03.html",
+    "iPhone 17 Pro Max 1TB": "p/item-iphone-04.html",
+    "iPhone 17 Pro Max 256GB": "p/item-iphone-05.html",
+    "iPhone 17 Pro Max 2TB": "p/item-iphone-06.html",
+    "iPhone 17 Pro Max 512GB": "p/item-iphone-07.html",
+    "iPhone 18 Pro 1TB": "p/item-iphone-08.html",
+    "iPhone 18 Pro 256GB": "p/item-iphone-09.html",
+    "iPhone 18 Pro 2TB": "p/item-iphone-10.html",
+    "iPhone 18 Pro 512GB": "p/item-iphone-11.html",
+    "iPhone 18 Pro Max 1TB": "p/item-iphone-12.html",
+    "iPhone 18 Pro Max 256GB": "p/item-iphone-13.html",
+    "iPhone 18 Pro Max 2TB": "p/item-iphone-14.html",
+    "iPhone 18 Pro Max 512GB": "p/item-iphone-15.html"
   },
   "ポケカBOX": {
     "【MEGA】 30th CELEBRATION BOX": "p/item-pokeca-01.html",
@@ -25,7 +32,6 @@ const ITEM_PAGES = {
     "【S＆V】 ステラミラクル BOX": "p/item-pokeca-12.html",
     "【S＆V】 テラスタルフェスex BOX": "p/item-pokeca-13.html",
     "【S＆V】 ナイトワンダラー BOX": "p/item-pokeca-14.html",
-    "【S＆V】 バトルパートナーズ BOX": "p/item-pokeca-15.html",
-    "【シュリンク無しBOX】 ストームエメラルダ": "p/item-pokeca-16.html"
+    "【S＆V】 バトルパートナーズ BOX": "p/item-pokeca-15.html"
   }
 };

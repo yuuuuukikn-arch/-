@@ -101,25 +101,42 @@ COLORS = {
     "グレイシャー": "グレイシャー",
     "グレイシャ": "グレイシャー",
     "シルバー": "シルバー",
+    # iPhone 17 Pro / Pro Max（店の表記 orange / blue / silver に合わせる）
+    "オレンジ": "オレンジ", "orange": "オレンジ",
+    "ブルー": "ブルー", "blue": "ブルー",
+    "silver": "シルバー",
 }
 IPHONE18_COLORS = ["バーガンディ", "ブラック", "グレイシャー", "シルバー"]
+IPHONE17PRO_COLORS = ["オレンジ", "ブルー", "シルバー"]
+
+
+def series_colors(name):
+    """機種名から色の一覧を返す（色別価格を作る機種だけ）"""
+    if name.startswith("iPhone 18"):
+        return IPHONE18_COLORS
+    if name.startswith("iPhone 17 Pro"):
+        return IPHONE17PRO_COLORS
+    return None
 DASH = "-‐−－–"
 
 
 def color_prices(name, base, note):
     """一丁目の減額メモ（例: 「ブラック,グレイシャー -20000,シルバー -25000」）から色別価格を出す。
     数字の前に並んだ色はその金額を減額、書かれていない色は満額。読み取れなければ None。"""
-    if not name.startswith("iPhone 18") or not note:
+    palette = series_colors(name)
+    if not palette or not note:
         return None
     deduct, pending = {}, []
     note = re.sub(r"(\d),(\d{3})\b", r"\1\2", note)  # 「-13,000」の桁区切りは色の区切りではない
+    note = re.sub(rf"([{DASH}]\d+)\s+(?=\S)", r"\1,", note)  # 「Orange -6000 Blue -2000」の空白区切りも色の区切り
     for tok in re.split(r"[,，、]", note):
         tok = tok.strip()
         m = re.match(rf"^(.*?)\s*[{DASH}]\s*(\d+)$", tok)
         label = (m.group(1) if m else tok).strip()
         if label:
-            if label not in COLORS:
+            if label.lower() not in COLORS and label not in COLORS:
                 return None
+            label = label if label in COLORS else label.lower()
             pending.append(COLORS[label])
         if m:
             for c in pending:
@@ -127,7 +144,7 @@ def color_prices(name, base, note):
             pending = []
     if pending:  # 金額がついていない色が残ったら読み方が不明
         return None
-    return {c: base - deduct.get(c, 0) for c in IPHONE18_COLORS}
+    return {c: base - deduct.get(c, 0) for c in palette}
 
 
 YEN_RE = re.compile(r"^([\d,]+)\s*円$")
@@ -298,7 +315,8 @@ def parse_ichome_boxes(text):
 
 def parse_ichome_unsealed(text):
     """買取一丁目の「【未開封】iPhone 18 Pro Max 256GB burgundy」形式（色ごとの買取金額）"""
-    COLOR_JA = {"burgundy": "バーガンディ", "black": "ブラック", "glacier": "グレイシャー", "silver": "シルバー"}
+    COLOR_JA = {"burgundy": "バーガンディ", "black": "ブラック", "glacier": "グレイシャー", "silver": "シルバー",
+                "orange": "オレンジ", "blue": "ブルー"}
     lines = [l.strip() for l in text.splitlines()]
     items = {}
     for i, line in enumerate(lines):

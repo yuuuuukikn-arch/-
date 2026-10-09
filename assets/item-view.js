@@ -159,7 +159,7 @@ function shopTable(p) {
   const shopHead = shops.map((sh) => `<th class="num">${shopLink(sh, "", p.name)}${p.latest.shops[sh].date < p.latest.date ? `<small class="stale">${p.latest.shops[sh].date.slice(5).replace("-", "/")}時点</small>` : ""}</th>`).join("");
   const hasColors = its.some((it) => it.colors);
   const body = hasColors
-    ? rowsHtml(IPHONE_COLORS, (it, c) => (it.colors ? it.colors[c] ?? null : null))
+    ? rowsHtml(colorsFor(p.name).length ? colorsFor(p.name) : [...new Set(its.flatMap((it) => Object.keys(it.colors || {})))], (it, c) => (it.colors ? it.colors[c] ?? null : null))
     : rowsHtml(["未開封"], (it) => it.sealed);
   const notes = shops.map((sh) => {
     const it = p.latest.shops[sh], info = SHOPS[sh] || {};
@@ -176,18 +176,12 @@ function shopTable(p) {
   </div>`;
 }
 
-function detail(p) {
+// 推移グラフと数字の箱（記録が 3 日分以上あるときだけ使う）
+function chartBlock(p, wed) {
   const h = p.history;
   const first = h[0], last = h[h.length - 1], prev = h[h.length - 2];
   const hi = h.reduce((a, b) => (b.price > a.price ? b : a));
-  const wed = currentCat === "iPhone"; // iPhone は水曜に上がりやすい傾向があるので、水曜の記録に印を付ける
-  return `<div class="detail-wrap">
-    ${verdict(p)}
-    <div class="shop-compare">
-      <h4>店舗別ランキング（高い順・押すとその店のサイトへ）</h4>
-      ${shopRanking(p, 5)}
-    </div>
-    ${shopTable(p)}
+  return `
     <div class="chart-head">
       <div>
         <h3>${disp(p.name)} の買取価格推移</h3>
@@ -208,6 +202,20 @@ function detail(p) {
       <div><span>記録開始からの変化</span><b class="${sign(last.price - first.price)}">${signed(last.price - first.price)}</b><small>${mdw(first.date)} から ${h.length}日分</small></div>
       <div><span>期間内の最高値</span><b>${yen(hi.price)}</b><small>${mdw(hi.date)}</small></div>
     </div>
+`;
+}
+
+function detail(p) {
+  const h = p.history;
+  const wed = currentCat === "iPhone"; // iPhone は水曜に上がりやすい傾向があるので、水曜の記録に印を付ける
+  return `<div class="detail-wrap">
+    ${verdict(p)}
+    <div class="shop-compare">
+      <h4>店舗別ランキング（高い順・押すとその店のサイトへ）</h4>
+      ${shopRanking(p, 5)}
+    </div>
+    ${shopTable(p)}
+    ${h.length >= 3 ? chartBlock(p, wed) : `<p class="chart-note">記録 ${h.length} 日目です。価格の推移グラフは、記録が 3 日分たまると表示します。</p>`}
   </div>`;
 }
 

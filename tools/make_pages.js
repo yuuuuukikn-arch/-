@@ -21,6 +21,9 @@ for (const f of ["assets/data.js", "assets/history.js"]) {
   vm.runInContext(fs.readFileSync(path.join(ROOT, f), "utf8").replace(/^const /gm, "var "), dctx);
 }
 const DATA = { SNAPSHOTS: dctx.SNAPSHOTS, CATALOG: dctx.CATALOG, SHOW_ONLY: dctx.SHOW_ONLY };
+const SITE_URL = "https://yuuuuukikn-arch.github.io/kaitori-navi/";
+// 商品ごとの解説（assets/notes.js の NOTES。商品名 → 文章。配列なら段落ごと）
+const NOTES = (() => { const c = {}; vm.createContext(c); const f = path.join(ROOT, "assets/notes.js"); if (!fs.existsSync(f)) return {}; vm.runInContext(fs.readFileSync(f, "utf8").replace(/^const /gm, "var "), c); return c.NOTES || {}; })();
 const ARTICLE_EXCLUDE = ["買取商店"]; // 公開しない店（規約で転載を禁止している）
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -55,12 +58,23 @@ const GA_TAG = `<!-- Google tag (gtag.js) -->
     gtag("config", "G-B6RYE9VRH1");
   </script>
   `;
-function head(title, desc, { noindex = false, depth = 1 } = {}) {
+function head(title, desc, { noindex = false, depth = 1, path: pagePath = "" } = {}) {
   const up = "../".repeat(depth);
+  const url = pagePath ? SITE_URL + pagePath : "";
+  // canonical（正式な URL）と OGP（X などで共有したときの題名・説明・画像）
+  const share = url ? `<link rel="canonical" href="${esc(url)}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="買取相場ナビ">
+  <meta property="og:title" content="${esc(title)}">
+  <meta property="og:description" content="${esc(desc)}">
+  <meta property="og:url" content="${esc(url)}">
+  <meta property="og:image" content="${esc(SITE_URL + "assets/icon-512.png")}">
+  <meta name="twitter:card" content="summary">` : "";
   return `${GA_TAG}<meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(desc)}">
+  ${share}
   ${noindex ? '<meta name="robots" content="noindex">' : ""}
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>¥</text></svg>">
   <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
@@ -72,7 +86,7 @@ function header(depth = 1) {
   const up = "../".repeat(depth);
   return `<header class="site-header"><div class="container nav">
       <a href="${up}index.html" class="logo"><span class="logo-mark">¥</span><span class="logo-text">買取相場ナビ</span></a>
-      <a href="${up}yoyaku.html" class="back-link">予約・抽選</a>
+      <a href="${up}index.html" class="back-link">‹ ランキングへ</a>
       <button class="theme-toggle" aria-label="ライト／ダーク切り替え"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg></button>
     </div></header>`;
 }
@@ -136,7 +150,7 @@ function privacyPage() {
   return `<!doctype html>
 <html lang="ja" data-theme="dark">
 <head>
-  ${head("プライバシーポリシー｜買取相場ナビ", "買取相場ナビのプライバシーポリシー（個人情報の扱い、広告・アフィリエイト、お問い合わせ先）。", { depth: 0 })}
+  ${head("プライバシーポリシー｜買取相場ナビ", "買取相場ナビのプライバシーポリシー（個人情報の扱い、広告・アフィリエイト、お問い合わせ先）。", { path: "privacy.html", depth: 0 })}
 </head>
 <body>
   ${header(0)}
@@ -181,7 +195,7 @@ function aboutPage() {
   return `<!doctype html>
 <html lang="ja" data-theme="dark">
 <head>
-  ${head("運営者情報｜買取相場ナビ", "買取相場ナビの目的、掲載の方針、運営者の連絡先。", { depth: 0 })}
+  ${head("運営者情報｜買取相場ナビ", "買取相場ナビの目的、掲載の方針、運営者の連絡先。", { path: "about.html", depth: 0 })}
 </head>
 <body>
   ${header(0)}
@@ -215,7 +229,7 @@ function calendarPage() {
   return `<!doctype html>
 <html lang="ja" data-theme="dark">
 <head>
-  ${head("発売カレンダー｜買取相場ナビ", "予約開始日と発売日をまとめた発売カレンダー。スマホのカレンダーに追加できます。", { depth: 0 })}
+  ${head("発売カレンダー｜買取相場ナビ", "予約開始日と発売日をまとめた発売カレンダー。スマホのカレンダーに追加できます。", { path: "calendar.html", depth: 0 })}
   <script src="assets/releases-public.js" defer></script>
   <script src="assets/calendar.js" defer></script>
 </head>
@@ -241,7 +255,7 @@ function calendarPage() {
 function footer(depth = 1) {
   const up = "../".repeat(depth);
   return `<footer class="site-footer"><div class="container">
-      <p>&copy; ${new Date().getFullYear()} 買取相場ナビ ・ <a href="${up}index.html">ランキングへ</a> ・ <a href="${up}yoyaku.html">予約・抽選・新発売</a> ・ <a href="${up}calendar.html">発売カレンダー</a> ・ <a href="${up}about.html">運営者情報</a> ・ <a href="${up}privacy.html">プライバシーポリシー</a></p>
+      <p>&copy; ${new Date().getFullYear()} 買取相場ナビ ・ <a href="${up}index.html">ランキングへ</a> ・ <a href="${up}calendar.html">発売カレンダー</a> ・ <a href="${up}about.html">運営者情報</a> ・ <a href="${up}privacy.html">プライバシーポリシー</a></p>
       <p class="muted">掲載の情報は確認時点のものです。申し込みや購入は、各公式ページ・販売店で行ってください。</p>
       ${PAGE_CONFIG.xUrl ? `<p><a href="${esc(PAGE_CONFIG.xUrl)}" target="_blank" rel="noopener">X（旧Twitter）で更新情報</a></p>` : ""}
     </div></footer>`;
@@ -311,11 +325,16 @@ const itemScripts = (cat, name) => `<script>window.ITEM_PAGE = ${JSON.stringify(
   <script src="../assets/chart.js"></script>
   <script src="../assets/item-view.js"></script>
   <script src="../assets/item.js"></script>`;
-function itemPage(cat, name) {
+function itemPage(cat, name, file) {
+  const noteSrc = NOTES[name];
+  const paras = noteSrc ? (Array.isArray(noteSrc) ? noteSrc : [noteSrc]) : [];
+  const note = paras.length
+    ? `<section class="item-note"><h2>解説</h2>${paras.map((t) => `<p>${esc(t)}</p>`).join("")}</section>`
+    : "";
   return `<!doctype html>
 <html lang="ja" data-theme="dark">
 <head>
-  ${head(`${name} の買取価格｜買取相場ナビ`, `${name}の買取価格を店舗別に比べます。価格の推移（7日・30日・全期間）と、定価との比較。`)}
+  ${head(`${name} の買取価格｜買取相場ナビ`, `${name}の買取価格を店舗別に比べます。価格の推移（7日・30日・全期間）と、定価との比較。`, { path: file })}
 </head>
 <body>
   ${header(1)}
@@ -324,13 +343,10 @@ function itemPage(cat, name) {
     <h1>${esc(name)}</h1>
     <div id="item-view"><p class="note">読み込み中…</p></div>
     <div class="tooltip" id="tooltip" hidden></div>
-    <section class="cal-grid-wrap"><h2>発売・予約カレンダー</h2><div data-cal-grid></div>
-      <p class="note"><a href="../calendar.html">発売カレンダーの一覧を見る ›</a></p></section>
+    ${note}
   </main>
   ${footer(1)}
   ${itemScripts(cat, name)}
-  <script src="../assets/releases-public.js"></script>
-  <script src="../assets/calendar-grid.js"></script>
 </body>
 </html>
 `;
@@ -351,7 +367,7 @@ function productPage(p) {
   return `<!doctype html>
 <html lang="ja" data-theme="dark">
 <head>
-  ${head(`${p.title}｜買取相場ナビ`, p.summary || p.title, { noindex: draft })}
+  ${head(`${p.title}｜買取相場ナビ`, p.summary || p.title, { noindex: draft, path: `p/${p.id}.html` })}
 </head>
 <body>
   ${header()}
@@ -364,13 +380,9 @@ function productPage(p) {
     ${facts}
     ${official ? `<div class="btn-row">${official}</div>` : ""}
     ${aff}
-    <section class="cal-grid-wrap"><h2>発売・予約カレンダー</h2><div data-cal-grid></div>
-      <p class="note"><a href="../calendar.html">発売カレンダーの一覧を見る ›</a></p></section>
   </main>
   ${footer()}
   ${p.chart ? itemScripts(p.chart.cat, p.chart.name) : ""}
-  <script src="../assets/releases-public.js"></script>
-  <script src="../assets/calendar-grid.js"></script>
 </body>
 </html>
 `;
@@ -388,7 +400,7 @@ function yoyakuPage(items) {
   return `<!doctype html>
 <html lang="ja" data-theme="dark">
 <head>
-  ${head("予約・抽選・新発売｜買取相場ナビ", "ポケモンカードなどの予約・抽選・新発売の情報を、確認できたものから一覧にします。", { depth: 0 })}
+  ${head("予約・抽選・新発売｜買取相場ナビ", "ポケモンカードなどの予約・抽選・新発売の情報を、確認できたものから一覧にします。", { path: "yoyaku.html", depth: 0 })}
 </head>
 <body>
   ${header(0)}
@@ -416,14 +428,13 @@ const listed = PAGES.filter((p) => published(p) && (p.kind === "yoyaku" || p.kin
 fs.writeFileSync(path.join(ROOT, "yoyaku.html"), yoyakuPage(listed));
 fs.writeFileSync(path.join(ROOT, "calendar.html"), calendarPage());
 fs.writeFileSync(path.join(ROOT, "privacy.html"), privacyPage());
-for (const it of ITEMS) fs.writeFileSync(path.join(ROOT, it.file), itemPage(it.cat, it.name));
+for (const it of ITEMS) fs.writeFileSync(path.join(ROOT, it.file), itemPage(it.cat, it.name, it.file));
 const itemMap = {};
 for (const it of ITEMS) (itemMap[it.cat] ||= {})[it.name] = it.file;
 fs.writeFileSync(path.join(ROOT, "assets/item-pages.js"), "// 商品ごとの個別ページ（tools/make_pages.js が作る）\nconst ITEM_PAGES = " + JSON.stringify(itemMap, null, 2) + ";\n");
 fs.writeFileSync(path.join(ROOT, "about.html"), aboutPage());
 
 // 検索エンジン用：sitemap.xml と robots.txt（公開中のページだけ）
-const SITE_URL = "https://yuuuuukikn-arch.github.io/kaitori-navi/";
 
 // ランキングページ（index.html）に、検索エンジン向けの文字と構造化データを書き込む。
 // 順位・価格は JavaScript で描いているので、HTML だけ読む検索エンジンには中身が見えない。
