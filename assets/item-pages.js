@@ -11,12 +11,21 @@ const ITEM_PAGES = {
     "iPhone 18 Pro Max 512GB": "p/item-iphone-08.html"
   },
   "ポケカBOX": {
-    "【MEGA】 MEGAドリームex BOX": "p/item-pokeca-01.html",
-    "【MEGA】 アビスアイ BOX": "p/item-pokeca-02.html",
-    "【MEGA】 インフェルノX BOX": "p/item-pokeca-03.html",
-    "【MEGA】 ニンジャスピナー BOX": "p/item-pokeca-04.html",
-    "【MEGA】 ムニキスゼロ BOX": "p/item-pokeca-05.html",
-    "【MEGA】 メガシンフォニア BOX": "p/item-pokeca-06.html",
-    "【MEGA】 メガブレイブ BOX": "p/item-pokeca-07.html"
+    "【MEGA】 30th CELEBRATION BOX": "p/item-pokeca-01.html",
+    "【MEGA】 30th CELEBRATION FUTURISTIC BOX": "p/item-pokeca-02.html",
+    "【MEGA】 30th CELEBRATION プレミアムデッキセット エーフィ・ブラッキー": "p/item-pokeca-03.html",
+    "【MEGA】 MEGAドリームex BOX": "p/item-pokeca-04.html",
+    "【MEGA】 アビスアイ BOX": "p/item-pokeca-05.html",
+    "【MEGA】 インフェルノX BOX": "p/item-pokeca-06.html",
+    "【MEGA】 ストームエメラルダ BOX": "p/item-pokeca-07.html",
+    "【MEGA】 ニンジャスピナー BOX": "p/item-pokeca-08.html",
+    "【MEGA】 ムニキスゼロ BOX": "p/item-pokeca-09.html",
+    "【MEGA】 メガシンフォニア BOX": "p/item-pokeca-10.html",
+    "【MEGA】 メガブレイブ BOX": "p/item-pokeca-11.html",
+    "【S＆V】 ステラミラクル BOX": "p/item-pokeca-12.html",
+    "【S＆V】 テラスタルフェスex BOX": "p/item-pokeca-13.html",
+    "【S＆V】 ナイトワンダラー BOX": "p/item-pokeca-14.html",
+    "【S＆V】 バトルパートナーズ BOX": "p/item-pokeca-15.html",
+    "【シュリンク無しBOX】 ストームエメラルダ": "p/item-pokeca-16.html"
   }
 };
