@@ -34,6 +34,8 @@ function sedori_admin_save() {
         $old = get_option('sedori_options', array());
         $opts['ad_html'] = current_user_can('unfiltered_html') ? trim($in['ad_html'] ?? '') : ($old['ad_html'] ?? '');
         update_option('sedori_options', $opts);
+        // 商品ごとの解説（1 行ごとに「商品名｜文章」）。タグは使わない
+        update_option('sedori_notes', wp_kses($in['sedori_notes'] ?? '', array()), false);
         delete_transient('sedori_remote_data');
         add_settings_error('sedori', 'saved', '設定を保存しました。', 'updated');
     }
@@ -129,6 +131,25 @@ function sedori_admin_page() {
                 <tr><th scope="row"><label for="news_days">表示期間</label></th>
                     <td><input type="number" id="news_days" name="news_days" min="1" value="<?php echo esc_attr($v('news_days', 7)); ?>"> 日
                         <p class="description">投稿ごとに期限を決めたいときは、カスタムフィールド <code>sokuho_until</code> に日付（例 2026-10-15）を入れます。</p></td></tr>
+
+                <tr><th colspan="2"><h2 style="margin:0">商品ごとの解説</h2></th></tr>
+                <tr><th scope="row"><label for="sedori_notes">解説の文章</label></th>
+                    <td><textarea id="sedori_notes" name="sedori_notes" rows="10" class="large-text" placeholder="iPhone 18 Pro Max 256GB｜バーガンディだけ満額。他の色は 1.5〜2 万円引かれるので、色で店を選ぶと差が出る。&#10;iPhone 18 Pro Max 256GB｜2 段落目はもう 1 行、同じ商品名で書く。"><?php echo esc_textarea(get_option('sedori_notes', '')); ?></textarea>
+                        <p class="description">1 行に 1 段落。「商品名｜文章」の形で書きます（区切りは全角の「｜」か半角の「|」）。商品名は下の一覧と同じ字にしてください。同じ商品名の行が複数あれば段落になります。書いた商品の個別ページに「解説」として出ます。</p>
+                        <?php if ($data) : ?>
+                        <details style="margin-top:6px"><summary>商品名の一覧（コピー用）</summary>
+                            <?php foreach ($data['categories'] as $name => $c) : ?>
+                                <p style="margin:6px 0 2px"><b><?php echo esc_html($name); ?></b></p>
+                                <ul style="margin:0 0 8px;padding-left:18px;list-style:disc">
+                                <?php foreach ($c['products'] as $pr) : ?>
+                                    <li><code><?php echo esc_html($pr['display']); ?></code>
+                                        <?php if (!empty($pr['slug'])) : ?> <a href="<?php echo esc_url(sedori_item_url($pr)); ?>" target="_blank">ページ</a><?php endif; ?></li>
+                                <?php endforeach; ?>
+                                </ul>
+                            <?php endforeach; ?>
+                        </details>
+                        <?php endif; ?>
+                    </td></tr>
             </table>
             <?php submit_button('設定を保存'); ?>
         </form>
