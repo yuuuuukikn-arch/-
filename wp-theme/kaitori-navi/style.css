@@ -1,0 +1,50 @@
+/*
+Theme Name: 買取相場ナビ
+Theme URI: https://github.com/yuuuuukikn-arch/kaitori-navi
+Description: 買取相場ナビ専用のテーマ。静的サイト（GitHub Pages 版）と同じ見た目（ヘッダー・フッター・配色・ダーク／ライト切り替え）を WordPress で再現する。ランキングの中身は「買取相場ナビ」プラグインが出す。
+Author: 買取相場ナビ
+Version: 0.1.0
+Requires PHP: 7.4
+License: GPL-2.0-or-later
+Text Domain: kaitori-navi
+*/
+
+/* 土台の見た目は assets/style.css（静的サイトと同じファイル）。ここはテーマ固有の上書きだけ */
+
+/* ヘッダーのタブはリンク（静的サイトではボタン） */
+.seg a {
+  font: inherit; font-size: .9rem; font-weight: 700; color: var(--muted); text-decoration: none;
+  padding: 6px 18px; border-radius: 999px; white-space: nowrap; min-height: 34px; display: inline-grid; place-items: center;
+}
+.seg a.active { background: var(--accent); color: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / .15); }
+
+/* プラグインのランキングを、テーマの配色（ライト／ダーク）に合わせる */
+.sdr {
+  --sdr-bg: var(--bg); --sdr-surface: var(--surface); --sdr-text: var(--text); --sdr-muted: var(--muted);
+  --sdr-border: var(--border); --sdr-accent: var(--accent); --sdr-plus: var(--plus); --sdr-plus-bg: var(--plus-bg);
+  --sdr-minus: var(--minus); --sdr-minus-bg: var(--minus-bg); --sdr-series-1: var(--series-1);
+  font-family: var(--font);
+}
+/* 表彰台：幅に応じて折り返す（3 枚目が切れない）。スマホ幅だけ横スワイプ */
+.sdr-podium { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+@media (max-width: 600px) {
+  .sdr-podium { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .sdr-podium::-webkit-scrollbar { display: none; }
+}
+
+/* WordPress の管理バーが出ているときは、固定ヘッダーをその下に */
+.admin-bar .site-header { top: 32px; }
+@media (max-width: 782px) { .admin-bar .site-header { top: 46px; } }
+
+/* 固定ページ・投稿の本文 */
+.page-article .entry-content img { max-width: 100%; height: auto; }
+.post-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.post-list li { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; }
+.post-list a { color: var(--text); text-decoration: none; font-weight: 700; }
+.post-list time { display: block; font-size: .8rem; color: var(--muted); }
+
+/* プラグインが固定色で塗っている箇所を、テーマの配色に合わせる（ダークでも読める） */
+.sdr .sdr-pod1 { background: color-mix(in srgb, #e7b416 10%, var(--surface)) !important; color: var(--text); }
+.sdr .sdr-sr-row.top { border-color: color-mix(in srgb, var(--plus) 45%, var(--border)); background: color-mix(in srgb, var(--plus) 8%, var(--surface)); }
+.sdr-tooltip { background: var(--surface); color: var(--text); border-color: var(--border); }
+.sdr-chart .dot { stroke: var(--surface); }

@@ -105,6 +105,11 @@ if (require.main === module) {
     "// assets/chart.js から自動コピー（tools/export_wp.js）。直接編集しないでください。\n" +
       fs.readFileSync(path.join(ROOT, "assets/chart.js"), "utf8").replace(/^const Chart = /m, "const SedoriChart = ")
   );
+  // テーマ（wp-theme/kaitori-navi）の土台 CSS は静的サイトと同じファイル。ここでコピーして同期する
+  const themeCss = path.join(ROOT, "wp-theme/kaitori-navi/assets/style.css");
+  if (fs.existsSync(path.dirname(themeCss))) {
+    fs.writeFileSync(themeCss, "/* assets/style.css から自動コピー（tools/export_wp.js）。直接編集しないでください。 */\n" + fs.readFileSync(path.join(ROOT, "assets/style.css"), "utf8"));
+  }
   fs.writeFileSync(OUT, JSON.stringify(out));
   for (const [c, v] of Object.entries(out.categories)) console.log(`${c}: ${v.products.length}件（掲載店: ${v.shops.join("・")}、更新 ${v.updated}）`);
   console.log(`書き出し: ${path.relative(ROOT, OUT)}（${fs.statSync(OUT).size.toLocaleString()} bytes）`);
