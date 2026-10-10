@@ -208,7 +208,7 @@ function sedori_render_item($p, $i, $data, $metric) {
         . " data-history='" . esc_attr(wp_json_encode($history)) . "'>";
 
     $html .= '<div class="sdr-head"><span class="sdr-rank r' . ($i + 1) . '">' . ($i + 1) . '</span><div class="sdr-title">'
-        . '<h3>' . esc_html($p['display']) . ($p['boost'] ? ' <span class="sdr-boost">強化</span>' : '') . '</h3>'
+        . '<h3>' . (isset($p['slug']) ? '<a class="sdr-item-link" href="' . esc_url(sedori_item_url($p)) . '">' . esc_html($p['display']) . '</a>' : esc_html($p['display'])) . ($p['boost'] ? ' <span class="sdr-boost">強化</span>' : '') . '</h3>'
         . ($p['bestColors'] ? '<small>最高値の色：' . esc_html(implode('・', $p['bestColors'])) . '</small>' : '')
         . '</div></div>';
 
@@ -249,7 +249,7 @@ function sedori_render_podium($products, $metric) {
                 $best[] = $s['shop'];
             }
         }
-        $html .= '<a class="sdr-pod sdr-pod' . ($i + 1) . '" href="#sdr-' . esc_attr(md5($p['name'])) . '">'
+        $html .= '<a class="sdr-pod sdr-pod' . ($i + 1) . '" href="' . esc_url(isset($p['slug']) ? sedori_item_url($p) : '#sdr-' . md5($p['name'])) . '">'
             . '<span class="sdr-pod-rank">' . $medals[$i] . ' ' . ($i + 1) . '位</span>'
             . '<b class="sdr-pod-name">' . esc_html($p['display']) . '</b>'
             . ($m ? '<span class="sdr-pod-metric ' . $m['sign'] . '"><small>' . esc_html($m['label']) . '</small>' . esc_html($m['text']) . '</span>' : '')

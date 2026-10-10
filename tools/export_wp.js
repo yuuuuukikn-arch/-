@@ -81,6 +81,15 @@ function buildCategory(cat) {
   });
   const metric = cat === "iPhone" ? "rate" : "profit";
   products.sort((a, b) => (a[metric] == null) - (b[metric] == null) || b[metric] - a[metric]);
+  // 個別ページの URL 用の slug（例: iphone-18-pro-max-256gb）。同じ名前が出たら -2, -3 を付ける
+  const used = buildCategory.used || (buildCategory.used = new Set());
+  for (const p of products) {
+    let base = p.name.replace(/[【】]/g, " ").trim().toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "") || "item";
+    let slug = base, n = 2;
+    while (used.has(slug)) slug = `${base}-${n++}`;
+    used.add(slug);
+    p.slug = slug;
+  }
   const dates = snaps.map((s) => s.date).sort();
   const updated = dates[dates.length - 1] || null;
   return {

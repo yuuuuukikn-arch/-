@@ -14,7 +14,9 @@ function wp_upload_dir() { return array('basedir' => '/nonexistent'); }
 function trailingslashit($s) { return rtrim($s, '/') . '/'; }
 function add_shortcode($t, $f) { $GLOBALS['sdr_sc'][$t] = $f; }
 function shortcode_atts($d, $a) { return array_merge($d, (array) $a); }
-function add_action() {} function add_options_page() {}
+function add_action() {} function add_filter() {} function add_options_page() {} function delete_option() {}
+function register_activation_hook() {} function register_deactivation_hook() {}
+function home_url($p = '') { return 'https://example.test' . $p; }
 function current_user_can() { return true; }
 function wp_enqueue_style($h, $u) { $GLOBALS['sdr_assets']['css'][$h] = $u; }
 function wp_enqueue_script($h, $u) { $GLOBALS['sdr_assets']['js'][$h] = $u; }

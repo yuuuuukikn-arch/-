@@ -80,6 +80,29 @@
     });
   });
 
+  // 商品の個別ページ：色のタブで、金額・カード・表の強調行を切り替える。推移グラフがあれば描く
+  document.querySelectorAll(".sdi").forEach(function (root) {
+    var tabs = root.querySelectorAll(".sdi-tabs button");
+    tabs.forEach(function (b) {
+      b.addEventListener("click", function () {
+        var c = b.getAttribute("data-color");
+        tabs.forEach(function (x) { x.classList.toggle("active", x === b); x.setAttribute("aria-selected", x === b ? "true" : "false"); });
+        root.querySelectorAll(".sdi-panel").forEach(function (p) { p.hidden = p.getAttribute("data-color") !== c; });
+        root.querySelectorAll(".sdi-table tbody tr").forEach(function (tr) { tr.classList.toggle("active", tr.getAttribute("data-color") === c); });
+      });
+    });
+    var wrap = root.querySelector(".sdi-chart-wrap");
+    if (wrap) {
+      drawChart(wrap, 30);
+      wrap.addEventListener("click", function (e) {
+        var b = e.target.closest("[data-range]");
+        if (!b) return;
+        wrap.querySelectorAll("[data-range]").forEach(function (x) { x.classList.toggle("active", x === b); });
+        drawChart(wrap, parseInt(b.getAttribute("data-range"), 10));
+      });
+    }
+  });
+
   var timer;
   window.addEventListener("resize", function () {
     clearTimeout(timer);
@@ -87,6 +110,10 @@
       document.querySelectorAll(".sdr-detail[open]").forEach(function (d) {
         var b = d.querySelector("[data-range].active");
         drawChart(d.closest(".sdr-item"), b ? parseInt(b.getAttribute("data-range"), 10) : 30);
+      });
+      document.querySelectorAll(".sdi-chart-wrap").forEach(function (w) {
+        var b = w.querySelector("[data-range].active");
+        drawChart(w, b ? parseInt(b.getAttribute("data-range"), 10) : 30);
       });
     }, 150);
   });

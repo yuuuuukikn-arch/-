@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 買取相場ナビ
  * Description: iPhone・ポケカBOXの買取価格ランキング（店舗比較・価格推移グラフ・速報バナー）をショートコード [sedori] で表示します。
- * Version: 1.0.0
+ * Version: 1.1.0
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Text Domain: sedori-hikaku
@@ -12,13 +12,14 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('SEDORI_VERSION', '1.0.0');
+define('SEDORI_VERSION', '1.1.0');
 define('SEDORI_DIR', plugin_dir_path(__FILE__));
 define('SEDORI_URL', plugin_dir_url(__FILE__));
 
 require_once SEDORI_DIR . 'includes/data.php';
 require_once SEDORI_DIR . 'includes/render.php';
 require_once SEDORI_DIR . 'includes/admin.php';
+require_once SEDORI_DIR . 'includes/item.php';
 
 /** 設定値（管理画面「設定 → 買取相場ナビ」） */
 function sedori_opt($key, $default = '') {
@@ -66,3 +67,7 @@ function sedori_news_shortcode() {
     return $html;
 }
 add_shortcode('sedori_news', 'sedori_news_shortcode');
+
+// 有効化・無効化のときに URL の決まり（/kaitori/<slug>/）を作り直す
+register_activation_hook(__FILE__, function () { delete_option('sedori_rewrite_v'); });
+register_deactivation_hook(__FILE__, function () { flush_rewrite_rules(false); });
