@@ -869,5 +869,112 @@ const SNAPSHOTS = [
     "boost": false
    }
   }
+ },
+ {
+  "date": "2026-10-10",
+  "shop": "買取ホムラ",
+  "cat": "ポケカBOX",
+  "items": {
+   "【MEGA】 30th CELEBRATION BOX": {
+    "sealed": 24800,
+    "jan": "114521329462424",
+    "boost": true
+   },
+   "【シュリンク無しBOX】 ストームエメラルダ": {
+    "sealed": 10000,
+    "jan": "114521329462233",
+    "boost": true
+   },
+   "【MEGA】 アビスアイ BOX": {
+    "sealed": 8800,
+    "jan": "114521329462127",
+    "boost": true
+   },
+   "【MEGA】 ニンジャスピナー BOX": {
+    "sealed": 8600,
+    "jan": "114521329432786",
+    "boost": true
+   },
+   "【MEGA】 ムニキスゼロ BOX": {
+    "sealed": 8500,
+    "jan": "114521329432274",
+    "boost": true
+   },
+   "【MEGA】 MEGAドリームex BOX": {
+    "sealed": 12100,
+    "jan": "114521329431932",
+    "boost": false
+   },
+   "【MEGA】 インフェルノX BOX": {
+    "sealed": 15000,
+    "jan": "114521329431529",
+    "boost": false
+   },
+   "【MEGA】 メガブレイブ BOX": {
+    "sealed": 7800,
+    "jan": "114521329431161",
+    "boost": false
+   },
+   "【MEGA】 メガシンフォニア BOX": {
+    "sealed": 7200,
+    "jan": "114521329431185",
+    "boost": false
+   },
+   "【S＆V】 ブラックボルト BOX": {
+    "sealed": 20000,
+    "jan": "114521329427768",
+    "boost": false
+   },
+   "【S＆V】 ホワイトフレア BOX": {
+    "sealed": 18000,
+    "jan": "114521329427782",
+    "boost": false
+   },
+   "【S＆V】 ブラックボルト デラックス BOX": {
+    "sealed": 24000,
+    "jan": "114521329427300",
+    "boost": false
+   },
+   "【S＆V】 ホワイトフレア デラックス BOX": {
+    "sealed": 22000,
+    "jan": "114521329427324",
+    "boost": false
+   },
+   "【S＆V】 ロケット団の栄光 BOX": {
+    "sealed": 21200,
+    "jan": "114521329374659",
+    "boost": false
+   },
+   "【S＆V】 熱風のアリーナ BOX": {
+    "sealed": 15000,
+    "jan": "114521329374758",
+    "boost": true
+   },
+   "【S＆V】 バトルパートナーズ BOX": {
+    "sealed": 10800,
+    "jan": "114521329362649",
+    "boost": true
+   },
+   "【S＆V】 テラスタルフェスex BOX": {
+    "sealed": 18000,
+    "jan": "114521329362342",
+    "boost": false
+   },
+   "【S＆V】 超電ブレイカー BOX": {
+    "sealed": 23500,
+    "jan": "114521329361505",
+    "boost": false
+   },
+   "【S＆V】 楽園ドラゴーナ BOX": {
+    "sealed": 14000,
+    "jan": "114521329361352",
+    "boost": true
+   },
+   "【S＆V】 ステラミラクル BOX": {
+    "sealed": 11000,
+    "jan": "114521329361000",
+    "boost": false
+   }
+  }
  }
 ];

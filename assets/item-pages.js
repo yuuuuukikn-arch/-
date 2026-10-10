@@ -32,6 +32,14 @@ const ITEM_PAGES = {
     "【S＆V】 ステラミラクル BOX": "p/item-pokeca-12.html",
     "【S＆V】 テラスタルフェスex BOX": "p/item-pokeca-13.html",
     "【S＆V】 ナイトワンダラー BOX": "p/item-pokeca-14.html",
-    "【S＆V】 バトルパートナーズ BOX": "p/item-pokeca-15.html"
+    "【S＆V】 バトルパートナーズ BOX": "p/item-pokeca-15.html",
+    "【S＆V】 ブラックボルト BOX": "p/item-pokeca-16.html",
+    "【S＆V】 ブラックボルト デラックス BOX": "p/item-pokeca-17.html",
+    "【S＆V】 ホワイトフレア BOX": "p/item-pokeca-18.html",
+    "【S＆V】 ホワイトフレア デラックス BOX": "p/item-pokeca-19.html",
+    "【S＆V】 ロケット団の栄光 BOX": "p/item-pokeca-20.html",
+    "【S＆V】 楽園ドラゴーナ BOX": "p/item-pokeca-21.html",
+    "【S＆V】 超電ブレイカー BOX": "p/item-pokeca-22.html",
+    "【S＆V】 熱風のアリーナ BOX": "p/item-pokeca-23.html"
   }
 };
